@@ -60,7 +60,7 @@ async function fetchEvent(id: string): Promise<Event | null> {
       date: raw.date as string,
       city: raw.city as string,
       venue: raw.venue as string,
-      price: raw.price,
+      price: raw.price as string | number | undefined,
       flyerUrl: raw.flyerUrl as string,
       videoUrl: raw.videoUrl as string,
       mediaStack: Array.isArray(raw.mediaStack) ? raw.mediaStack as Event["mediaStack"] : [],
@@ -72,7 +72,6 @@ async function fetchEvent(id: string): Promise<Event | null> {
       isRecurring: !!raw.isRecurring,
       recurringLabel: raw.recurringLabel as string,
       viralScore: typeof raw.viralScore === "number" ? raw.viralScore : 0,
-      status: raw.status as string,
     };
   } catch {
     return null;
