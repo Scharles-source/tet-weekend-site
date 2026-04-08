@@ -2,9 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { doc, getDoc } from "firebase/firestore";
 import { CalendarDays, MapPin, Building2, Users, Flame, Music } from "lucide-react";
-import { db } from "@/lib/firebase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Event } from "@/lib/types";
@@ -15,6 +13,72 @@ import {
   sanitizeFirestoreVideoUrl,
 } from "@/lib/utils";
 
+const PROJECT_ID = "tetweekend-b7f17";
+
+interface FirestoreValue {
+  stringValue?: string;
+  integerValue?: string;
+  doubleValue?: number;
+  booleanValue?: boolean;
+  timestampValue?: string;
+  arrayValue?: { values?: FirestoreValue[] };
+  mapValue?: { fields?: Record<string, FirestoreValue> };
+  nullValue?: null;
+}
+
+function fromFirestore(value: FirestoreValue): unknown {
+  if (value.stringValue !== undefined) return value.stringValue;
+  if (value.integerValue !== undefined) return Number(value.integerValue);
+  if (value.doubleValue !== undefined) return value.doubleValue;
+  if (value.booleanValue !== undefined) return value.booleanValue;
+  if (value.timestampValue !== undefined) return value.timestampValue;
+  if (value.nullValue !== undefined) return null;
+  if (value.arrayValue?.values) return value.arrayValue.values.map(fromFirestore);
+  if (value.mapValue?.fields) {
+    const obj: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value.mapValue.fields)) obj[k] = fromFirestore(v);
+    return obj;
+  }
+  return null;
+}
+
+async function fetchEvent(id: string): Promise<Event | null> {
+  try {
+    const res = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/events/${id}`
+    );
+    if (!res.ok) return null;
+    const doc = await res.json();
+    if (!doc.fields) return null;
+    const d = doc.fields as Record<string, FirestoreValue>;
+    const raw: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(d)) raw[k] = fromFirestore(v);
+    return {
+      id,
+      title: raw.title as string ?? "Sans titre",
+      description: raw.description as string,
+      date: raw.date as string,
+      city: raw.city as string,
+      venue: raw.venue as string,
+      price: raw.price,
+      flyerUrl: raw.flyerUrl as string,
+      videoUrl: raw.videoUrl as string,
+      mediaStack: Array.isArray(raw.mediaStack) ? raw.mediaStack as Event["mediaStack"] : [],
+      category: raw.category as string,
+      interestedCount: typeof raw.interestedCount === "number" ? raw.interestedCount : 0,
+      viewsCount: typeof raw.viewsCount === "number" ? raw.viewsCount : 0,
+      goingCount: typeof raw.goingCount === "number" ? raw.goingCount : 0,
+      isFeatured: !!raw.isFeatured,
+      isRecurring: !!raw.isRecurring,
+      recurringLabel: raw.recurringLabel as string,
+      viralScore: typeof raw.viralScore === "number" ? raw.viralScore : 0,
+      status: raw.status as string,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [event, setEvent] = useState<Event | null>(null);
@@ -23,28 +87,8 @@ export default function EventDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    getDoc(doc(db, "events", id)).then((snap) => {
-      if (snap.exists()) {
-        const d = snap.data();
-        setEvent({
-          id: snap.id,
-          title: d.title ?? "Sans titre",
-          description: d.description,
-          date: d.date?.toDate?.()?.toISOString() ?? d.date,
-          city: d.city,
-          venue: d.venue,
-          price: d.price,
-          flyerUrl: d.flyerUrl,
-          videoUrl: d.videoUrl,
-          mediaStack: d.mediaStack ?? [],
-          category: d.category,
-          interestedCount: d.interestedCount ?? 0,
-          isFeatured: !!d.isFeatured,
-          isRecurring: !!d.isRecurring,
-          recurringLabel: d.recurringLabel,
-          viralScore: d.viralScore ?? 0,
-        });
-      }
+    fetchEvent(id).then((e) => {
+      setEvent(e);
       setLoading(false);
     });
   }, [id]);
@@ -214,6 +258,32 @@ export default function EventDetailPage() {
                   <video src={videoUrl} controls style={{ width: "100%", borderRadius: 16 }} />
                 </div>
               )}
+
+              {/* App CTA */}
+              <div style={{
+                background: "rgba(107,138,255,0.08)", border: "1px solid rgba(107,138,255,0.2)",
+                borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
+              }}>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
+                    🎟️ Obtiens ton billet sur l&apos;app
+                  </div>
+                  <div style={{ fontSize: 13, color: "var(--text-sec)" }}>
+                    Télécharge TètWeekend pour acheter, gérer et partager tes billets.
+                  </div>
+                </div>
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.haiti.tetweekend"
+                  target="_blank" rel="noopener noreferrer"
+                  style={{
+                    background: "var(--blue)", color: "var(--black)",
+                    padding: "10px 20px", borderRadius: 10,
+                    fontWeight: 600, fontSize: 13, textDecoration: "none", whiteSpace: "nowrap",
+                  }}
+                >
+                  Google Play →
+                </a>
+              </div>
             </div>
 
             {/* RIGHT — Details card */}
@@ -247,7 +317,8 @@ export default function EventDetailPage() {
 
               {/* CTA */}
               <a
-                href="#"
+                href="https://play.google.com/store/apps/details?id=com.haiti.tetweekend"
+                target="_blank" rel="noopener noreferrer"
                 style={{
                   display: "block", textAlign: "center",
                   background: "var(--blue)", color: "var(--black)",
@@ -256,7 +327,7 @@ export default function EventDetailPage() {
                   marginBottom: 12,
                 }}
               >
-                Obtenir mon billet
+                Obtenir mon billet →
               </a>
               <Link href="/events" style={{
                 display: "block", textAlign: "center",

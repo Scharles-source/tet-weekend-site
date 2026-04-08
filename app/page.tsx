@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { TrendingUp, MapPin, Ticket, Zap, Smartphone, Bell, Users } from "lucide-react";
+import { TrendingUp, MapPin, Ticket, Zap, Smartphone, Bell, Users, X, Gift } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
@@ -10,9 +10,149 @@ import { useEffect, useState } from "react";
 
 const CONTAINER = { maxWidth: 1200, margin: "0 auto", width: "100%" } as const;
 
+function BetaModal({ onClose }: { onClose: () => void }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/beta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, phone }),
+      });
+      const data = await res.json();
+      if (data.success) setDone(true);
+      else setError(data.error ?? "Une erreur s'est produite.");
+    } catch {
+      setError("Erreur de connexion. Réessaie.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "20px",
+    }} onClick={onClose}>
+      <div style={{
+        background: "var(--surface)", borderRadius: 24,
+        padding: "36px 32px", maxWidth: 440, width: "100%",
+        border: "1px solid rgba(107,138,255,0.25)",
+        position: "relative",
+      }} onClick={(e) => e.stopPropagation()}>
+        <button onClick={onClose} style={{
+          position: "absolute", top: 16, right: 16,
+          background: "transparent", border: "none", cursor: "pointer",
+          color: "var(--text-sec)", padding: 4,
+        }}>
+          <X size={20} />
+        </button>
+
+        {done ? (
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 800, marginBottom: 12 }}>
+              Tu es sur la liste !
+            </h3>
+            <p style={{ color: "var(--text-sec)", fontSize: 14, lineHeight: 1.7 }}>
+              On t&apos;envoie l&apos;accès beta dès que l&apos;app est prête. Reste à l&apos;écoute 🔥
+            </p>
+            <button onClick={onClose} style={{
+              marginTop: 24, background: "var(--blue)", color: "var(--black)",
+              padding: "12px 32px", borderRadius: 100, fontWeight: 600,
+              fontSize: 14, border: "none", cursor: "pointer",
+            }}>
+              Fermer
+            </button>
+          </div>
+        ) : (
+          <>
+            <div style={{
+              width: 52, height: 52, borderRadius: 14,
+              background: "rgba(107,138,255,0.12)", display: "flex",
+              alignItems: "center", justifyContent: "center",
+              marginBottom: 20, color: "var(--blue)",
+            }}>
+              <Smartphone size={24} />
+            </div>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 800, marginBottom: 8 }}>
+              Deviens testeur beta 🚀
+            </h3>
+            <p style={{ color: "var(--text-sec)", fontSize: 13, lineHeight: 1.7, marginBottom: 24 }}>
+              Accès exclusif à l&apos;app avant tout le monde + billets VIP offerts aux premiers testeurs.
+            </p>
+
+            <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <input
+                type="text"
+                placeholder="Ton prénom / nom"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                style={{
+                  background: "var(--surface2)", border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 10, padding: "12px 16px", color: "var(--white)",
+                  fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box",
+                }}
+              />
+              <input
+                type="email"
+                placeholder="Ton adresse email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{
+                  background: "var(--surface2)", border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 10, padding: "12px 16px", color: "var(--white)",
+                  fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box",
+                }}
+              />
+              <input
+                type="tel"
+                placeholder="Numéro de téléphone (optionnel)"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                style={{
+                  background: "var(--surface2)", border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 10, padding: "12px 16px", color: "var(--white)",
+                  fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box",
+                }}
+              />
+              {error && <p style={{ color: "#ff6b6b", fontSize: 13 }}>{error}</p>}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  background: "var(--blue)", color: "var(--black)",
+                  padding: "13px", borderRadius: 10, fontWeight: 700,
+                  fontSize: 14, border: "none", cursor: loading ? "not-allowed" : "pointer",
+                  opacity: loading ? 0.7 : 1, marginTop: 4,
+                }}
+              >
+                {loading ? "Envoi..." : "Je veux l'accès beta →"}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [trending, setTrending] = useState<Event[]>([]);
+  const [betaOpen, setBetaOpen] = useState(false);
 
   useEffect(() => {
     getEvents(8).then(setEvents);
@@ -21,6 +161,7 @@ export default function HomePage() {
 
   return (
     <>
+      {betaOpen && <BetaModal onClose={() => setBetaOpen(false)} />}
       <Navbar />
       <main style={{ paddingTop: 72 }}>
 
@@ -68,7 +209,7 @@ export default function HomePage() {
                 }}>
                   Kote{" "}
                   <em style={{ fontStyle: "normal", color: "var(--blue)", display: "block" }}>
-                    chill la ye?
+                    Chill lan ye la?
                   </em>
                 </h1>
 
@@ -76,8 +217,7 @@ export default function HomePage() {
                   color: "var(--text-sec)", fontSize: 17, fontWeight: 300,
                   maxWidth: 480, marginBottom: 40, lineHeight: 1.7,
                 }}>
-                  Découvre les meilleurs événements haïtiens près de toi.
-                  Concerts, soirées, festivals — ne rate plus rien.
+                  Dekouvri tout pi bon event haitien yo yon sel kote — ou pa bezwen ap fouiller instagram pou jwenn saw bezwen an anko.
                 </p>
 
                 <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -251,8 +391,8 @@ export default function HomePage() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 2 }}>
                 {[
                   { icon: <Zap size={18} />, title: "Trending en temps réel", desc: "Notre algorithme viral détecte les événements qui buzz dans ta ville avant tout le monde." },
-                  { icon: <MapPin size={18} />, title: "Découverte locale", desc: "Soirées, concerts, festivals — filtrés par ville, date et catégorie pour la diaspora haïtienne." },
-                  { icon: <Ticket size={18} />, title: "Billets intégrés", desc: "Achète tes billets directement dans l'app. Pas de redirections, pas de complications." },
+                  { icon: <MapPin size={18} />, title: "Découverte locale", desc: "Soirées, concerts, festivals — filtrés par ville, date et catégorie." },
+                  { icon: <Gift size={18} />, title: "Billets VIP gratuits", desc: "Possibilité de gagner des billets VIP à des événements — juste en les partageant à tes amis." },
                 ].map((f) => (
                   <div key={f.title} style={{ background: "var(--surface)", padding: "28px 24px" }}>
                     <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(107,138,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18, color: "var(--blue)" }}>{f.icon}</div>
@@ -281,15 +421,15 @@ export default function HomePage() {
                   L&apos;app TètWeekend,<br />
                   <span style={{ color: "var(--blue)" }}>toujours avec toi</span>
                 </h2>
-                <p style={{ color: "var(--text-sec)", fontSize: 16, maxWidth: 480, lineHeight: 1.7, marginBottom: 36 }}>
-                  Suis les événements en temps réel, retrouve tes amis, accède à tes billets — directement depuis ton téléphone.
+                <p style={{ color: "var(--text-sec)", fontSize: 16, maxWidth: 480, lineHeight: 1.7, marginBottom: 24 }}>
+                  Imagine une app où tu vois les fèt avant Instagram, tu gagnes des billets VIP juste en partageant, et tu retrouves tes amis en temps réel. C&apos;est ça TètWeekend.
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
                   {[
                     { icon: <Bell size={16} />, text: "Notifications instantanées pour les événements près de toi" },
                     { icon: <Users size={16} />, text: "Vois quels amis participent aux soirées" },
-                    { icon: <Ticket size={16} />, text: "Achète et gère tes billets en quelques secondes" },
+                    { icon: <Ticket size={16} />, text: "Gagne et gère tes billets en quelques secondes" },
                   ].map((item) => (
                     <div key={item.text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(107,138,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--blue)", flexShrink: 0 }}>
@@ -300,14 +440,32 @@ export default function HomePage() {
                   ))}
                 </div>
 
+                {/* Urgency badge */}
+                <div style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  background: "rgba(255,107,107,0.1)", border: "1px solid rgba(255,107,107,0.25)",
+                  color: "#ff6b6b", fontSize: 12, fontWeight: 600,
+                  padding: "6px 14px", borderRadius: 100, marginBottom: 16,
+                }}>
+                  🔥 Accès beta limité — rejoins avant tout le monde
+                </div>
+
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                  <a href="https://play.google.com/store/apps/details?id=com.haiti.tetweekend" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--blue)", color: "var(--black)", padding: "12px 24px", borderRadius: 12, fontWeight: 600, fontSize: 14, textDecoration: "none" }}>
+                  <button
+                    onClick={() => setBetaOpen(true)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10,
+                      background: "var(--blue)", color: "var(--black)",
+                      padding: "12px 24px", borderRadius: 12, fontWeight: 600,
+                      fontSize: 14, textDecoration: "none", border: "none", cursor: "pointer",
+                    }}
+                  >
                     <Smartphone size={18} />
-                    <div>
-                      <div style={{ fontSize: 10, fontWeight: 400, opacity: 0.7, lineHeight: 1 }}>Disponible sur</div>
+                    <div style={{ textAlign: "left" }}>
+                      <div style={{ fontSize: 10, fontWeight: 400, opacity: 0.7, lineHeight: 1 }}>Testeur beta sur</div>
                       <div style={{ fontWeight: 700, lineHeight: 1.2 }}>Google Play</div>
                     </div>
-                  </a>
+                  </button>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--surface2)", color: "var(--text-sec)", padding: "12px 24px", borderRadius: 12, fontSize: 14, border: "1px solid rgba(255,255,255,0.07)" }}>
                     <Smartphone size={18} />
                     <div>
