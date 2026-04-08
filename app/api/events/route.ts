@@ -30,7 +30,29 @@ function fromFirestore(value: FirestoreValue): unknown {
   return null;
 }
 
-async function queryEvents(limitCount: number, orderField = "date", extraFilter?: object) {
+interface EventDoc {
+  id: string | undefined;
+  title: string;
+  description: string;
+  date: string;
+  city: string;
+  venue: string;
+  price: unknown;
+  flyerUrl: string;
+  videoUrl: string;
+  mediaStack: unknown[];
+  category: string;
+  interestedCount: number;
+  viewsCount: number;
+  goingCount: number;
+  isFeatured: boolean;
+  isRecurring: boolean;
+  recurringLabel: string;
+  viralScore: number;
+  status: string;
+}
+
+async function queryEvents(limitCount: number, orderField = "date", extraFilter?: object): Promise<EventDoc[]> {
   const whereClause = extraFilter ?? {
     fieldFilter: {
       field: { fieldPath: "status" },
