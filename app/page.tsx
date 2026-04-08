@@ -1,19 +1,23 @@
+"use client";
 import Link from "next/link";
 import { TrendingUp, MapPin, Ticket, Zap, Smartphone, Bell, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
 import { getEvents, getTrendingEvents } from "@/lib/firestore";
-
-export const revalidate = 60;
+import { Event } from "@/lib/types";
+import { useEffect, useState } from "react";
 
 const CONTAINER = { maxWidth: 1200, margin: "0 auto", width: "100%" } as const;
 
-export default async function HomePage() {
-  const [events, trending] = await Promise.all([
-    getEvents(8),
-    getTrendingEvents(5),
-  ]);
+export default function HomePage() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [trending, setTrending] = useState<Event[]>([]);
+
+  useEffect(() => {
+    getEvents(8).then(setEvents);
+    getTrendingEvents(5).then(setTrending);
+  }, []);
 
   return (
     <>
