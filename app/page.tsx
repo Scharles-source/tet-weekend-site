@@ -4,7 +4,7 @@ import { TrendingUp, MapPin, Ticket, Zap, Smartphone, Bell, Users } from "lucide
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
-import { getEvents, getTrendingEvents } from "@/lib/firestore";
+import { apiGetEvents as getEvents, apiGetTrendingEvents as getTrendingEvents } from "@/lib/api";
 import { Event } from "@/lib/types";
 import { useEffect, useState } from "react";
 

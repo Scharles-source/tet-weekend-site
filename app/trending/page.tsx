@@ -4,7 +4,7 @@ import { TrendingUp, Eye, Heart, CalendarDays, Music } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
-import { getMostViewedEvents, getMostLikedEvents, getWeekendEvents, getTrendingEvents } from "@/lib/firestore";
+import { apiGetMostViewedEvents as getMostViewedEvents, apiGetMostLikedEvents as getMostLikedEvents, apiGetWeekendEvents as getWeekendEvents, apiGetTrendingEvents as getTrendingEvents } from "@/lib/api";
 import { Event } from "@/lib/types";
 
 export default function TrendingPage() {

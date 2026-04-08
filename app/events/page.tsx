@@ -4,7 +4,7 @@ import { Search, Music } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
-import { getEvents } from "@/lib/firestore";
+import { apiGetEvents as getEvents } from "@/lib/api";
 import { Event } from "@/lib/types";
 
 const CATEGORIES = ["Tout", "Konpa", "Rasin", "Rara", "Festival", "Rap Kreyòl", "Gospel", "Dance"];
