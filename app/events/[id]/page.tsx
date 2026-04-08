@@ -130,7 +130,7 @@ export default function EventDetailPage() {
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 72,
                   }}>
-                    {categoryEmoji(event.category)}
+                    🎵
                   </div>
                 )}
 
