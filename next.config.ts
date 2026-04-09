@@ -13,6 +13,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/ad/admin",
+        destination: "https://tet-weekend-admin.vercel.app/dashboard",
+        permanent: false,
+      },
+      {
+        source: "/ad/admin/:path*",
+        destination: "https://tet-weekend-admin.vercel.app/dashboard/:path*",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
