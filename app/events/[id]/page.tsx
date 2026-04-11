@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CalendarDays, MapPin, Building2, Users, Flame, Music } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import BetaModal from "@/components/BetaModal";
 import { Event } from "@/lib/types";
 import {
   formatPrice,
@@ -83,6 +84,7 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeMedia, setActiveMedia] = useState(0);
+  const [betaOpen, setBetaOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -271,17 +273,16 @@ export default function EventDetailPage() {
                     Télécharge TètWeekend pour acheter, gérer et partager tes billets.
                   </div>
                 </div>
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.haiti.tetweekend"
-                  target="_blank" rel="noopener noreferrer"
+                <button
+                  onClick={() => setBetaOpen(true)}
                   style={{
                     background: "var(--blue)", color: "var(--black)",
                     padding: "10px 20px", borderRadius: 10,
-                    fontWeight: 600, fontSize: 13, textDecoration: "none", whiteSpace: "nowrap",
+                    fontWeight: 600, fontSize: 13, border: "none", cursor: "pointer", whiteSpace: "nowrap",
                   }}
                 >
                   Google Play →
-                </a>
+                </button>
               </div>
             </div>
 
@@ -325,6 +326,7 @@ export default function EventDetailPage() {
         </div>
       </main>
       <Footer />
+      {betaOpen && <BetaModal onClose={() => setBetaOpen(false)} />}
     </>
   );
 }
