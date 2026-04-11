@@ -77,7 +77,7 @@ export default function TrendingPage() {
                 <section style={{ marginBottom: 48 }}>
                   <SectionHeader icon={<Eye size={18} />} title="Plus vus" subtitle="Les événements les plus consultés" />
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
-                    {mostViewed.map((e) => <EventCard key={e.id} event={e} />)}
+                    {mostViewed.map((e) => <EventCard key={e.id} event={e} statMode="views" />)}
                   </div>
                 </section>
               )}
@@ -87,7 +87,7 @@ export default function TrendingPage() {
                 <section style={{ marginBottom: 48 }}>
                   <SectionHeader icon={<Heart size={18} />} title="Plus aimés" subtitle="Les événements avec le plus de j'aime" />
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
-                    {mostLiked.map((e) => <EventCard key={e.id} event={e} />)}
+                    {mostLiked.map((e) => <EventCard key={e.id} event={e} statMode="likes" />)}
                   </div>
                 </section>
               )}
@@ -116,7 +116,7 @@ export default function TrendingPage() {
                 <section>
                   <SectionHeader icon={<TrendingUp size={18} />} title="Top global" subtitle="Score combiné: vues + j'aime + participation" />
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
-                    {overall.map((e) => <EventCard key={e.id} event={e} />)}
+                    {overall.map((e) => <EventCard key={e.id} event={e} statMode="all" />)}
                   </div>
                 </section>
               )}

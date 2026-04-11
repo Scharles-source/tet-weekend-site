@@ -1,8 +1,14 @@
 "use client";
 import Link from "next/link";
-import { CalendarDays, MapPin, Flame, RefreshCw } from "lucide-react";
+import { CalendarDays, MapPin, Flame, RefreshCw, Eye, Heart, Users } from "lucide-react";
 import { Event } from "@/lib/types";
 import { formatPrice, formatEventDate, getEventThumbnail } from "@/lib/utils";
+
+function fmt(n?: number) {
+  if (!n || n <= 0) return null;
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(".0", "")}k`;
+  return `${n}`;
+}
 
 const GRADIENT_FALLBACKS = [
   "linear-gradient(135deg, #1a0a2e, #4a1060)",
@@ -18,9 +24,19 @@ function getGradient(id: string) {
   return GRADIENT_FALLBACKS[Math.abs(hash) % GRADIENT_FALLBACKS.length];
 }
 
-export default function EventCard({ event }: { event: Event }) {
+export default function EventCard({
+  event,
+  statMode,
+}: {
+  event: Event;
+  statMode?: "views" | "likes" | "all";
+}) {
   const thumb = getEventThumbnail(event.mediaStack, event.flyerUrl);
   const isHot = (event.viralScore ?? 0) > 60;
+
+  const views = fmt(event.viewsCount);
+  const likes = fmt(event.interestedCount);
+  const going = fmt(event.goingCount);
 
   return (
     <Link href={`/events/${event.id}`} style={{ textDecoration: "none" }}>
@@ -157,7 +173,40 @@ export default function EventCard({ event }: { event: Event }) {
           <span style={{ fontSize: 13, fontWeight: 500, color: "var(--blue)" }}>
             {formatPrice(event.price)}
           </span>
-          {(event.interestedCount ?? 0) > 0 && (
+
+          {/* Stats selon le mode */}
+          {statMode === "views" && views && (
+            <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--text-sec)" }}>
+              <Eye size={11} /> {views} vues
+            </span>
+          )}
+          {statMode === "likes" && likes && (
+            <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#ff6b6b" }}>
+              <Heart size={11} /> {likes} j&apos;aime
+            </span>
+          )}
+          {statMode === "all" && (
+            <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: "var(--text-sec)" }}>
+              {views && (
+                <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                  <Eye size={10} /> {views}
+                </span>
+              )}
+              {likes && (
+                <span style={{ display: "flex", alignItems: "center", gap: 3, color: "#ff6b6b" }}>
+                  <Heart size={10} /> {likes}
+                </span>
+              )}
+              {going && (
+                <span style={{ display: "flex", alignItems: "center", gap: 3, color: "var(--blue)" }}>
+                  <Users size={10} /> {going}
+                </span>
+              )}
+            </span>
+          )}
+
+          {/* Fallback quand pas de statMode */}
+          {!statMode && (event.interestedCount ?? 0) > 0 && (
             <span style={{ fontSize: 11, color: "var(--text-sec)" }}>
               {event.interestedCount} intéressés
             </span>
