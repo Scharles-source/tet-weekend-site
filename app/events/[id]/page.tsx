@@ -314,20 +314,6 @@ export default function EventDetailPage() {
                 )}
               </div>
 
-              {/* CTA */}
-              <a
-                href="https://play.google.com/store/apps/details?id=com.haiti.tetweekend"
-                target="_blank" rel="noopener noreferrer"
-                style={{
-                  display: "block", textAlign: "center",
-                  background: "var(--blue)", color: "var(--black)",
-                  padding: "14px", borderRadius: 12,
-                  fontWeight: 500, fontSize: 15, textDecoration: "none",
-                  marginBottom: 12,
-                }}
-              >
-                Obtenir mon billet →
-              </a>
               <Link href="/events" style={{
                 display: "block", textAlign: "center",
                 color: "var(--text-sec)", fontSize: 13, textDecoration: "none",
