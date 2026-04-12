@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
 import BetaModal from "@/components/BetaModal";
+import VenueStories from "@/components/VenueStories";
 import { apiGetEvents as getEvents, apiGetTrendingEvents as getTrendingEvents } from "@/lib/api";
 import { Event } from "@/lib/types";
 import { useEffect, useState } from "react";
@@ -237,6 +238,21 @@ export default function HomePage() {
             </div>
           </section>
         )}
+
+        {/* ===== SPOTS & VENUES ===== */}
+        <section style={{ padding: "60px var(--page-px, 32px) 40px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <div style={CONTAINER}>
+            <div style={{ marginBottom: 24 }}>
+              <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--blue)", fontWeight: 500, marginBottom: 8 }}>
+                Spots & Venues
+              </p>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px, 2.5vw, 32px)", fontWeight: 700, letterSpacing: "-0.5px" }}>
+                Les meilleurs endroits
+              </h2>
+            </div>
+            <VenueStories />
+          </div>
+        </section>
 
         {/* ===== FEATURES ===== */}
         <section style={{ padding: "80px var(--page-px, 32px)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
