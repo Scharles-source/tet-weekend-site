@@ -14,11 +14,11 @@ const nextConfig: NextConfig = {
       // Les assets (_next/static) se chargent directement via assetPrefix côté admin
       {
         source: "/ad/admin",
-        destination: "https://tet-weekend-dashboard.vercel.app/ad/admin",
+        destination: "https://tet-weekend-dashboard-scharles-sources-projects.vercel.app/ad/admin",
       },
       {
         source: "/ad/admin/:path*",
-        destination: "https://tet-weekend-dashboard.vercel.app/ad/admin/:path*",
+        destination: "https://tet-weekend-dashboard-scharles-sources-projects.vercel.app/ad/admin/:path*",
       },
     ];
   },
