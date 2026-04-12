@@ -10,12 +10,7 @@ const nextConfig: NextConfig = {
 
   async rewrites() {
     return [
-      // Proxy assets admin (JS/CSS) — assetPrefix pointe vers /ad/assets
-      {
-        source: "/ad/assets/_next/:path*",
-        destination: "https://tet-weekend-dashboard-scharles-sources-projects.vercel.app/_next/:path*",
-      },
-      // Proxy pages admin
+      // Proxy pages admin + assets (basePath génère /ad/admin/_next/static/...)
       {
         source: "/ad/admin",
         destination: "https://tet-weekend-dashboard-scharles-sources-projects.vercel.app/ad/admin",
