@@ -1,8 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import VenueSheet, { VenueData } from "./VenueSheet";
 
-/* ─── Données Gecko Lounge ──────────────────────────────── */
+/* ─── Données Gecko Lounge (fallback statique) ──────────── */
 const GECKO: VenueData = {
   id: "gecko-lounge",
   name: "Gecko Lounge Bar",
@@ -67,12 +69,50 @@ const GECKO: VenueData = {
   ],
 };
 
-/* ─── Liste des venues (extensible facilement) ──────────── */
-const VENUES: VenueData[] = [GECKO];
+const FALLBACK_VENUES: VenueData[] = [GECKO];
 
 /* ─── Composant stories ─────────────────────────────────── */
 export default function VenueStories() {
+  const [venues, setVenues] = useState<VenueData[]>(FALLBACK_VENUES);
   const [open, setOpen] = useState<VenueData | null>(null);
+
+  useEffect(() => {
+    const fetchVenues = async () => {
+      try {
+        const q = query(
+          collection(db, "venue_profiles"),
+          where("isActive", "==", true),
+          orderBy("order", "asc")
+        );
+        const snap = await getDocs(q);
+        if (snap.empty) return; // keep fallback
+        const fetched: VenueData[] = snap.docs.map(d => {
+          const data = d.data();
+          return {
+            id: d.id,
+            name: (data.name ?? "") as string,
+            shortName: (data.shortName ?? "") as string,
+            logo: (data.logoUrl ?? "") as string,
+            category: (data.category ?? "") as string,
+            address: (data.address ?? "") as string,
+            phone: (data.phone ?? "") as string,
+            instagram: (data.instagram ?? "") as string,
+            description: (data.description ?? "") as string,
+            coverColor: (data.coverColor ?? "#1a2a1a") as string,
+            ambiance: (data.ambiance ?? []) as string[],
+            parking: (data.parking ?? "") as string,
+            hours: (data.hours ?? []) as { day: string; time: string }[],
+            menu: (data.menu ?? []) as VenueData["menu"],
+          };
+        });
+        setVenues(fetched);
+      } catch (err) {
+        // silently keep fallback data on error
+        console.warn("venue_profiles fetch failed, using fallback:", err);
+      }
+    };
+    fetchVenues();
+  }, []);
 
   return (
     <>
@@ -85,7 +125,7 @@ export default function VenueStories() {
         scrollbarWidth: "none",
         msOverflowStyle: "none",
       }}>
-        {VENUES.map((venue) => (
+        {venues.map((venue) => (
           <button
             key={venue.id}
             onClick={() => setOpen(venue)}
