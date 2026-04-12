@@ -10,8 +10,12 @@ const nextConfig: NextConfig = {
 
   async rewrites() {
     return [
-      // Proxy /ad/admin/* vers le vrai admin app sur tet-weekend-dashboard.vercel.app
-      // Les assets (_next/static) se chargent directement via assetPrefix côté admin
+      // Proxy assets admin (JS/CSS) — assetPrefix pointe vers /ad/assets
+      {
+        source: "/ad/assets/_next/:path*",
+        destination: "https://tet-weekend-dashboard-scharles-sources-projects.vercel.app/_next/:path*",
+      },
+      // Proxy pages admin
       {
         source: "/ad/admin",
         destination: "https://tet-weekend-dashboard-scharles-sources-projects.vercel.app/ad/admin",
