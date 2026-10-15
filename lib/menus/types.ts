@@ -4,9 +4,34 @@ export type Zone = "Pétion-Ville" | "Delmas";
 
 export const ZONES: Zone[] = ["Pétion-Ville", "Delmas"];
 
-export type Categorie = "Entrées" | "Plats" | "Desserts" | "Boissons" | "Cocktails";
+export type Categorie =
+  | "Menu du jour"
+  | "Menu de la semaine"
+  | "Spécial"
+  | "Carte"
+  | "Entrées"
+  | "Plats"
+  | "Desserts"
+  | "Boissons"
+  | "Cocktails"
+  | "Promotions";
 
-export const CATEGORIES: Categorie[] = ["Entrées", "Plats", "Desserts", "Boissons", "Cocktails"];
+/** Ordre d'affichage : menus datés d'abord, puis la carte, puis les promotions. */
+export const CATEGORIES: Categorie[] = [
+  "Menu du jour",
+  "Menu de la semaine",
+  "Spécial",
+  "Carte",
+  "Entrées",
+  "Plats",
+  "Desserts",
+  "Boissons",
+  "Cocktails",
+  "Promotions",
+];
+
+/** Catégories pouvant constituer l'offre « en cours » mise en avant. */
+export const CATEGORIES_DATEES: Categorie[] = ["Menu du jour", "Menu de la semaine", "Spécial"];
 
 export interface Restaurant {
   id: string;
@@ -51,6 +76,12 @@ export interface MenuItem {
   devise: Devise;
   disponible: boolean;
   ordre: number;
+  source_url: string | null;
+  /** AAAA-MM-JJ : date de la publication / du relevé du prix. */
+  date_releve: string | null;
+  valide_du: string | null;
+  valide_au: string | null;
+  a_verifier: boolean;
 }
 
 export interface Reglages {

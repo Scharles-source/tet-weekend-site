@@ -27,7 +27,8 @@ const COLONNES_RESTAURANT = [
   "photo_carte_url", "date_dernier_releve",
 ].join(",");
 
-const COLONNES_MENU = "id,restaurant_id,categorie,nom,description,prix,devise,disponible,ordre";
+const COLONNES_MENU =
+  "id,restaurant_id,categorie,nom,description,prix,devise,disponible,ordre,source_url,date_releve,valide_du,valide_au,a_verifier";
 
 function configuration() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -75,7 +76,16 @@ function normaliserRestaurant(r: Restaurant): Restaurant {
 }
 
 function normaliserItem(i: MenuItem): MenuItem {
-  return { ...i, prix: Number(i.prix), ordre: Number(i.ordre) };
+  return {
+    ...i,
+    prix: Number(i.prix),
+    ordre: Number(i.ordre),
+    source_url: i.source_url ?? null,
+    date_releve: i.date_releve ?? null,
+    valide_du: i.valide_du ?? null,
+    valide_au: i.valide_au ?? null,
+    a_verifier: Boolean(i.a_verifier),
+  };
 }
 
 export async function lireReglages(): Promise<Reglages> {
@@ -92,16 +102,15 @@ export async function lireReglages(): Promise<Reglages> {
   };
 }
 
-/** Répertoire public : statut publié (RLS) ET au moins un article au menu. */
+/** Répertoire public : tous les restaurants publiés (RLS). Ceux sans menu affichent « Menu en cours de mise à jour ». */
 export async function lireRepertoire(): Promise<{ restaurants: Restaurant[]; items: MenuItem[]; reglages: Reglages }> {
   const [restaurants, items, reglages] = await Promise.all([
     lire<Restaurant[]>(`restaurants?select=${COLONNES_RESTAURANT}&statut=eq.publie&order=nom.asc`),
-    lire<MenuItem[]>(`menu_items?select=${COLONNES_MENU}`),
+    lire<MenuItem[]>(`menu_items?select=${COLONNES_MENU}&order=ordre.asc,nom.asc`),
     lireReglages(),
   ]);
-  const avecMenu = new Set(items.map((i) => i.restaurant_id));
   return {
-    restaurants: restaurants.filter((r) => avecMenu.has(r.id)).map(normaliserRestaurant),
+    restaurants: restaurants.map(normaliserRestaurant),
     items: items.map(normaliserItem),
     reglages,
   };

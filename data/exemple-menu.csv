@@ -1,7 +1,8 @@
-restaurant_slug,categorie,nom,description,prix,devise,disponible,ordre
-exemple-restaurant-test,Entrées,EXEMPLE Accras de morue,"Données fictives — format uniquement",750,HTG,oui,1
-exemple-restaurant-test,Plats,EXEMPLE Griot complet,"Données fictives — format uniquement",2500,HTG,oui,1
-exemple-restaurant-test,Plats,EXEMPLE Poisson gros sel,"Données fictives — format uniquement",25,USD,non,2
-exemple-restaurant-test,Desserts,EXEMPLE Pain patate,,600,HTG,,1
-exemple-restaurant-test,Boissons,EXEMPLE Jus de chadèque,,500,HTG,oui,1
-exemple-restaurant-test,Cocktails,EXEMPLE Cocktail maison,,12.50,USD,oui,1
+restaurant_slug,categorie,nom,description,prix,devise,disponible,ordre,source_url,date_releve,valide_du,valide_au,a_verifier
+exemple-restaurant-test,Menu du jour,EXEMPLE Plat du jour,"Données fictives — format uniquement",11,USD,oui,1,https://www.instagram.com/p/EXEMPLE/,2026-10-15,2026-10-15,2026-10-15,
+exemple-restaurant-test,Menu de la semaine,EXEMPLE Lundi — Option 1,"Données fictives — plat + 2 accompagnements",845,HTG,oui,1,https://www.instagram.com/p/EXEMPLE/,2026-10-12,2026-10-12,2026-10-18,
+exemple-restaurant-test,Spécial,EXEMPLE Spécial grillade,"Données fictives — samedi 12h00–14h30, + taxes",20,USD,oui,1,https://www.instagram.com/p/EXEMPLE/,2026-10-10,,,
+exemple-restaurant-test,Carte,EXEMPLE Griot à la carte,"Données fictives — format uniquement",12.35,USD,oui,1,https://www.instagram.com/p/EXEMPLE/,2026-10-01,,,
+exemple-restaurant-test,Plats,EXEMPLE Griot complet,"Données fictives — format uniquement",2500,HTG,oui,1,,,,,
+exemple-restaurant-test,Boissons,EXEMPLE Jus de chadèque,,500,HTG,oui,1,,,,,
+exemple-restaurant-test,Promotions,EXEMPLE Offre du mardi,"Données fictives — sur place / à emporter",8,USD,oui,1,https://www.instagram.com/p/EXEMPLE/,2026-08-04,,,oui

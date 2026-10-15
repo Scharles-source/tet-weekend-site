@@ -66,7 +66,8 @@ Configure `firebase.json` pour pointer sur le dossier `.next` ou `out`.
 1. Créer un projet Supabase (offre gratuite).
 2. Appliquer les migrations de `supabase/migrations/` dans l'ordre (SQL Editor, ou `supabase db push`) :
    - `20261014000000_menus_budgets.sql` : tables `restaurants`, `menu_items`, `settings`, RLS, réglages par défaut ;
-   - `20261014000100_amorce_24_restaurants.sql` : les 24 restaurants vérifiés le 14 oct. 2026, **en brouillon et sans menu**.
+   - `20261014000100_amorce_24_restaurants.sql` : les 24 restaurants vérifiés le 14 oct. 2026, **en brouillon et sans menu** ;
+   - `20261015000000_menus_dates_sources.sql` : catégories datées (`Menu du jour`, `Menu de la semaine`, `Spécial`, `Carte`, `Promotions`) et colonnes `source_url`, `date_releve`, `valide_du`, `valide_au`, `a_verifier` sur `menu_items`. Aucune donnée existante n'est modifiée.
 3. Dans Vercel, ajouter les variables puis redéployer (elles sont lues au build) :
 
 ```env
@@ -91,7 +92,7 @@ Sans ces variables, les pages affichent « Configuration Supabase manquante » a
 
 ## Règles de publication et de retrait
 
-- Un restaurant apparaît dans le répertoire si **`statut = publie` ET au moins un article au menu**. Aucun accord préalable n'est requis (prix et noms de plats sont des faits).
+- Un restaurant apparaît dans le répertoire dès que **`statut = publie`**. Sans article au menu, sa carte et sa fiche affichent « Menu en cours de mise à jour ». Les brouillons et les retirés restent invisibles (fiche en 404). Aucun accord préalable n'est requis (prix et noms de plats sont des faits).
 - Ne jamais réutiliser les photos ou le logo d'un restaurant sans son accord (`photo_carte_url` uniquement avec accord). Ne jamais présenter un restaurant comme partenaire.
 - **Retrait sur demande, immédiat** : passer `statut = 'retire'` (et `retrait_demande_le`, `motif_retrait`). Le restaurant disparaît aussitôt du public (fiche en 404).
 - Fraîcheur : « Carte vérifiée il y a X jours » jusqu'à 30 jours après `date_dernier_releve`, puis « Prix en cours de vérification ». La date du relevé reste toujours affichée.
@@ -106,6 +107,9 @@ node --env-file=.env.import scripts/import-menus.mjs --restaurants fiches.csv --
 
 - `--dry-run` : valide les fichiers sans rien écrire.
 - `--remplacer-menu` : supprime d'abord le menu existant de chaque restaurant présent dans le fichier menu. Sans cette option, les articles sont mis à jour par clé (restaurant, catégorie, nom), et les articles absents du fichier restent en base.
+- `--completer-seulement` : n'écrase **rien**. Une fiche existante ne reçoit que les champs encore vides en base. Un article déjà présent (même clé) est laissé tel quel. La colonne `statut` est refusée et aucun restaurant n'est créé. C'est l'option à utiliser pour verser une collecte (Instagram, etc.) sans toucher aux données déjà vérifiées. Incompatible avec `--remplacer-menu`.
+- Une fiche déjà en base est mise à jour par `PATCH` sur les seules colonnes présentes dans le fichier : une ligne partielle (ex. `slug` + `date_dernier_releve`) est donc acceptée.
+- En fin d'import, le script affiche le nombre de restaurants par statut, pour contrôler qu'aucun statut n'a changé.
 - Formats acceptés : CSV (séparateur `,` ou `;`, UTF-8, guillemets pour les textes contenant des virgules) ou JSON (tableau d'objets avec les mêmes clés).
 - Exemples **fictifs** : `data/exemple-restaurants.csv`, `data/exemple-menu.csv`. Ne pas les importer en production.
 
@@ -147,13 +151,43 @@ Cellule vide = **valeur inchangée** (jamais remplie par défaut). Pour effacer 
 | Colonne | Format | Description |
 |---|---|---|
 | `restaurant_slug` | slug | **Obligatoire.** Le restaurant doit déjà exister |
-| `categorie` | `Entrées`, `Plats`, `Desserts`, `Boissons`, `Cocktails` | **Obligatoire.** La fourchette de prix est calculée sur `Plats` |
+| `categorie` | `Menu du jour`, `Menu de la semaine`, `Spécial`, `Carte`, `Entrées`, `Plats`, `Desserts`, `Boissons`, `Cocktails`, `Promotions` | **Obligatoire.** Voir « Catégories datées » ci-dessous |
 | `nom` | texte | **Obligatoire.** Unique par (restaurant, catégorie) |
-| `description` | texte court | Optionnel |
-| `prix` | nombre ≥ 0 | **Obligatoire.** `2500`, `2 500` ou `12,50` acceptés |
-| `devise` | `HTG` ou `USD` | **Obligatoire.** Devise d'origine de l'article |
+| `description` | texte court | Optionnel. Y noter les conditions telles qu'affichées (horaires, « + taxes », « sur place uniquement »…) |
+| `prix` | nombre ≥ 0 | **Obligatoire.** `2500`, `2 500` ou `12,50` acceptés. Prix **tel qu'affiché** : jamais converti, jamais majoré des taxes |
+| `devise` | `HTG` ou `USD` | **Obligatoire.** Devise d'origine, telle qu'affichée par le restaurant |
 | `disponible` | oui / non | Défaut `oui` |
 | `ordre` | entier | Ordre d'affichage dans la catégorie (défaut : ordre des lignes) |
+| `source_url` | URL `https://…` | Lien de la publication d'où vient le prix (post Instagram, etc.) |
+| `date_releve` | `AAAA-MM-JJ` ou `JJ/MM/AAAA` | Date de publication de la source (ou du relevé). **Obligatoire** pour `Menu du jour`, `Menu de la semaine`, `Spécial` et `Promotions` |
+| `valide_du`, `valide_au` | dates | Période annoncée par le restaurant (ex. semaine du 12 au 18 oct.). Optionnel |
+| `a_verifier` | oui / non | Défaut `non`. `oui` : prix affiché avec « Prix à confirmer », jamais mis en avant |
+
+Les colonnes `source_url` à `a_verifier` sont facultatives : un fichier à l'ancien format (8 colonnes) reste valide.
+
+#### Catégories datées et règles de collecte
+
+- **Aucune donnée inventée** : pas de plat, de prix ou de devise supposés. Un prix daté sans date de relevé est refusé par le script.
+- Les taxes ou frais signalés par le restaurant (ex. « + 10 % TCA ») vont dans les champs `taxe_pct` / `taxe_incluse` de la fiche (ou dans `description`), **jamais ajoutés au prix**.
+- Les opérations ponctuelles extérieures au restaurant (ex. Burger Week) ne sont pas importées comme prix du menu.
+
+## Affichage des menus
+
+**Cartes de l'accueil** (dans l'ordre) :
+1. L'offre **en cours** (2 au plus, « + N autres offres en cours » au-delà) : catégorie, date, nom, prix dans la devise d'origine. Une offre est en cours si elle est disponible, n'est pas « à vérifier », et :
+   - si `valide_du`/`valide_au` sont renseignés : la date du jour (heure d'Haïti) est dans la période ;
+   - sinon, `Menu du jour` : relevé le jour même ; `Menu de la semaine` / `Spécial` : relevé il y a 30 jours au plus.
+   `Carte` et `Promotions` ne sont jamais mises en avant.
+2. La fourchette des plats : catégorie `Plats` si elle existe, sinon `Carte` + menus datés (jamais les promotions). Puis le nombre d'articles.
+3. Le badge de fraîcheur (date du dernier relevé de la fiche).
+
+Les restaurants avec une offre en cours passent en tête, puis ceux qui ont un menu, puis les « Menu en cours de mise à jour ». Le filtre **« Avec menu uniquement »** masque ces derniers. La recherche ignore les accents.
+
+**Fiche restaurant** : le menu vient en premier. Les catégories non vides suivent l'ordre Menu du jour → Menu de la semaine → Spécial → Carte → Entrées → Plats → Desserts → Boissons → Cocktails → Promotions.
+- Chaque ligne affiche le prix dans sa devise d'origine et l'équivalent (≈) au taux affiché, si un taux est connu.
+- Une catégorie datée dont tous les articles partagent la même période porte cette période dans son titre (« Menu de la semaine du 12–18 oct. 2026 »). Sinon, la date s'affiche sous chaque article (« Valable … » ou « Relevé le … »), avec un lien « source » quand `source_url` existe.
+- « Prix à confirmer » s'affiche si le relevé de l'article date de plus de 30 jours ou s'il est marqué `a_verifier`. Le prix reste visible.
+- Le simulateur est pré-rempli (quantité 1) avec l'offre en cours la plus prioritaire, sinon le premier article du menu (hors promotions), sauf si l'utilisateur a déjà un plateau enregistré.
 
 ## Simulateur de budget
 

@@ -2,7 +2,8 @@
 // Import des fiches restaurants et des menus (CSV ou JSON) dans Supabase — format documenté dans le README.
 //
 //   node --env-file=.env.import scripts/import-menus.mjs \
-//     [--restaurants data/exemple-restaurants.csv] [--menu data/exemple-menu.csv] [--remplacer-menu] [--dry-run]
+//     [--restaurants data/exemple-restaurants.csv] [--menu data/exemple-menu.csv]
+//     [--remplacer-menu | --completer-seulement] [--dry-run]
 //
 // Variables : SUPABASE_URL (ou NEXT_PUBLIC_SUPABASE_URL) et SUPABASE_SERVICE_ROLE_KEY.
 // La clé service_role ne doit JAMAIS être exposée côté client ni commitée.
@@ -10,7 +11,13 @@
 import { readFile } from "node:fs/promises";
 import { extname } from "node:path";
 
-const CATEGORIES = ["Entrées", "Plats", "Desserts", "Boissons", "Cocktails"];
+const CATEGORIES = [
+  "Menu du jour", "Menu de la semaine", "Spécial", "Carte",
+  "Entrées", "Plats", "Desserts", "Boissons", "Cocktails",
+  "Promotions",
+];
+// Un prix daté (menu du jour, de la semaine, spécial, promotion) sans date de relevé n'entre pas.
+const CATEGORIES_DATEES = ["Menu du jour", "Menu de la semaine", "Spécial", "Promotions"];
 const DEVISES = ["HTG", "USD"];
 const ZONES = ["Pétion-Ville", "Delmas"];
 const STATUTS = ["brouillon", "publie", "retire"];
@@ -25,7 +32,10 @@ const COLONNES_RESTAURANT = {
   releve_par: "texte", statut: "statut", retrait_demande_le: "date", motif_retrait: "texte",
 };
 
-const COLONNES_MENU = ["restaurant_slug", "categorie", "nom", "description", "prix", "devise", "disponible", "ordre"];
+const COLONNES_MENU = [
+  "restaurant_slug", "categorie", "nom", "description", "prix", "devise", "disponible", "ordre",
+  "source_url", "date_releve", "valide_du", "valide_au", "a_verifier",
+];
 
 // ───────────── Arguments ─────────────
 const args = process.argv.slice(2);
@@ -36,7 +46,13 @@ const option = (nom) => {
 const fichierRestaurants = option("--restaurants");
 const fichierMenu = option("--menu");
 const remplacerMenu = args.includes("--remplacer-menu");
+const completerSeulement = args.includes("--completer-seulement");
 const dryRun = args.includes("--dry-run");
+
+if (remplacerMenu && completerSeulement) {
+  console.error("--remplacer-menu et --completer-seulement sont incompatibles.");
+  process.exit(1);
+}
 
 if (!fichierRestaurants && !fichierMenu) {
   console.error("Usage : node scripts/import-menus.mjs [--restaurants fichier.csv|json] [--menu fichier.csv|json] [--remplacer-menu] [--dry-run]");
@@ -192,6 +208,16 @@ function lireArticle(ligne, n) {
     if (p < 0) throw new Error("prix négatif");
     const disponible = champ("disponible");
     const ordre = champ("ordre");
+    const source = champ("source_url");
+    if (source !== null && !/^https:\/\//.test(String(source))) throw new Error(`source_url invalide « ${source} » (https://…)`);
+    const dateReleve = champ("date_releve") === null ? null : date(champ("date_releve"));
+    const valideDu = champ("valide_du") === null ? null : date(champ("valide_du"));
+    const valideAu = champ("valide_au") === null ? null : date(champ("valide_au"));
+    if (valideDu && valideAu && valideDu > valideAu) throw new Error("valide_du est après valide_au");
+    if (CATEGORIES_DATEES.includes(categorie) && !dateReleve) {
+      throw new Error(`catégorie « ${categorie} » : date_releve obligatoire (un prix daté sans date n'entre pas)`);
+    }
+    const aVerifier = champ("a_verifier");
     return {
       slug,
       article: {
@@ -202,6 +228,11 @@ function lireArticle(ligne, n) {
         devise: convertir("devise", devise),
         disponible: disponible === null ? true : booleen(disponible),
         ordre: ordre === null ? n : Math.trunc(nombre(ordre)),
+        source_url: source === null ? null : String(source),
+        date_releve: dateReleve,
+        valide_du: valideDu,
+        valide_au: valideAu,
+        a_verifier: aVerifier === null ? false : booleen(aVerifier),
       },
     };
   } catch (e) {
@@ -253,15 +284,45 @@ for (const { slug, article } of articles) {
   menu.push(article);
 }
 
+if (completerSeulement && restaurants.some((r) => "statut" in r)) {
+  throw new Error("--completer-seulement : la colonne statut est interdite (la publication reste manuelle).");
+}
+
+const sansSource = articles.filter(({ article }) => !article.source_url).length;
 console.log(`Fichier valide : ${restaurants.length} fiche(s) restaurant, ${articles.length} article(s) pour ${parRestaurant.size} restaurant(s).`);
+if (sansSource > 0) console.log(`ℹ ${sansSource} article(s) sans source_url.`);
 if (dryRun) {
   console.log("--dry-run : aucune écriture.");
   process.exit(0);
 }
 
+const slugsFiches = restaurants.map((r) => r.slug);
+const existants = slugsFiches.length
+  ? await api("GET", `restaurants?select=*&slug=in.(${slugsFiches.map(encodeURIComponent).join(",")})`)
+  : [];
+const parSlug = new Map(existants.map((r) => [r.slug, r]));
+
 for (const r of restaurants) {
-  await api("POST", "restaurants?on_conflict=slug", [r], "resolution=merge-duplicates,return=minimal");
-  console.log(`✓ fiche ${r.slug}${r.statut ? ` (statut : ${r.statut})` : ""}`);
+  const actuel = parSlug.get(r.slug);
+  if (!actuel) {
+    if (completerSeulement) throw new Error(`--completer-seulement : restaurant inconnu « ${r.slug} » (aucune création).`);
+    await api("POST", "restaurants", [r], "return=minimal");
+    console.log(`✓ fiche créée ${r.slug}${r.statut ? ` (statut : ${r.statut})` : ""}`);
+    continue;
+  }
+  // Mise à jour (PATCH) et non upsert : une fiche partielle ne doit pas passer par un INSERT (nom, zones obligatoires).
+  const { slug, ...champs } = r;
+  const aEcrire = completerSeulement
+    ? Object.fromEntries(Object.entries(champs).filter(([cle]) => actuel[cle] === null || actuel[cle] === undefined))
+    : champs;
+  const ignores = Object.keys(champs).filter((cle) => !(cle in aEcrire));
+  if (Object.keys(aEcrire).length > 0) {
+    await api("PATCH", `restaurants?slug=eq.${encodeURIComponent(slug)}`, aEcrire, "return=minimal");
+  }
+  console.log(
+    `✓ fiche ${slug} : ${Object.keys(aEcrire).join(", ") || "rien à écrire"}` +
+      (ignores.length ? ` (déjà renseigné, conservé : ${ignores.join(", ")})` : "")
+  );
 }
 
 if (parRestaurant.size > 0) {
@@ -274,20 +335,27 @@ if (parRestaurant.size > 0) {
   for (const [slug, menu] of parRestaurant) {
     const id = ids.get(slug);
     if (remplacerMenu) await api("DELETE", `menu_items?restaurant_id=eq.${id}`, undefined, "return=minimal");
+    // --completer-seulement : un article déjà présent (même restaurant, catégorie, nom) n'est jamais modifié.
     await api(
       "POST",
       "menu_items?on_conflict=restaurant_id,categorie,nom",
       menu.map((a) => ({ ...a, restaurant_id: id })),
-      "resolution=merge-duplicates,return=minimal"
+      `resolution=${completerSeulement ? "ignore" : "merge"}-duplicates,return=minimal`
     );
-    console.log(`✓ menu ${slug} : ${menu.length} article(s)${remplacerMenu ? " (menu remplacé)" : ""}`);
+    console.log(
+      `✓ menu ${slug} : ${menu.length} article(s)` +
+        (remplacerMenu ? " (menu remplacé)" : completerSeulement ? " (articles existants conservés)" : "")
+    );
   }
 }
 
-// Règle de publication : publié ET au moins un article. On signale les fiches publiées encore vides.
+const statuts = await api("GET", "restaurants?select=statut");
+const compte = statuts.reduce((acc, r) => ({ ...acc, [r.statut]: (acc[r.statut] ?? 0) + 1 }), {});
+console.log(`Statuts en base : ${Object.entries(compte).map(([s, n]) => `${s} ${n}`).join(", ")}`);
+
 const publies = await api("GET", "restaurants?select=slug,menu_items(count)&statut=eq.publie");
 const vides = publies.filter((r) => (r.menu_items?.[0]?.count ?? 0) === 0).map((r) => r.slug);
 if (vides.length > 0) {
-  console.warn(`⚠ Publiés sans menu (invisibles dans le répertoire) : ${vides.join(", ")}`);
+  console.warn(`⚠ Publiés sans menu (affichés « Menu en cours de mise à jour ») : ${vides.join(", ")}`);
 }
 console.log("Import terminé.");

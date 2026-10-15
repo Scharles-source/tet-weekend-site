@@ -8,7 +8,7 @@ export function BadgeFraicheur({ verifiee, libelle }: { verifiee: boolean; libel
           : "border-amber-400/30 bg-amber-400/10 text-amber-200")
       }
     >
-      <span aria-hidden="true">{verifiee ? "✓" : "⏳"}</span>
+      <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${verifiee ? "bg-emerald-300" : "bg-amber-200"}`} />
       {libelle}
     </span>
   );

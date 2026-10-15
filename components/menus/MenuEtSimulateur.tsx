@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { calculerBudget, tauxApplicable, type MontantDouble } from "@/lib/menus/budget";
-import { formatMontant, formatTaux } from "@/lib/menus/format";
+import { calculerBudget, convertirEnCentimes, tauxApplicable, type MontantDouble } from "@/lib/menus/budget";
+import { articlePreRempli, etatArticle, formatMontant, formatTaux, periodeCommune } from "@/lib/menus/format";
 import { CATEGORIES, type Devise, type MenuItem } from "@/lib/menus/types";
 
 interface ParametresRestaurant {
@@ -47,6 +47,7 @@ const CHAMP =
 export default function MenuEtSimulateur({ slug, items, restaurant, tauxGlobal }: Props) {
   const [plateau, setPlateau] = useState<PlateauSauve>(PLATEAU_VIDE);
   const [charge, setCharge] = useState(false);
+  const [prerempli, setPrerempli] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -59,6 +60,12 @@ export default function MenuEtSimulateur({ slug, items, restaurant, tauxGlobal }
         );
         // eslint-disable-next-line react-hooks/set-state-in-effect -- restauration unique après hydratation (localStorage indisponible côté serveur)
         setPlateau({ ...PLATEAU_VIDE, ...sauve, quantites });
+      } else {
+        const article = articlePreRempli(items);
+        if (article) {
+          setPlateau({ ...PLATEAU_VIDE, quantites: { [article.id]: 1 } });
+          setPrerempli(article.nom);
+        }
       }
     } catch {}
     setCharge(true);
@@ -120,6 +127,12 @@ export default function MenuEtSimulateur({ slug, items, restaurant, tauxGlobal }
     (g) => g.items.length > 0
   );
   const libelleTaux = tauxUtilise !== null ? formatTaux(tauxUtilise) : "Taux de change non renseigné";
+  const maintenant = new Date();
+  const equivalent = (item: MenuItem): string | null => {
+    const autre: Devise = item.devise === "HTG" ? "USD" : "HTG";
+    const c = convertirEnCentimes(item.prix, item.devise, autre, tauxUtilise);
+    return c === null ? null : `≈ ${formatMontant(c / 100, autre)}`;
+  };
 
   return (
     <>
@@ -127,12 +140,22 @@ export default function MenuEtSimulateur({ slug, items, restaurant, tauxGlobal }
         <h2 id="titre-menu" className="mb-3 font-[family-name:var(--font-display)] text-xl font-bold">
           Menu
         </h2>
-        {parCategorie.map((g) => (
+        {tauxUtilise !== null && (
+          <p className="mb-3 text-xs text-[var(--text-sec)]">Équivalents calculés au taux {libelleTaux}.</p>
+        )}
+        {parCategorie.map((g) => {
+          const periode = periodeCommune(g.items);
+          return (
           <div key={g.categorie} className="mb-5">
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--blue)]">{g.categorie}</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--blue)]">
+              {g.categorie}
+              {periode && <span className="font-normal normal-case tracking-normal text-[var(--text-sec)]"> du {periode}</span>}
+            </h3>
             <ul className="divide-y divide-white/5 rounded-2xl border border-white/10 bg-[var(--surface)]">
               {g.items.map((item) => {
                 const q = plateau.quantites[item.id] ?? 0;
+                const etat = etatArticle(item, maintenant);
+                const eq = equivalent(item);
                 return (
                   <li key={item.id} className="flex items-center gap-3 p-3">
                     <div className="min-w-0 flex-1">
@@ -140,12 +163,30 @@ export default function MenuEtSimulateur({ slug, items, restaurant, tauxGlobal }
                         {item.nom}
                       </p>
                       {item.description && <p className="text-sm text-[var(--text-sec)]">{item.description}</p>}
-                      <p className="text-sm font-semibold text-[var(--white)]">
-                        {formatMontant(item.prix, item.devise)}
-                        {!item.disponible && (
-                          <span className="ml-2 font-normal text-amber-200">Indisponible</span>
-                        )}
+                      <p className="text-sm">
+                        <span className="font-semibold text-[var(--white)]">{formatMontant(item.prix, item.devise)}</span>
+                        {eq && <span className="text-[var(--text-sec)]"> {eq}</span>}
+                        {!item.disponible && <span className="ml-2 text-amber-200">Indisponible</span>}
+                        {etat.aConfirmer && <span className="ml-2 font-medium text-amber-200">Prix à confirmer</span>}
                       </p>
+                      {(etat.date || item.source_url) && (
+                        <p className="text-xs text-[var(--text-sec)]">
+                          {!periode && etat.date}
+                          {item.source_url && (
+                            <>
+                              {!periode && etat.date && " · "}
+                              <a
+                                href={item.source_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline underline-offset-2 hover:text-[var(--white)]"
+                              >
+                                source
+                              </a>
+                            </>
+                          )}
+                        </p>
+                      )}
                     </div>
                     {item.disponible && (
                       <div className="flex items-center gap-2">
@@ -179,7 +220,8 @@ export default function MenuEtSimulateur({ slug, items, restaurant, tauxGlobal }
               })}
             </ul>
           </div>
-        ))}
+          );
+        })}
       </section>
 
       <section
@@ -269,6 +311,11 @@ export default function MenuEtSimulateur({ slug, items, restaurant, tauxGlobal }
           </p>
         ) : (
           <>
+            {prerempli && lignes.some((l) => l.item.nom === prerempli) && (
+              <p className="mb-2 text-xs text-[var(--text-sec)]">
+                « {prerempli} » a été ajouté pour démarrer : ajoutez ou retirez des plats avec + et −.
+              </p>
+            )}
             <ul className="mb-3 text-sm">
               {lignes.map(({ item, quantite }) => (
                 <li key={item.id} className="flex justify-between gap-3 py-1">

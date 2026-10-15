@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Repertoire, { type CarteRestaurant } from "@/components/menus/Repertoire";
 import { Gabarit, MessageErreurDonnees } from "@/components/menus/Gabarit";
 import { lireRepertoire } from "@/lib/menus/data";
-import { fourchettePlats, fraicheur, prixMinHtg } from "@/lib/menus/format";
+import { etatArticle, fourchettePlats, fraicheur, offresEnCours, prixMinHtg } from "@/lib/menus/format";
 
 export const dynamic = "force-dynamic";
 
@@ -26,17 +26,30 @@ export default async function AccueilMenus() {
   }
 
   const { restaurants, items, reglages } = donnees;
+  const maintenant = new Date();
   const cartes: CarteRestaurant[] = restaurants.map((r) => {
-    const f = fourchettePlats(r, items.filter((i) => i.restaurant_id === r.id), reglages.tauxGlobal);
+    const menu = items.filter((i) => i.restaurant_id === r.id);
+    const f = fourchettePlats(r, menu, reglages.tauxGlobal);
+    const offres = offresEnCours(menu, maintenant);
     return {
       slug: r.slug,
       nom: r.nom,
       zones: r.zones,
       quartier: r.quartier,
       typeCuisine: r.type_cuisine,
+      nbArticles: menu.length,
+      offres: offres.slice(0, 2).map((o) => ({
+        id: o.id,
+        categorie: o.categorie,
+        nom: o.nom,
+        prix: o.prix,
+        devise: o.devise,
+        date: etatArticle(o, maintenant).date,
+      })),
+      autresOffres: Math.max(0, offres.length - 2),
       fourchette: f,
       prixMinHtg: f ? prixMinHtg(f, r.taux_htg_usd ?? reglages.tauxGlobal) : null,
-      fraicheur: fraicheur(r.date_dernier_releve),
+      fraicheur: fraicheur(r.date_dernier_releve, maintenant),
     };
   });
 
