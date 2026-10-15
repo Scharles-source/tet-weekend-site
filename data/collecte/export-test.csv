@@ -1,0 +1,4 @@
+restaurant_slug,categorie,nom,description,prix,devise,disponible,ordre,source_url,date_releve,valide_du,valide_au,a_verifier
+test-collecte-menu,Plats,TEST Griot complet,,12.5,USD,oui,1,https://exemple.test/menu-test,2026-10-15,,,non
+test-collecte-menu,Plats,TEST Boisson maison,,500,HTG,oui,2,https://exemple.test/menu-test,2026-10-15,,,non
+test-collecte-menu,Desserts,TEST Flan coco,,8,USD,oui,3,https://exemple.test/menu-test,2026-10-15,,,non

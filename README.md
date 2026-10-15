@@ -207,3 +207,80 @@ Le plateau (articles, personnes, pourboire, taux saisi) est conservé dans le `l
 ```bash
 npm run typecheck && npm run lint && npm test && npm run build
 ```
+
+---
+
+# Collecte des menus (bots → OCR → relecture → export)
+
+Pipeline **hors ligne** pour relever les menus des 24 restaurants. **Aucune publication automatique vers Supabase** : les bots préparent, Smith importe via `scripts/import-menus.mjs`.
+
+## Ce que l'outil fait
+
+1. **Bot sites** (`collecte:sites`) — pages propres des restaurants (sites en bio Instagram déjà relevés le 15 oct. 2026, sinon Maps / manuel). Respecte `robots.txt`, user-agent `TetWeekend-CollecteMenus/1.0`, un site à la fois. Arrêt immédiat au premier CAPTCHA / blocage.
+2. **Bot Maps assisté** (`collecte:maps`) — ouvre chaque fiche dans Edge ; Smith clique sur l'onglet Menu, enregistre les photos + dates, puis lance l'OCR. Pas de scraping Maps autonome.
+3. **OCR** (`collecte:ocr`) — Tesseract **local** (binaire système, ou `tesseract.js` en repli). Propose des lignes, ne décide jamais.
+4. **Relecture** (`collecte:relire`) — correction humaine obligatoire (`statut: vérifié`).
+5. **Export** (`collecte:exporter`) — CSV/JSON au format exact de l'import. **Refuse** toute ligne encore « à vérifier ».
+
+## Ce que l'outil ne fait PAS
+
+- **Pas de bot Instagram** (pas d'API officielle pour lire un autre compte ; scraping interdit / bloqué). La fouille du 15 oct. 2026 est le point de départ (`PISTES.md` par restaurant, catalogue dans `lib/collecte/sources.ts`).
+- Pas de collecte automatique des stories.
+- Pas de contournement d'anti-bot, pas de connexion à un compte Google / Instagram.
+- Pas d'écriture Supabase, pas de clé `service_role`, pas de données inventées.
+- Les photos de cartes servent à l'extraction uniquement (jamais publiées comme photos du restaurant).
+- Prix d'événements (ex. Burger Week) : ne jamais les exporter comme carte permanente.
+
+## Prérequis
+
+- Node 22+ (type stripping pour `lib/collecte/*.ts`).
+- **Tesseract OCR** (recommandé) : `winget install UB-Mannheim.TesseractOCR` puis redémarrer le terminal. Langues `fra` + `eng`. Variable optionnelle `TESSERACT_PATH`.
+- Repli : `tesseract.js` (devDependency) si le binaire système est absent — au premier lancement les données de langue sont téléchargées.
+- Edge (ou `EDGE_PATH`) pour le bot Maps assisté.
+
+## Commandes
+
+```bash
+# 1. Créer les dossiers data/collecte/<slug>/ (+ restaurant de test)
+npm run collecte:init -- --avec-test
+
+# 2a. Sites (polite ; --dry-run pour valider sans écrire)
+npm run collecte:sites -- --dry-run
+npm run collecte:sites -- --slug jojo-restaurant-evergreen
+
+# 2b. Maps assisté (ouvre Edge, une fiche à la fois)
+npm run collecte:maps -- --slug jojo-restaurant-evergreen
+
+# 3. OCR d'une image (ou --texte pour un fichier déjà lu)
+npm run collecte:ocr -- --slug test-collecte-menu --texte data/collecte/test-collecte-menu/sources/menu-test.txt
+npm run collecte:ocr -- --slug jojo-restaurant-evergreen --image photo.jpg --type maps-photo --date-photo "Nov 2020"
+
+# 4. Relecture
+npm run collecte:relire -- --slug test-collecte-menu --liste
+npm run collecte:relire -- --slug test-collecte-menu --id <id> --nom "…" --prix 12.5 --devise USD --categorie Plats
+npm run collecte:relire -- --slug test-collecte-menu --tout-verifier
+
+# 5. Export (échoue si une ligne reste « à vérifier »)
+npm run collecte:exporter -- --slug test-collecte-menu --out data/collecte/export-test.csv
+
+# 6. Récap
+npm run collecte:etat
+
+# 7. Import Supabase — manuel, par Smith
+node --env-file=.env.import scripts/import-menus.mjs --menu data/collecte/export-test.csv --completer-seulement --dry-run
+```
+
+## Fichiers
+
+| Chemin | Rôle |
+|---|---|
+| `lib/collecte/` | Types, extraction, export, état, catalogue des 24 restos, parse HTML |
+| `scripts/collecte/` | CLI (init, sites, maps, ocr, relire, exporter, etat) |
+| `data/collecte/<slug>/collecte.json` | Sources + lignes (`à vérifier` / `vérifié` / `rejeté`) |
+| `data/collecte/<slug>/sources/` | Images, HTML, PDF, texte OCR brut |
+| `data/collecte/<slug>/PISTES.md` | Pistes Instagram / site déjà connues |
+| `data/collecte/ETAT.md` | Récap généré (pas commencé → … → publié) |
+
+États : `pas_commence` → `image_recue` → `extraction_proposee` → `verifie` → `publie` (ce dernier uniquement après import manuel).
+
+Fraîcheur Maps : toute photo de carte **sans date** ou **de plus de 12 mois** est marquée `a_reverifier` (ex. carte Jojo nov. 2020).

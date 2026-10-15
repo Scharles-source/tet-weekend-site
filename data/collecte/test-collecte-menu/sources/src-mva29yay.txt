@@ -1,0 +1,5 @@
+﻿Plats
+TEST Griot complet 12.50 USD
+TEST Boisson maison 500 HTG
+Desserts
+TEST Flan coco 8 USD

@@ -27,6 +27,13 @@ yarn-error.log*
 .env
 .env.import
 
+# Collecte menus : images sources lourdes (garder collecte.json / ETAT.md / exports)
+data/collecte/**/sources/*.{png,jpg,jpeg,webp,pdf,gif}
+data/collecte/**/sources/*.{PNG,JPG,JPEG,WEBP,PDF}
+
+# Données de langue tesseract.js (téléchargées au premier OCR image)
+*.traineddata
+
 # vercel
 .vercel
 
