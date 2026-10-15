@@ -9,7 +9,14 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --test --disable-warning=MODULE_TYPELESS_PACKAGE_JSON \"lib/**/*.test.ts\"",
-    "import:menus": "node scripts/import-menus.mjs"
+    "import:menus": "node scripts/import-menus.mjs",
+    "collecte:init": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/init.mjs",
+    "collecte:sites": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/sites.mjs",
+    "collecte:maps": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/maps.mjs",
+    "collecte:ocr": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/ocr.mjs",
+    "collecte:relire": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/relire.mjs",
+    "collecte:exporter": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/exporter.mjs",
+    "collecte:etat": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/etat.mjs"
   },
   "dependencies": {
     "firebase": "^12.11.0",
@@ -26,6 +33,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
     "tailwindcss": "^4",
+    "tesseract.js": "^6.0.1",
     "typescript": "^5"
   }
 }

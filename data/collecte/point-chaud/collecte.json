@@ -1,0 +1,13 @@
+{
+  "slug": "point-chaud",
+  "nom": "Point Chaud",
+  "etat": "pas_commence",
+  "historique": {},
+  "site_maps": null,
+  "categories_maps": [],
+  "collecte_manuelle": [
+    "Chaîne : préciser la succursale relevée."
+  ],
+  "sources": [],
+  "lignes": []
+}
