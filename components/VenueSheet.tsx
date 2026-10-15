@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import {
   X, MapPin, Phone, Clock, Flame, Car, Star, ChevronRight,
-  Instagram, UtensilsCrossed,
+  AtSign, UtensilsCrossed,
 } from "lucide-react";
 
 /* ─── Types ─────────────────────────────────────────────── */
@@ -214,7 +214,7 @@ export default function VenueSheet({ venue, onClose }: Props) {
             <InfoRow icon={<Car size={16} />} label="Parking" value={venue.parking} divider />
             {venue.instagram && (
               <InfoRow
-                icon={<Instagram size={16} />}
+                icon={<AtSign size={16} />}
                 label="Instagram"
                 value={`@${venue.instagram}`}
                 divider
