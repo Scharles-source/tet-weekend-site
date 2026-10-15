@@ -284,3 +284,57 @@ node --env-file=.env.import scripts/import-menus.mjs --menu data/collecte/export
 États : `pas_commence` → `image_recue` → `extraction_proposee` → `verifie` → `publie` (ce dernier uniquement après import manuel).
 
 Fraîcheur Maps : toute photo de carte **sans date** ou **de plus de 12 mois** est marquée `a_reverifier` (ex. carte Jojo nov. 2020).
+
+---
+
+# Interface admin `/admin`
+
+La page `/admin` **ne lance aucun bot elle-même**. Elle crée un **job** dans Supabase ; un **runner local** sur le PC de Smith récupère le job et exécute la CLI (`scripts/collecte/`). Rien ne tourne automatiquement : chaque job part d’un clic manuel.
+
+```
+Navigateur (/admin)  →  PostgREST (job en_attente)
+                              ↑
+PC local : npm run collecte:runner  (service_role local uniquement)
+                              ↓
+                    CLI sites / maps / ocr / export / etat
+```
+
+## Ce que l’admin ne fait pas
+
+- Pas d’import Supabase, pas de publication de restaurants / menus.
+- Pas d’exécution des bots sur Vercel (pas d’Edge, pas de Tesseract, pas de fichiers locaux).
+- Aucune clé `service_role` dans Vercel ni dans le navigateur.
+
+## Mise en place (Smith)
+
+1. Appliquer `supabase/migrations/20261015000100_collecte_jobs.sql` dans le SQL Editor.
+2. Authentication → Add user (e-mail + mot de passe).
+3. Marquer l’admin :
+   ```sql
+   update public.profiles set is_admin = true where email = 'ton@email';
+   -- si la ligne n'existe pas encore (utilisateur créé avant la migration) :
+   insert into public.profiles (id, email, is_admin)
+   select id, email, true from auth.users where email = 'ton@email'
+   on conflict (id) do update set is_admin = true;
+   ```
+4. Variables **publiques** (Vercel + `.env.local`) :
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://<projet>.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<clé anon>
+   ```
+5. Variables **locales uniquement** (`.env.import`, gitignoré) pour le runner :
+   ```env
+   SUPABASE_URL=https://<projet>.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=<clé service_role>
+   ```
+6. Lancer le runner : `npm run collecte:runner`
+7. Ouvrir `https://tetweekend.com/admin` (ou `localhost:3000/admin`) et se connecter.
+
+## Utilisation
+
+- Bannière **Runner : en ligne / hors ligne** (heartbeat &lt; 2 min).
+- Boutons Sites / Maps / OCR / Exporter par restaurant (désactivés si hors ligne).
+- Historique des 20 derniers jobs + page `/admin/jobs/[id]` pour le log.
+- `/admin` n’est lié depuis aucune page publique et envoie `noindex`.
+
+Import des menus validés : toujours manuel avec `scripts/import-menus.mjs --completer-seulement`.

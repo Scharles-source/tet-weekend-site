@@ -16,9 +16,12 @@
     "collecte:ocr": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/ocr.mjs",
     "collecte:relire": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/relire.mjs",
     "collecte:exporter": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/exporter.mjs",
-    "collecte:etat": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/etat.mjs"
+    "collecte:etat": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/etat.mjs",
+    "collecte:runner": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/collecte/runner.mjs"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
     "firebase": "^12.11.0",
     "lucide-react": "^1.7.0",
     "next": "16.2.2",
