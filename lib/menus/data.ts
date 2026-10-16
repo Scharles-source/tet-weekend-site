@@ -46,7 +46,7 @@ async function lire<T>(chemin: string): Promise<T> {
   try {
     res = await fetch(`${url}/rest/v1/${chemin}`, {
       headers: { apikey: cle, Authorization: `Bearer ${cle}`, Accept: "application/json" },
-      next: { revalidate: REVALIDATION_SECONDES },
+      next: { revalidate: REVALIDATION_SECONDES, tags: ["menus-public"] },
     });
   } catch {
     throw new ErreurDonnees("Impossible de joindre la base de données. Réessayez dans un instant.");
