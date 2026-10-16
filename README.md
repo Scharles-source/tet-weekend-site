@@ -168,6 +168,12 @@ Calcul (`lib/menus/budget.ts`, testé dans `lib/menus/budget.test.ts`) :
 
 Le plateau (articles, personnes, pourboire, taux saisi) est conservé dans le `localStorage` du navigateur, par restaurant.
 
+## Admin `/admin`
+
+Page unique `https://www.tetweekend.com/admin` (non liée depuis le site public, `noindex`). Connexion Supabase Auth. Seul un profil `is_admin = true` voit la section **Restaurants et menus** (publier / dépublier / retirer, articles). Les écritures passent par la session de l'utilisateur (JWT + RLS), jamais par `service_role`.
+
+Statuts enregistrés : `brouillon`, `publie`, `retire` (sans accent).
+
 ## Vérifications
 
 ```bash
