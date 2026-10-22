@@ -35,7 +35,7 @@ Projet Supabase `cuqvrwekndbpaacftmus`. Migration `supabase/migrations/202610220
 
 ## Repérage
 
-Phase 2. La table `watch_accounts` et sa saisie admin existent. Pas de scan, pas de publication automatique. Les faits (date, lieu, prix, artistes) se publient. L'image du flyer ne est pas copiée : texte + lien vers le post. Retrait sur demande.
+Phase 2. La table `watch_accounts` et sa saisie admin existent. Pas de scan, pas de publication automatique. Les faits (date, lieu, prix, artistes) se publient. Depuis le 22 octobre 2026, un flyer ajouté par l'admin est affiché en entier ; il se masque sur demande, sans retirer l'événement.
 
 ## Phases
 
