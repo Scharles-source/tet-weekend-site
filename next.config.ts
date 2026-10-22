@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  async redirects() {
+    return [
+      { source: "/restaurant/:slug", destination: "/lieux/:slug", permanent: true },
+    ];
+  },
+
   async rewrites() {
     return [
       // Proxy pages admin + assets (basePath génère /ad/admin/_next/static/...)

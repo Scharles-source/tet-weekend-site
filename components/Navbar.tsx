@@ -2,12 +2,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { TrendingUp, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [cheminOuvert, setCheminOuvert] = useState<string | null>(null);
+  const open = cheminOuvert === pathname;
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -17,8 +18,7 @@ export default function Navbar() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Close menu on route change
-  useEffect(() => { setOpen(false); }, [pathname]);
+  // Le menu se ferme tout seul quand la route change : il n'est ouvert que pour le chemin courant.
 
   return (
     <>
@@ -49,13 +49,10 @@ export default function Navbar() {
         {!isMobile && (
           <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
             <NavLink href="/" active={pathname === "/"}>Accueil</NavLink>
-            <NavLink href="/events" active={pathname.startsWith("/events")}>Événements</NavLink>
-            <NavLink href="/trending" active={pathname.startsWith("/trending")}>
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <TrendingUp size={14} /> Trending
-              </span>
-            </NavLink>
-            <Link href="/events" style={{
+            <NavLink href="/evenements" active={pathname.startsWith("/evenements")}>Événements</NavLink>
+            <NavLink href="/lieux" active={pathname.startsWith("/lieux")}>Lieux</NavLink>
+            <NavLink href="/artistes" active={pathname.startsWith("/artistes")}>Artistes</NavLink>
+            <Link href="/evenements" style={{
               background: "var(--blue)", color: "var(--black)",
               padding: "8px 20px", borderRadius: 100,
               fontWeight: 500, fontSize: 14, textDecoration: "none",
@@ -68,7 +65,7 @@ export default function Navbar() {
         {/* Mobile hamburger */}
         {isMobile && (
           <button
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => setCheminOuvert(open ? null : pathname)}
             aria-label="Menu"
             style={{
               background: "none", border: "none", color: "var(--white)",
@@ -94,16 +91,13 @@ export default function Navbar() {
           borderBottom: "1px solid rgba(107,138,255,0.15)",
           paddingBottom: 16,
         }}>
-          <MobileLink href="/" active={pathname === "/"} onClick={() => setOpen(false)}>Accueil</MobileLink>
-          <MobileLink href="/events" active={pathname.startsWith("/events")} onClick={() => setOpen(false)}>Événements</MobileLink>
-          <MobileLink href="/trending" active={pathname.startsWith("/trending")} onClick={() => setOpen(false)}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-              <TrendingUp size={15} /> Trending
-            </span>
-          </MobileLink>
+          <MobileLink href="/" active={pathname === "/"} onClick={() => setCheminOuvert(null)}>Accueil</MobileLink>
+          <MobileLink href="/evenements" active={pathname.startsWith("/evenements")} onClick={() => setCheminOuvert(null)}>Événements</MobileLink>
+          <MobileLink href="/lieux" active={pathname.startsWith("/lieux")} onClick={() => setCheminOuvert(null)}>Lieux</MobileLink>
+          <MobileLink href="/artistes" active={pathname.startsWith("/artistes")} onClick={() => setCheminOuvert(null)}>Artistes</MobileLink>
           <Link
-            href="/events"
-            onClick={() => setOpen(false)}
+            href="/evenements"
+            onClick={() => setCheminOuvert(null)}
             style={{
               margin: "12px 20px 0",
               background: "var(--blue)", color: "var(--black)",

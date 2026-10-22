@@ -35,3 +35,8 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# caches locaux, hors dépôt
+*.traineddata
+.firebase/
+data/collecte/
