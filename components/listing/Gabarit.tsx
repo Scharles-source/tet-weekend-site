@@ -1,13 +1,13 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ConfigurationSupabaseManquante } from "@/lib/menus/data";
+import { ConfigurationSupabaseManquante } from "@/lib/listing/data";
 
 export function Gabarit({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
       <main className="pt-[72px]">
-        <div className="mx-auto w-full max-w-3xl px-[var(--page-px)] py-6">{children}</div>
+        <div className="mx-auto w-full max-w-3xl px-[var(--page-px)] py-8">{children}</div>
       </main>
       <Footer />
     </>
@@ -28,5 +28,5 @@ export function MessageErreurDonnees({ erreur }: { erreur: unknown }) {
     return <MessageEtat titre="Service non configuré" texte={erreur.message} />;
   }
   const texte = erreur instanceof Error ? erreur.message : "Erreur inconnue.";
-  return <MessageEtat titre="Menus momentanément indisponibles" texte={texte} />;
+  return <MessageEtat titre="Événements momentanément indisponibles" texte={texte} />;
 }

@@ -1,67 +1,89 @@
 import { clientServeur } from "./supabase.ts";
-import type { CategorieMenu, DeviseMenu, StatutRestaurant } from "./schema.ts";
 
-export interface ArticleAdmin {
-  id: string;
-  restaurant_id: string;
-  categorie: CategorieMenu;
-  nom: string;
-  description: string | null;
-  prix: number;
-  devise: DeviseMenu;
-  disponible: boolean;
-  ordre: number;
-  source_url: string | null;
-  date_releve: string | null;
-  valide_du: string | null;
-  valide_au: string | null;
-  a_verifier: boolean;
-}
-
-export interface RestaurantAdmin {
+export interface LieuAdmin {
   id: string;
   slug: string;
   nom: string;
-  zones: string[];
-  statut: StatutRestaurant;
-  date_dernier_releve: string | null;
-  motif_retrait: string | null;
-  articles: ArticleAdmin[];
+  ville: string | null;
+  pays: string | null;
+  adresse: string | null;
+  type: string | null;
+  description: string | null;
+  instagram: string | null;
+  facebook: string | null;
+  site_web: string | null;
+  statut: string;
 }
 
-function nombre(v: unknown): number {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
+export interface ArtisteAdmin {
+  id: string;
+  slug: string;
+  nom: string;
+  type: string | null;
+  ville_base: string | null;
+  bio: string | null;
+  instagram: string | null;
+  facebook: string | null;
+  site_web: string | null;
+  statut: string;
 }
 
-export async function chargerRestaurants(): Promise<RestaurantAdmin[]> {
+export interface EvenementAdmin {
+  id: string;
+  slug: string;
+  titre: string;
+  date_debut: string;
+  date_fin: string | null;
+  venue_id: string | null;
+  ville: string | null;
+  description: string | null;
+  prix: string | null;
+  source: string | null;
+  source_url: string | null;
+  categorie: string | null;
+  fuseau: string;
+  a_verifier: boolean;
+  statut: string;
+  artist_ids: string[];
+}
+
+export interface CompteAdmin {
+  id: string;
+  plateforme: string;
+  handle: string | null;
+  url: string | null;
+  type: string;
+  actif: boolean;
+}
+
+export async function chargerListing(): Promise<{
+  lieux: LieuAdmin[];
+  artistes: ArtisteAdmin[];
+  evenements: EvenementAdmin[];
+  comptes: CompteAdmin[];
+}> {
   const supabase = await clientServeur();
-  const { data, error } = await supabase
-    .from("restaurants")
-    .select(
-      `id, slug, nom, zones, statut, date_dernier_releve, motif_retrait,
-       menu_items (id, restaurant_id, categorie, nom, description, prix, devise, disponible, ordre, source_url, date_releve, valide_du, valide_au, a_verifier)`
-    )
-    .order("nom", { ascending: true });
-  if (error) throw new Error(error.message);
-
-  return (data ?? []).map((r) => {
-    const articles = ((r.menu_items ?? []) as ArticleAdmin[]).map((a) => ({
-      ...a,
-      prix: nombre(a.prix),
-      a_verifier: Boolean(a.a_verifier),
-      disponible: a.disponible !== false,
-    }));
-    articles.sort((a, b) => a.categorie.localeCompare(b.categorie, "fr") || a.ordre - b.ordre || a.nom.localeCompare(b.nom, "fr"));
-    return {
-      id: r.id,
-      slug: r.slug,
-      nom: r.nom,
-      zones: r.zones ?? [],
-      statut: r.statut,
-      date_dernier_releve: r.date_dernier_releve,
-      motif_retrait: r.motif_retrait,
-      articles,
-    };
-  });
+  const [lieux, artistes, evenements, comptes] = await Promise.all([
+    supabase.from("venues").select("id,slug,nom,ville,pays,adresse,type,description,instagram,facebook,site_web,statut").order("nom"),
+    supabase.from("artists").select("id,slug,nom,type,ville_base,bio,instagram,facebook,site_web,statut").order("nom"),
+    supabase
+      .from("events")
+      .select("id,slug,titre,date_debut,date_fin,venue_id,ville,description,prix,source,source_url,categorie,fuseau,a_verifier,statut,event_artists(artist_id)")
+      .order("date_debut", { ascending: false }),
+    supabase.from("watch_accounts").select("id,plateforme,handle,url,type,actif").order("created_at", { ascending: false }),
+  ]);
+  for (const res of [lieux, artistes, evenements, comptes]) {
+    if (res.error) throw new Error(res.error.message);
+  }
+  return {
+    lieux: (lieux.data ?? []) as LieuAdmin[],
+    artistes: (artistes.data ?? []) as ArtisteAdmin[],
+    evenements: ((evenements.data ?? []) as (Omit<EvenementAdmin, "artist_ids"> & { event_artists?: { artist_id: string }[] })[]).map(
+      (e) => {
+        const { event_artists, ...reste } = e;
+        return { ...reste, artist_ids: (event_artists ?? []).map((l) => l.artist_id) };
+      },
+    ),
+    comptes: (comptes.data ?? []) as CompteAdmin[],
+  };
 }

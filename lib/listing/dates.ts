@@ -1,0 +1,112 @@
+import { FUSEAU_DEFAUT } from "./schema.ts";
+
+const JOURS: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+function parties(date: Date, timeZone: string) {
+  const dtf = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hourCycle: "h23",
+    hour12: false,
+    weekday: "short",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  const brut = Object.fromEntries(
+    dtf.formatToParts(date).filter((p) => p.type !== "literal").map((p) => [p.type, p.value]),
+  );
+  let hour = Number(brut.hour);
+  if (hour === 24) hour = 0;
+  return {
+    weekday: brut.weekday,
+    year: Number(brut.year),
+    month: Number(brut.month),
+    day: Number(brut.day),
+    hour,
+    minute: Number(brut.minute),
+    second: Number(brut.second),
+  };
+}
+
+function decalageMs(instant: Date, timeZone: string): number {
+  const p = parties(instant, timeZone);
+  const murCommeUtc = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+  return murCommeUtc - instant.getTime();
+}
+
+/** Heure murale « AAAA-MM-JJTHH:mm » dans `fuseau` → instant ISO UTC. */
+export function instantDepuisSaisie(local: string, fuseau: string = FUSEAU_DEFAUT): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(local);
+  if (!m) throw new Error(`Date invalide : ${local}`);
+  const [, ys, ms, ds, hs, mins] = m;
+  const murUtc = new Date(Date.UTC(Number(ys), Number(ms) - 1, Number(ds), Number(hs), Number(mins), 0));
+  const une = murUtc.getTime() - decalageMs(murUtc, fuseau);
+  const deux = murUtc.getTime() - decalageMs(new Date(une), fuseau);
+  return new Date(deux).toISOString();
+}
+
+/** Instant ISO → valeur pour un champ datetime-local, dans `fuseau`. */
+export function saisieDepuisInstant(iso: string, fuseau: string = FUSEAU_DEFAUT): string {
+  const p = parties(new Date(iso), fuseau);
+  const mois = String(p.month).padStart(2, "0");
+  const jour = String(p.day).padStart(2, "0");
+  const heure = String(p.hour).padStart(2, "0");
+  const minute = String(p.minute).padStart(2, "0");
+  return `${p.year}-${mois}-${jour}T${heure}:${minute}`;
+}
+
+export function formaterQuand(iso: string, fuseau: string = FUSEAU_DEFAUT): string {
+  return new Intl.DateTimeFormat("fr-FR", {
+    timeZone: fuseau,
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso));
+}
+
+/** Terminé quand la fin (ou le début, s'il n'y a pas de fin) est passée. */
+export function estTermine(
+  evenement: { date_debut: string; date_fin: string | null },
+  maintenant = Date.now(),
+): boolean {
+  const fin = Date.parse(evenement.date_fin ?? evenement.date_debut);
+  return Number.isFinite(fin) && fin < maintenant;
+}
+
+/**
+ * Vendredi 00:00 → dimanche 23:59:59.999 dans le fuseau.
+ * Du lundi au jeudi, c'est le weekend qui vient. Vendredi, samedi et dimanche, c'est le weekend en cours.
+ */
+export function intervalleWeekend(maintenant = new Date(), fuseau: string = FUSEAU_DEFAUT): { debut: Date; fin: Date } {
+  const p = parties(maintenant, fuseau);
+  const dow = JOURS[p.weekday] ?? 0;
+  const deltaVendredi = dow === 0 ? -2 : 5 - dow;
+  const ancre = new Date(Date.UTC(p.year, p.month - 1, p.day));
+  const vendredi = new Date(ancre.getTime() + deltaVendredi * 86_400_000);
+  const dimanche = new Date(vendredi.getTime() + 2 * 86_400_000);
+  const ymd = (d: Date) => d.toISOString().slice(0, 10);
+  return {
+    debut: new Date(instantDepuisSaisie(`${ymd(vendredi)}T00:00`, fuseau)),
+    fin: new Date(Date.parse(instantDepuisSaisie(`${ymd(dimanche)}T23:59`, fuseau)) + 59_999),
+  };
+}
+
+export function dansLeWeekend(
+  iso: string,
+  maintenant = new Date(),
+  fuseau: string = FUSEAU_DEFAUT,
+): boolean {
+  const { debut, fin } = intervalleWeekend(maintenant, fuseau);
+  const t = Date.parse(iso);
+  return t >= debut.getTime() && t <= fin.getTime();
+}
+
+export function formatIcs(iso: string): string {
+  return new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+}

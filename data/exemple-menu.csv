@@ -1,7 +1,0 @@
-restaurant_slug,categorie,nom,description,prix,devise,disponible,ordre
-exemple-restaurant-test,Entrées,EXEMPLE Accras de morue,"Données fictives — format uniquement",750,HTG,oui,1
-exemple-restaurant-test,Plats,EXEMPLE Griot complet,"Données fictives — format uniquement",2500,HTG,oui,1
-exemple-restaurant-test,Plats,EXEMPLE Poisson gros sel,"Données fictives — format uniquement",25,USD,non,2
-exemple-restaurant-test,Desserts,EXEMPLE Pain patate,,600,HTG,,1
-exemple-restaurant-test,Boissons,EXEMPLE Jus de chadèque,,500,HTG,oui,1
-exemple-restaurant-test,Cocktails,EXEMPLE Cocktail maison,,12.50,USD,oui,1
