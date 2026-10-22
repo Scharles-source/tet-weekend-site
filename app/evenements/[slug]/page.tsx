@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
-import { CarteEvenement } from "@/components/listing/CarteEvenement";
+import { CarteEvenement, ZoneFlyer } from "@/components/listing/CarteEvenement";
 import { lienGoogleAgenda } from "@/lib/listing/calendrier";
 import { lireAnnuaire, chargerAnnuaire } from "@/lib/listing/data";
 import { estTermine, formaterQuand } from "@/lib/listing/dates";
@@ -22,10 +22,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const evenement = evenements.find((e) => e.slug === slug);
     if (!evenement) return { title: "Événement — Tèt Weekend" };
     const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(", ");
+    const description = [evenement.description, ou].filter(Boolean).join(" — ") || evenement.titre;
     return {
       title: `${evenement.titre} — Tèt Weekend`,
-      description: [evenement.description, ou].filter(Boolean).join(" — ") || evenement.titre,
+      description,
       alternates: { canonical: `${SITE}/evenements/${evenement.slug}` },
+      openGraph: evenement.flyer
+        ? {
+            title: evenement.titre,
+            description,
+            images: [{
+              url: evenement.flyer.publicUrl,
+              width: evenement.flyer.width ?? undefined,
+              height: evenement.flyer.height ?? undefined,
+              alt: evenement.flyer.alt,
+            }],
+          }
+        : undefined,
     };
   } catch {
     return { title: "Événement — Tèt Weekend" };
@@ -70,6 +83,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
             Événement terminé
           </p>
         )}
+        <ZoneFlyer evenement={evenement} />
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight">{evenement.titre}</h1>
         <p className="mt-2 text-[var(--text-sec)]">{formaterQuand(evenement.date_debut, evenement.fuseau)}</p>
         {evenement.date_fin && (

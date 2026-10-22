@@ -2,10 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { Deconnexion } from "@/components/admin/Deconnexion";
-import { changerStatut, enregistrerArtiste, enregistrerCompte, enregistrerEvenement, enregistrerLieu } from "@/app/admin/actions";
+import { SectionEvenements } from "@/components/admin/SectionEvenements";
+import { changerStatut, enregistrerArtiste, enregistrerCompte, enregistrerLieu } from "@/app/admin/actions";
 import type { ArtisteAdmin, CompteAdmin, EvenementAdmin, LieuAdmin } from "@/lib/admin/charger";
-import { saisieDepuisInstant } from "@/lib/listing/dates";
-import { CATEGORIES, FUSEAU_DEFAUT, FUSEAUX, LIBELLES_STATUT, PLATEFORMES, SOURCES, TYPES_ARTISTE, TYPES_COMPTE, TYPES_LIEU } from "@/lib/listing/schema";
+import { LIBELLES_STATUT, PLATEFORMES, TYPES_ARTISTE, TYPES_COMPTE, TYPES_LIEU } from "@/lib/listing/schema";
 import { slugifier } from "@/lib/listing/slug";
 
 type Onglet = "evenements" | "lieux" | "artistes" | "comptes";
@@ -38,7 +38,7 @@ export function DashboardListing({
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-5xl">
       <header className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-2xl font-extrabold">Événements</h1>
@@ -55,7 +55,7 @@ export function DashboardListing({
       </div>
       {erreur && <p className="mb-4 text-sm text-amber-200">{erreur}</p>}
       {pending && <p className="mb-4 text-sm text-[var(--text-sec)]">Enregistrement…</p>}
-      {onglet === "evenements" && <FormulaireEvenement lieux={lieux} artistes={artistes} evenements={evenements} onAction={executer} />}
+      {onglet === "evenements" && <SectionEvenements lieux={lieux} artistes={artistes} evenements={evenements} />}
       {onglet === "lieux" && <FormulaireLieu lieux={lieux} onAction={executer} />}
       {onglet === "artistes" && <FormulaireArtiste artistes={artistes} onAction={executer} />}
       {onglet === "comptes" && <FormulaireCompte comptes={comptes} onAction={executer} />}
@@ -86,116 +86,6 @@ function BoutonsStatut({
       {statut !== "retire" && (
         <button type="button" className="text-sm underline" onClick={() => onAction(() => changerStatut({ table, id, statut: "retire" }))}>Retirer</button>
       )}
-    </div>
-  );
-}
-
-function FormulaireEvenement({
-  lieux,
-  artistes,
-  evenements,
-  onAction,
-}: {
-  lieux: LieuAdmin[];
-  artistes: ArtisteAdmin[];
-  evenements: EvenementAdmin[];
-  onAction: (action: () => Promise<{ ok: boolean; erreur?: string }>) => void;
-}) {
-  const vide = {
-    id: "",
-    titre: "",
-    slug: "",
-    date_debut: "",
-    date_fin: "",
-    venue_id: "",
-    ville: "",
-    description: "",
-    prix: "",
-    source: "manuel",
-    source_url: "",
-    categorie: "",
-    fuseau: FUSEAU_DEFAUT,
-    a_verifier: false,
-    artist_ids: [] as string[],
-  };
-  const [f, setF] = useState(vide);
-  function set<K extends keyof typeof vide>(cle: K, valeur: (typeof vide)[K]) {
-    setF((actuel) => ({ ...actuel, [cle]: valeur }));
-  }
-  return (
-    <div className="space-y-6">
-      <form
-        className="space-y-3 rounded-2xl border border-white/10 bg-[var(--surface)] p-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          onAction(() => enregistrerEvenement({ id: f.id || null, champs: { ...f, venue_id: f.venue_id || null } }));
-        }}
-      >
-        <h2 className="font-bold">{f.id ? "Modifier l'événement" : "Nouvel événement"}</h2>
-        <input className={champ} placeholder="Titre" value={f.titre} onChange={(e) => { set("titre", e.target.value); if (!f.id) set("slug", slugOuVide(e.target.value)); }} required />
-        <input className={champ} placeholder="slug" value={f.slug} onChange={(e) => set("slug", e.target.value)} required />
-        <label className="block text-sm">Début<input type="datetime-local" className={champ} value={f.date_debut} onChange={(e) => set("date_debut", e.target.value)} required /></label>
-        <label className="block text-sm">Fin (vide si inconnue)<input type="datetime-local" className={champ} value={f.date_fin} onChange={(e) => set("date_fin", e.target.value)} /></label>
-        <select className={champ} value={f.fuseau} onChange={(e) => set("fuseau", e.target.value)}>
-          {FUSEAUX.map((z) => <option key={z.id} value={z.id}>{z.nom}</option>)}
-        </select>
-        <input className={champ} placeholder="Ville" value={f.ville} onChange={(e) => set("ville", e.target.value)} />
-        <select className={champ} value={f.venue_id} onChange={(e) => set("venue_id", e.target.value)}>
-          <option value="">Lieu (aucun)</option>
-          {lieux.map((l) => <option key={l.id} value={l.id}>{l.nom}</option>)}
-        </select>
-        <select className={champ} value={f.categorie} onChange={(e) => set("categorie", e.target.value)}>
-          <option value="">Catégorie (inconnue)</option>
-          {CATEGORIES.map((c) => <option key={c.slug} value={c.slug}>{c.nom}</option>)}
-        </select>
-        <select multiple className={`${champ} min-h-28`} value={f.artist_ids} onChange={(e) => set("artist_ids", [...e.target.selectedOptions].map((o) => o.value))}>
-          {artistes.map((a) => <option key={a.id} value={a.id}>{a.nom}</option>)}
-        </select>
-        <textarea className={champ} placeholder="Description" value={f.description} onChange={(e) => set("description", e.target.value)} />
-        <input className={champ} placeholder="Prix d'entrée (laisser vide si inconnu)" value={f.prix} onChange={(e) => set("prix", e.target.value)} />
-        <select className={champ} value={f.source} onChange={(e) => set("source", e.target.value)}>
-          <option value="">Source</option>
-          {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <input className={champ} placeholder="Lien du post d'origine" value={f.source_url} onChange={(e) => set("source_url", e.target.value)} />
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.a_verifier} onChange={(e) => set("a_verifier", e.target.checked)} /> À vérifier</label>
-        <div className="flex gap-2">
-          <button type="submit" className="min-h-11 rounded-xl bg-[var(--blue)] px-4 font-medium text-black">Enregistrer en brouillon</button>
-          {f.id && <button type="button" className="min-h-11 rounded-xl border border-white/15 px-4" onClick={() => setF(vide)}>Annuler</button>}
-        </div>
-      </form>
-      <ul className="space-y-3">
-        {evenements.map((e) => (
-          <li key={e.id} className="rounded-2xl border border-white/10 p-4">
-            <p className="font-medium">{e.titre}</p>
-            <p className="text-sm text-[var(--text-sec)]">{[e.ville, e.prix].filter(Boolean).join(" · ") || "Prix et ville non indiqués"}</p>
-            <button
-              type="button"
-              className="mt-2 text-sm underline"
-              onClick={() => setF({
-                id: e.id,
-                titre: e.titre,
-                slug: e.slug,
-                date_debut: saisieDepuisInstant(e.date_debut, e.fuseau),
-                date_fin: e.date_fin ? saisieDepuisInstant(e.date_fin, e.fuseau) : "",
-                venue_id: e.venue_id ?? "",
-                ville: e.ville ?? "",
-                description: e.description ?? "",
-                prix: e.prix ?? "",
-                source: e.source ?? "",
-                source_url: e.source_url ?? "",
-                categorie: e.categorie ?? "",
-                fuseau: e.fuseau || FUSEAU_DEFAUT,
-                a_verifier: e.a_verifier,
-                artist_ids: e.artist_ids,
-              })}
-            >
-              Modifier
-            </button>
-            <BoutonsStatut table="events" id={e.id} statut={e.statut} onAction={onAction} />
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

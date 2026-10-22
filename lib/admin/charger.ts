@@ -40,11 +40,23 @@ export interface EvenementAdmin {
   prix: string | null;
   source: string | null;
   source_url: string | null;
+  source_account: string | null;
+  spotted_at: string | null;
   categorie: string | null;
   fuseau: string;
   a_verifier: boolean;
   statut: string;
   artist_ids: string[];
+  flyer_storage_path: string | null;
+  flyer_url: string | null;
+  flyer_card_url: string | null;
+  flyer_width: number | null;
+  flyer_height: number | null;
+  flyer_mime_type: string | null;
+  flyer_alt: string | null;
+  flyer_credit: string | null;
+  flyer_hidden_at: string | null;
+  flyer_hidden_reason: string | null;
 }
 
 export interface CompteAdmin {
@@ -68,7 +80,7 @@ export async function chargerListing(): Promise<{
     supabase.from("artists").select("id,slug,nom,type,ville_base,bio,instagram,facebook,site_web,statut").order("nom"),
     supabase
       .from("events")
-      .select("id,slug,titre,date_debut,date_fin,venue_id,ville,description,prix,source,source_url,categorie,fuseau,a_verifier,statut,event_artists(artist_id)")
+      .select("id,slug,titre,date_debut,date_fin,venue_id,ville,description,prix,source,source_url,source_account,spotted_at,categorie,fuseau,a_verifier,statut,flyer_storage_path,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,flyer_hidden_at,flyer_hidden_reason,event_artists(artist_id)")
       .order("date_debut", { ascending: false }),
     supabase.from("watch_accounts").select("id,plateforme,handle,url,type,actif").order("created_at", { ascending: false }),
   ]);

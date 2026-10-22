@@ -24,6 +24,16 @@ export interface ArtistePublic {
   site_web: string | null;
 }
 
+export interface FlyerPublic {
+  publicUrl: string;
+  cardUrl: string | null;
+  width: number | null;
+  height: number | null;
+  mimeType: "image/jpeg" | "image/png" | "image/webp" | null;
+  alt: string;
+  credit: string | null;
+}
+
 export interface EvenementPublic {
   id: string;
   slug: string;
@@ -35,8 +45,10 @@ export interface EvenementPublic {
   prix: string | null;
   source: string | null;
   source_url: string | null;
+  source_account: string | null;
   categorie: string | null;
   fuseau: string;
   lieu: LieuPublic | null;
   artistes: ArtistePublic[];
+  flyer: FlyerPublic | null;
 }

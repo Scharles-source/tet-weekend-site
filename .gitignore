@@ -38,5 +38,6 @@ next-env.d.ts
 
 # caches locaux, hors dépôt
 *.traineddata
+public/apercu-flyer/
 .firebase/
 data/collecte/

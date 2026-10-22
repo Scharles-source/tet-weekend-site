@@ -1,4 +1,6 @@
-import type { ArtistePublic, EvenementPublic, LieuPublic } from "./types.ts";
+import { altFlyer } from "./flyer.ts";
+import { formaterQuand } from "./dates.ts";
+import type { ArtistePublic, EvenementPublic, FlyerPublic, LieuPublic } from "./types.ts";
 
 export class ConfigurationSupabaseManquante extends Error {
   constructor(manquantes: string[]) {
@@ -96,7 +98,7 @@ function evenementDe(brut: EvenementBrut): EvenementPublic {
     .map((l) => l.artists)
     .filter((a): a is Record<string, unknown> => Boolean(a && typeof a.id === "string"))
     .map(artisteDe);
-  return {
+  const evenement: EvenementPublic = {
     id: String(brut.id),
     slug: String(brut.slug),
     titre: String(brut.titre),
@@ -107,10 +109,30 @@ function evenementDe(brut: EvenementBrut): EvenementPublic {
     prix: texte(brut.prix),
     source: texte(brut.source),
     source_url: texte(brut.source_url),
+    source_account: texte(brut.source_account),
     categorie: texte(brut.categorie),
     fuseau: texte(brut.fuseau) ?? "America/Port-au-Prince",
     lieu: lieuDe(venueBrut ?? null),
     artistes,
+    flyer: null,
+  };
+  const lieu = evenement.lieu?.nom ?? evenement.ville;
+  evenement.flyer = flyerDe(brut, evenement.titre, lieu, formaterQuand(evenement.date_debut, evenement.fuseau));
+  return evenement;
+}
+
+function flyerDe(brut: Record<string, unknown>, titre: string, lieu: string | null, quand: string): FlyerPublic | null {
+  const url = texte(brut.flyer_url);
+  if (!url) return null;
+  const mime = texte(brut.flyer_mime_type);
+  return {
+    publicUrl: url,
+    cardUrl: texte(brut.flyer_card_url),
+    width: typeof brut.flyer_width === "number" ? brut.flyer_width : null,
+    height: typeof brut.flyer_height === "number" ? brut.flyer_height : null,
+    mimeType: mime === "image/jpeg" || mime === "image/png" || mime === "image/webp" ? mime : null,
+    alt: texte(brut.flyer_alt) ?? altFlyer(titre, lieu, quand),
+    credit: texte(brut.flyer_credit),
   };
 }
 
@@ -122,7 +144,7 @@ export interface Annuaire {
 
 export async function lireAnnuaire(): Promise<Annuaire> {
   const selectEvents = encodeURIComponent(
-    `id,slug,titre,date_debut,date_fin,ville,description,prix,source,source_url,categorie,fuseau,venues(${COLONNES_LIEU}),event_artists(artists(${COLONNES_ARTISTE}))`,
+    `id,slug,titre,date_debut,date_fin,ville,description,prix,source,source_url,source_account,categorie,fuseau,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,venues(${COLONNES_LIEU}),event_artists(artists(${COLONNES_ARTISTE}))`,
   );
   const [lieux, artistes, evenements] = await Promise.all([
     lire<Record<string, unknown>[]>(`venues?select=${COLONNES_LIEU}&order=nom.asc`),

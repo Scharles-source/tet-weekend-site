@@ -12,6 +12,7 @@ export const CATEGORIES = [
   { slug: "concerts", nom: "Concerts" },
   { slug: "soirees-kompa", nom: "Soirées kompa" },
   { slug: "festivals", nom: "Festivals" },
+  { slug: "autre", nom: "Autre" },
 ] as const;
 
 export type SlugCategorie = (typeof CATEGORIES)[number]["slug"];

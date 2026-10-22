@@ -14,6 +14,7 @@ export function jsonLdEvenement(e: EvenementPublic, url: string): Record<string,
   };
   if (e.date_fin) data.endDate = e.date_fin;
   if (e.description) data.description = e.description;
+  if (e.flyer?.publicUrl) data.image = e.flyer.publicUrl;
   const nomLieu = e.lieu?.nom ?? e.ville;
   if (nomLieu) {
     const adresse: Record<string, string> = { "@type": "PostalAddress" };

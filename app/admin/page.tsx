@@ -37,7 +37,7 @@ export default async function PageAdmin() {
       <main className="mx-auto max-w-lg pt-10">
         <h1 className="mb-3 text-2xl font-extrabold">Admin</h1>
         <p className="text-sm text-amber-100">
-          {acces.message}. La migration <code>20261022000000_listing_evenements.sql</code> doit être appliquée.
+          {acces.message}. Les migrations <code>20261022000000_listing_evenements.sql</code> et <code>20261022020000_flyers_evenements.sql</code> doivent être appliquées.
         </p>
       </main>
     );
