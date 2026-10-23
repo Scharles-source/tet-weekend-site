@@ -127,13 +127,6 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
         )}
         {evenement.prix && <p className="mt-4">Entrée : {evenement.prix}</p>}
         {evenement.description && <p className="mt-4 whitespace-pre-wrap text-[15px]">{evenement.description}</p>}
-        {evenement.source_url && (
-          <p className="mt-4">
-            <a href={evenement.source_url} className="font-semibold text-[#E02B20] no-underline" rel="noreferrer">
-              Voir le post d&apos;origine
-            </a>
-          </p>
-        )}
         <div className="mt-6 flex flex-wrap gap-2">
           <a href={lienGoogleAgenda(evenement, url)} className="min-h-11 rounded-full bg-[#E02B20] px-4 py-3 text-sm font-semibold text-white">
             Ajouter à Google Agenda

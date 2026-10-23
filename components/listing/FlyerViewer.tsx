@@ -85,14 +85,7 @@ function FlyerOuvert({ evenement, onClose }: { evenement: EvenementPublic; onClo
       <footer className="absolute right-0 bottom-0 left-0 flex h-24 flex-col justify-center gap-1 px-4 text-sm text-white" onClick={(e) => e.stopPropagation()}>
         <p className="font-medium">{evenement.titre}</p>
         <p className="text-white/80">{[quand, lieu].filter(Boolean).join(" · ")}</p>
-        <p className="flex flex-wrap gap-3 text-white/80">
-          {credit && <span>Flyer : {credit}</span>}
-          {evenement.source_url && (
-            <a href={evenement.source_url} className="underline" rel="noreferrer" target="_blank">
-              Voir le post d&apos;origine
-            </a>
-          )}
-        </p>
+        {credit && <p className="text-white/80">Flyer : {credit}</p>}
       </footer>
     </div>
   );

@@ -382,6 +382,9 @@ export function SectionEvenements({
           </select>
           <input className={champ} placeholder="Compte (@compte ou nom)" value={f.source_account} onChange={(e) => set("source_account", e.target.value)} />
           <input className={champ} placeholder="URL du post d'origine" value={f.source_url} onChange={(e) => set("source_url", e.target.value)} />
+          {f.source_url.trim().startsWith("http") && (
+            <a className="text-sm underline" href={f.source_url.trim()} target="_blank" rel="noreferrer">Ouvrir le post d&apos;origine</a>
+          )}
           <label className="block text-sm">Repéré le<input type="datetime-local" className={champ} value={f.spotted_at} onChange={(e) => set("spotted_at", e.target.value)} /></label>
         </fieldset>
 
@@ -464,6 +467,7 @@ export function SectionEvenements({
               <button type="button" className="underline" onClick={() => charger(e)}>Modifier</button>
               <button type="button" className="underline" onClick={() => executer(() => dupliquerEvenement(e.id))}>Dupliquer</button>
               {e.statut === "publie" && <a className="underline" href={`/evenements/${e.slug}`} target="_blank" rel="noreferrer">Page publique</a>}
+              {e.source_url && <a className="underline" href={e.source_url} target="_blank" rel="noreferrer">Post d&apos;origine</a>}
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
               <span className="rounded-full border border-white/15 px-2 py-1 text-xs">{LIBELLES_STATUT[e.statut as "brouillon"] ?? e.statut}</span>
