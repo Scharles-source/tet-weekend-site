@@ -92,6 +92,24 @@ interface EvenementBrut extends Record<string, unknown> {
   event_artists?: { artists?: Record<string, unknown> | null }[] | null;
 }
 
+function urlPostOrigine(): RegExp {
+  return /https?:\/\/(?:www\.)?(?:instagram\.com\/(?:p|reel|tv)\/|facebook\.com\/(?:[\w.-]+\/)?(?:posts|videos|photos|reel)\/|facebook\.com\/(?:share|events)\/|fb\.watch\/)[^\s)]*/gi;
+}
+
+export function descriptionPublique(valeur: string | null): string | null {
+  if (!valeur) return null;
+  const sansParentheses = valeur.replace(/\(([^()]*)\)/g, (tout, dedans: string) => {
+    const reste = dedans.replace(urlPostOrigine(), "").replace(/^(?:\s|[:.-]|affiche|source|post)+$/i, "").trim();
+    return reste ? `(${reste})` : "";
+  });
+  const sans = sansParentheses
+    .replace(urlPostOrigine(), "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\s+([.,;])/g, "$1")
+    .trim();
+  return sans || null;
+}
+
 function evenementDe(brut: EvenementBrut): EvenementPublic {
   const venueBrut = Array.isArray(brut.venues) ? brut.venues[0] : brut.venues;
   const artistes = (brut.event_artists ?? [])
@@ -105,7 +123,7 @@ function evenementDe(brut: EvenementBrut): EvenementPublic {
     date_debut: String(brut.date_debut),
     date_fin: texte(brut.date_fin),
     ville: texte(brut.ville) ?? lieuDe(venueBrut ?? null)?.ville ?? null,
-    description: texte(brut.description),
+    description: descriptionPublique(texte(brut.description)),
     prix: texte(brut.prix),
     source: texte(brut.source),
     source_url: null,
