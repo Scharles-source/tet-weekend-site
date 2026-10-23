@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saisieDepuisInstant } from "@/lib/listing/dates";
 import { CATEGORIES, FUSEAUX } from "@/lib/listing/schema";
+import { AIDE, BTN_PRIMAIRE, BTN_SECONDAIRE, CARTE, CHAMP } from "@/components/admin/styles";
 import {
   FREQUENCES,
   LIMITES_VISIBLES,
@@ -18,7 +19,7 @@ import {
   type VueSource,
 } from "@/lib/crawlers/vue";
 
-const champ = "min-h-11 w-full rounded-xl border border-white/15 bg-[var(--black)] px-3";
+const champ = CHAMP;
 
 export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCollecte; apercu?: boolean }) {
   const router = useRouter();
@@ -77,55 +78,49 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
   );
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-sm text-[var(--text-sec)]"><Link href="/admin">Admin</Link></p>
-          <h1 className="font-[family-name:var(--font-display)] text-2xl font-extrabold">Collecte — Événements</h1>
-          <p className="text-sm text-[var(--text-sec)]">{donnees.email} — rien n&apos;est publié sans un clic d&apos;approbation.</p>
-        </div>
-      </header>
-      {message && <p className="text-sm text-amber-100">{message}</p>}
+    <div className="space-y-6">
+      <p className={AIDE}>{donnees.email} — rien n&apos;est publié sans un clic d&apos;approbation. <Link href="/admin" className="font-semibold text-[#E02B20] no-underline">Retour aux événements</Link></p>
+      {message && <p className="text-sm font-semibold text-[#92400E]">{message}</p>}
       <section id="bandeau" className="grid gap-3 sm:grid-cols-4">
         <Carte titre="Crawler" valeur={donnees.globalEnabled ? "Activé" : "Pause globale"} />
         <Carte titre="Runner" valeur={donnees.runnerEnLigne ? "En ligne" : "Hors ligne"} detail={donnees.heartbeatAt ? `Dernier battement ${donnees.heartbeatAt}` : "Aucun battement"} />
         <Carte titre="Jobs" valeur={`${donnees.comptes.queued} en file`} detail={`${donnees.comptes.running} en cours · ${donnees.comptes.blocked} bloqués · ${donnees.comptes.failed} échoués`} />
         <Carte titre="À valider" valeur={String(donnees.aValider)} />
       </section>
-      <section className="rounded-2xl border border-white/10 p-4 text-sm text-[var(--text-sec)]">
+      <section className={`${CARTE} p-4 text-sm text-[#8A7B66]`}>
         <ul className="list-disc space-y-1 pl-5">
           {LIMITES_VISIBLES.map((ligne) => <li key={ligne}>{ligne}</li>)}
         </ul>
       </section>
       <section className="flex flex-wrap gap-2">
-        <button type="button" disabled={pending} className="min-h-11 rounded-full bg-[var(--blue)] px-4 text-sm text-black disabled:opacity-50" onClick={() => agir("/api/admin/crawlers/jobs", { jobType: "scan_all" })}>Scanner toutes les sources actives</button>
-        <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-4 text-sm disabled:opacity-50" onClick={() => agirMethode("/api/admin/crawlers/settings", "PATCH", { globalEnabled: !donnees.globalEnabled })}>{donnees.globalEnabled ? "Pause globale" : "Reprendre"}</button>
-        <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-4 text-sm disabled:opacity-50" onClick={() => agirMethode("/api/admin/crawlers/settings", "PATCH", { schedulerEnabled: !donnees.schedulerEnabled })}>Planification automatique : {donnees.schedulerEnabled ? "oui" : "non"}</button>
+        <button type="button" disabled={pending} className={BTN_PRIMAIRE} onClick={() => agir("/api/admin/crawlers/jobs", { jobType: "scan_all" })}>Scanner toutes les sources actives</button>
+        <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agirMethode("/api/admin/crawlers/settings", "PATCH", { globalEnabled: !donnees.globalEnabled })}>{donnees.globalEnabled ? "Pause globale" : "Reprendre"}</button>
+        <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agirMethode("/api/admin/crawlers/settings", "PATCH", { schedulerEnabled: !donnees.schedulerEnabled })}>Planification automatique : {donnees.schedulerEnabled ? "oui" : "non"}</button>
       </section>
       <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); void agir("/api/admin/crawlers/jobs", { jobType: "import_url", inputUrl: url }); }}>
         <input className={`${champ} max-w-xl`} placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)} aria-label="URL à importer" />
-        <button type="submit" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-4 text-sm disabled:opacity-50">Importer une URL</button>
+        <button type="submit" disabled={pending} className={BTN_SECONDAIRE}>Importer une URL</button>
       </form>
       <FormulaireSource pending={pending} onCreer={(body) => agir("/api/admin/watch-accounts", body)} />
       <section id="sources" className="space-y-3">
-        <h2 className="text-xl font-bold">Sources</h2>
-        {donnees.sources.length === 0 && <p className="text-sm text-[var(--text-sec)]">Aucune source.</p>}
+        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">Sources</h2>
+        {donnees.sources.length === 0 && <p className="text-sm text-[#8A7B66]">Aucune source.</p>}
         {donnees.sources.map((source) => (
-          <article key={source.id} className="rounded-2xl border border-white/10 p-4 text-sm">
+          <article key={source.id} className={`${CARTE} p-4 text-sm`}>
             <p className="font-semibold">{source.displayName || source.handle || source.profileUrl} · {source.platform}</p>
-            <p className="text-[var(--text-sec)]">{source.sourceType} · {[source.city, source.country].filter(Boolean).join(", ") || "Ville non indiquée"} · {frequenceLibelle(source.scanFrequencyMinutes)} · {source.active ? "active" : "en pause"}</p>
-            <p className="text-[var(--text-sec)]">Dernier scan : {source.lastScannedAt ?? "jamais"} · succès : {source.lastSuccessAt ?? "jamais"} · candidats : {source.candidats}</p>
-            {source.lastError && <p className="text-amber-100">{source.lastError}</p>}
+            <p className="text-[#8A7B66]">{source.sourceType} · {[source.city, source.country].filter(Boolean).join(", ") || "Ville non indiquée"} · {frequenceLibelle(source.scanFrequencyMinutes)} · {source.active ? "active" : "en pause"}</p>
+            <p className="text-[#8A7B66]">Dernier scan : {source.lastScannedAt ?? "jamais"} · succès : {source.lastSuccessAt ?? "jamais"} · candidats : {source.candidats}</p>
+            {source.lastError && <p className="text-[#92400E]">{source.lastError}</p>}
             <div className="mt-2 flex flex-wrap gap-2">
-              <button type="button" disabled={pending || !source.active} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50" onClick={() => agir("/api/admin/crawlers/jobs", { jobType: "scan_source", sourceId: source.id })}>Scanner</button>
-              <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50" onClick={() => agirMethode(`/api/admin/watch-accounts/${source.id}`, "PATCH", { active: !source.active })}>{source.active ? "Mettre en pause" : "Réactiver"}</button>
+              <button type="button" disabled={pending || !source.active} className={BTN_SECONDAIRE} onClick={() => agir("/api/admin/crawlers/jobs", { jobType: "scan_source", sourceId: source.id })}>Scanner</button>
+              <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agirMethode(`/api/admin/watch-accounts/${source.id}`, "PATCH", { active: !source.active })}>{source.active ? "Mettre en pause" : "Réactiver"}</button>
             </div>
             <EditionSource source={source} pending={pending} onSauver={(body) => agirMethode(`/api/admin/watch-accounts/${source.id}`, "PATCH", body)} />
           </article>
         ))}
       </section>
       <section id="jobs" className="space-y-3">
-        <h2 className="text-xl font-bold">Jobs</h2>
+        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">Jobs</h2>
         <div className="flex flex-wrap gap-2">
           <select className={champ} aria-label="Filtrer par statut" value={filtreStatut} onChange={(e) => setFiltreStatut(e.target.value)}>
             <option value="">Tous les statuts</option>
@@ -137,24 +132,24 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
           </select>
         </div>
         {jobs.map((job) => (
-          <details key={job.id} open={apercu} className="rounded-2xl border border-white/10 p-4 text-sm">
+          <details key={job.id} open={apercu} className={`${CARTE} p-4 text-sm`}>
             <summary className="cursor-pointer">{new Date(job.createdAt).toLocaleString("fr-FR")} · {job.jobType} · {job.sourceNom ?? job.inputUrl ?? "—"} · {libelleStatutJob(job.status)}</summary>
-            <p className="mt-2 text-[var(--text-sec)]">scannés {job.counts.scanned ?? 0} · nouveaux {job.counts.newCandidates ?? 0} · doublons {job.counts.duplicates ?? 0} · ignorés {job.counts.ignored ?? 0} · erreurs {job.counts.errors ?? 0}</p>
-            {job.errorMessage && <p className="text-amber-100">{job.errorMessage}</p>}
+            <p className="mt-2 text-[#8A7B66]">scannés {job.counts.scanned ?? 0} · nouveaux {job.counts.newCandidates ?? 0} · doublons {job.counts.duplicates ?? 0} · ignorés {job.counts.ignored ?? 0} · erreurs {job.counts.errors ?? 0}</p>
+            {job.errorMessage && <p className="text-[#92400E]">{job.errorMessage}</p>}
             <ul className="mt-2 space-y-1">{job.logs.map((log) => <li key={log.id}>{new Date(log.createdAt).toLocaleString("fr-FR")} · {log.level} · {log.message}</li>)}</ul>
             <div className="mt-2 flex gap-2">
-              {["queued", "running"].includes(job.status) && <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50" onClick={() => agir(`/api/admin/crawlers/jobs/${job.id}/cancel`)}>Annuler</button>}
-              {["failed", "blocked"].includes(job.status) && <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50" onClick={() => agir(`/api/admin/crawlers/jobs/${job.id}/retry`)}>Réessayer</button>}
+              {["queued", "running"].includes(job.status) && <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agir(`/api/admin/crawlers/jobs/${job.id}/cancel`)}>Annuler</button>}
+              {["failed", "blocked"].includes(job.status) && <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agir(`/api/admin/crawlers/jobs/${job.id}/retry`)}>Réessayer</button>}
             </div>
           </details>
         ))}
       </section>
       <section id="a-valider" className="space-y-4">
-        <h2 className="text-xl font-bold">À valider</h2>
+        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">À valider</h2>
         {selection.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50" onClick={() => agir("/api/admin/event-candidates/bulk", { ids: selection, action: "reject" })}>Rejeter la sélection</button>
-            <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50" onClick={() => agir("/api/admin/event-candidates/bulk", { ids: selection, action: "duplicate" })}>Marquer la sélection comme doublon</button>
+            <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agir("/api/admin/event-candidates/bulk", { ids: selection, action: "reject" })}>Rejeter la sélection</button>
+            <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agir("/api/admin/event-candidates/bulk", { ids: selection, action: "duplicate" })}>Marquer la sélection comme doublon</button>
           </div>
         )}
         {donnees.candidats.map((candidat) => (
@@ -167,22 +162,22 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
 
 function Carte({ titre, valeur, detail }: { titre: string; valeur: string; detail?: string }) {
   return (
-    <article className="rounded-2xl border border-white/10 p-4">
-      <p className="text-xs uppercase tracking-wide text-[var(--text-sec)]">{titre}</p>
+    <article className={`${CARTE} p-4`}>
+      <p className="text-xs uppercase tracking-wide text-[#8A7B66]">{titre}</p>
       <p className="text-lg font-bold">{valeur}</p>
-      {detail && <p className="text-xs text-[var(--text-sec)]">{detail}</p>}
+      {detail && <p className="text-xs text-[#8A7B66]">{detail}</p>}
     </article>
   );
 }
 
 function FormulaireSource({ pending, onCreer }: { pending: boolean; onCreer: (body: Record<string, unknown>) => void }) {
   return (
-    <form className="grid gap-2 rounded-2xl border border-white/10 p-4 sm:grid-cols-2" onSubmit={(e) => {
+    <form className={`${CARTE} grid gap-2 p-4 sm:grid-cols-2`} onSubmit={(e) => {
       e.preventDefault();
       const donnees = new FormData(e.currentTarget);
       onCreer(Object.fromEntries(donnees.entries()));
     }}>
-      <h2 className="sm:col-span-2 text-xl font-bold">Ajouter une source</h2>
+      <h2 className="sm:col-span-2 font-[family-name:var(--font-display)] text-[18px] font-extrabold">Ajouter une source</h2>
       <select name="platform" className={champ} aria-label="Plateforme">{PLATEFORMES_SOURCE.map((p) => <option key={p}>{p}</option>)}</select>
       <select name="sourceType" className={champ} aria-label="Type">{TYPES_SOURCE.map((t) => <option key={t}>{t}</option>)}</select>
       <input name="handle" className={champ} placeholder="Handle" aria-label="Handle" />
@@ -193,7 +188,7 @@ function FormulaireSource({ pending, onCreer }: { pending: boolean; onCreer: (bo
       <select name="scanFrequencyMinutes" className={champ} defaultValue="1440" aria-label="Fréquence">{FREQUENCES.map((f) => <option key={f.minutes} value={f.minutes}>{f.libelle}</option>)}</select>
       <input name="maxPostsPerScan" className={champ} defaultValue="20" aria-label="Maximum de posts" />
       <input name="notes" className={champ} placeholder="Notes" aria-label="Notes" />
-      <button type="submit" disabled={pending} className="min-h-11 rounded-full bg-[var(--blue)] px-4 text-sm text-black disabled:opacity-50">Ajouter</button>
+      <button type="submit" disabled={pending} className={BTN_PRIMAIRE}>Ajouter</button>
     </form>
   );
 }
@@ -213,7 +208,7 @@ function EditionSource({ source, pending, onSauver }: { source: VueSource; pendi
         <select name="scanFrequencyMinutes" defaultValue={String(source.scanFrequencyMinutes)} className={champ} aria-label="Fréquence">{FREQUENCES.map((f) => <option key={f.minutes} value={f.minutes}>{f.libelle}</option>)}</select>
         <input name="maxPostsPerScan" defaultValue={String(source.maxPostsPerScan)} className={champ} aria-label="Maximum de posts" />
         <input name="notes" defaultValue={source.notes ?? ""} className={champ} aria-label="Notes" />
-        <button type="submit" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50">Enregistrer la source</button>
+        <button type="submit" disabled={pending} className={BTN_SECONDAIRE}>Enregistrer la source</button>
       </form>
     </details>
   );
@@ -241,27 +236,27 @@ function CandidatCarte({
     return { fields: { ...brut, gratuit: brut.gratuit === "on", venueId: brut.venueId || null }, publish: publier };
   }
   return (
-    <article className="grid gap-4 rounded-2xl border border-white/10 p-4 lg:grid-cols-2">
+    <article className={`${CARTE} grid gap-4 p-4 lg:grid-cols-2`}>
       <div>
         <label className="mb-2 flex items-center gap-2 text-sm"><input type="checkbox" checked={coche} onChange={(e) => onCoche(e.target.checked)} /> Sélectionner</label>
         {candidat.flyerUrl ? (
           <a href={candidat.flyerUrl} target="_blank" rel="noreferrer">
             {/* Le flyer candidat est une URL signée ou locale : object-fit contain, pas de recadrage. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={candidat.flyerUrl} alt={`Flyer — ${candidat.title ?? "candidat"}`} className="max-h-[420px] w-full rounded-[18px] bg-[#0D0A14] object-contain" />
+            <img src={candidat.flyerUrl} alt={`Flyer — ${candidat.title ?? "candidat"}`} className="max-h-[260px] w-full rounded-[12px] bg-[#F3E6D8] object-contain" />
           </a>
         ) : (
-          <div className="flex min-h-40 flex-col justify-center rounded-[18px] bg-[#0D0A14] p-4 text-sm">
+          <div className="flex min-h-40 flex-col justify-center rounded-[12px] border-2 border-dashed border-[#D8C6A4] p-4 text-sm">
             <p>Aucun flyer récupéré</p>
             <a className="underline" href={candidat.sourcePostUrl} target="_blank" rel="noreferrer">Voir la source</a>
           </div>
         )}
-        {candidat.caption && <p className="mt-3 whitespace-pre-wrap text-sm text-[var(--text-sec)]">{candidat.caption}</p>}
+        {candidat.caption && <p className="mt-3 whitespace-pre-wrap text-sm text-[#8A7B66]">{candidat.caption}</p>}
       </div>
       <form className="space-y-2" onSubmit={(e) => { e.preventDefault(); onAction(`/api/admin/event-candidates/${candidat.id}/approve`, "POST", champs(e.currentTarget)); }}>
         <p className="text-sm"><a className="underline" href={candidat.sourcePostUrl} target="_blank" rel="noreferrer">{candidat.platform}</a> · {candidat.compte ?? "compte non indiqué"}</p>
-        <p className="text-xs text-[var(--text-sec)]">Titre {libelleConfiance(candidat.confidence.titre?.niveau)} · Date {libelleConfiance(candidat.confidence.date?.niveau)} · Lieu {libelleConfiance(candidat.confidence.lieu?.niveau)}</p>
-        {(candidat.duplicateOfEventId || candidat.duplicateOfCandidateId) && <p className="text-sm text-amber-100">Doublon probable. {candidat.duplicateOfEventId ? `Événement ${candidat.duplicateOfEventId}` : `Candidat ${candidat.duplicateOfCandidateId}`}</p>}
+        <p className="text-xs text-[#8A7B66]">Titre {libelleConfiance(candidat.confidence.titre?.niveau)} · Date {libelleConfiance(candidat.confidence.date?.niveau)} · Lieu {libelleConfiance(candidat.confidence.lieu?.niveau)}</p>
+        {(candidat.duplicateOfEventId || candidat.duplicateOfCandidateId) && <p className="text-sm text-[#92400E]">Doublon probable. {candidat.duplicateOfEventId ? `Événement ${candidat.duplicateOfEventId}` : `Candidat ${candidat.duplicateOfCandidateId}`}</p>}
         <input name="titre" defaultValue={candidat.title ?? ""} className={champ} aria-label="Titre" required />
         <input name="dateDebut" type="datetime-local" defaultValue={debut} className={champ} aria-label="Début" />
         <input name="dateFin" type="datetime-local" className={champ} aria-label="Fin" />
@@ -276,10 +271,10 @@ function CandidatCarte({
         <textarea name="description" defaultValue={candidat.description ?? ""} className={champ} aria-label="Description" />
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={publier} onChange={(e) => setPublier(e.target.checked)} /> Publier immédiatement après approbation</label>
         <div className="flex flex-wrap gap-2">
-          <button type="submit" disabled={pending} className="min-h-11 rounded-full bg-[var(--blue)] px-3 text-sm text-black disabled:opacity-50">{publier ? "Approuver et publier" : "Approuver comme brouillon"}</button>
-          <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50" onClick={(e) => onAction(`/api/admin/event-candidates/${candidat.id}`, "PATCH", champs(e.currentTarget.form!))}>Enregistrer les corrections</button>
-          <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50" onClick={() => onAction(`/api/admin/event-candidates/${candidat.id}/reject`, "POST", { reason: "" })}>Rejeter</button>
-          <button type="button" disabled={pending} className="min-h-11 rounded-full border border-white/15 px-3 disabled:opacity-50" onClick={() => onAction(`/api/admin/event-candidates/${candidat.id}/duplicate`, "POST", {})}>Marquer comme doublon</button>
+          <button type="submit" disabled={pending} className={BTN_PRIMAIRE}>{publier ? "Approuver et publier" : "Approuver comme brouillon"}</button>
+          <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={(e) => onAction(`/api/admin/event-candidates/${candidat.id}`, "PATCH", champs(e.currentTarget.form!))}>Enregistrer les corrections</button>
+          <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => onAction(`/api/admin/event-candidates/${candidat.id}/reject`, "POST", { reason: "" })}>Rejeter</button>
+          <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => onAction(`/api/admin/event-candidates/${candidat.id}/duplicate`, "POST", {})}>Marquer comme doublon</button>
         </div>
       </form>
     </article>

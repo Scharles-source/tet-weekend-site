@@ -86,7 +86,7 @@ const FIXTURE: VueCollecte = {
 export default function PageApercuCollecte() {
   if (process.env.NODE_ENV === "production") notFound();
   return (
-    <div className="min-h-screen bg-[var(--black)] px-4 py-6 text-[var(--white)]">
+    <div className="min-h-screen bg-[#FBF7EF] px-4 py-6 text-[#191410]">
       <CollecteEvenements donnees={FIXTURE} apercu />
     </div>
   );

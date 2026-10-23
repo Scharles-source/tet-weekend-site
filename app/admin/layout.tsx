@@ -6,5 +6,10 @@ export const metadata: Metadata = {
 };
 
 export default function LayoutAdmin({ children }: { children: React.ReactNode }) {
-  return <div className="min-h-screen bg-[var(--black)] px-4 py-6 text-[var(--white)] sm:px-6">{children}</div>;
+  return (
+    <div className="admin-clair min-h-dvh bg-[#FBF7EF] font-[family-name:var(--font-inter)] text-[#191410]">
+      <style>{".admin-clair :focus-visible{outline:2px solid #E02B20;outline-offset:2px}"}</style>
+      {children}
+    </div>
+  );
 }
