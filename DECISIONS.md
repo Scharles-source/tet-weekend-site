@@ -14,7 +14,7 @@ Tèt Weekend devient un listing d'événements haïtiens (Haïti + diaspora). Pa
 - Le sitemap ne liste que les événements à venir.
 - L'heure saisie dans l'admin est interprétée dans le fuseau choisi (Haïti par défaut).
 - `follows` et les alertes ne sont pas créés (phase 3). Les statistiques de vues non plus.
-- `watch_accounts` existe. On peut y ajouter des comptes. Aucun scan (phase 2).
+- `watch_accounts` existe. La veille est décrite dans la décision « Crawlers d'événements » : rien n'est publié sans validation.
 - Les pages Firebase `/events` et `/trending` restent en place. La navigation pointe vers `/evenements`, `/lieux` et `/artistes`.
 
 ## 22 octobre 2026 — Flyer en en-tête
@@ -27,3 +27,13 @@ Pour un événement qui a un flyer, le visuel de la carte et de la page est le f
 - La catégorie `autre` s'ajoute à bals, concerts, soirees-kompa et festivals.
 - Aucune version recadrée n'est générée : la carte et la visionneuse lisent le fichier original. `flyer_card_url` reste disponible.
 - Bucket Storage : `event-flyers`. Écriture par la session admin, jamais avec `service_role` dans le navigateur.
+
+## 22 octobre 2026 — Crawlers d'événements
+
+La veille crée des jobs. Un runner local (`npm run events:runner`) les exécute. Rien n'est publié sans approbation dans **Collecte — Événements**.
+
+- `watch_accounts` garde ses colonnes (`plateforme`, `url`, `type`, `actif`). Les champs de fréquence et de dernier scan s'ajoutent. Les tables `crawl_jobs` sont nouvelles : `collecte_jobs` (menus) n'est pas sur `main` et n'est pas réutilisée.
+- Instagram et Facebook restent bloqués sans voie officielle. Eventbrite n'appelle l'API que si une clé est sur le runner. Les sites et les flux RSS publics respectent `robots.txt`.
+- Le flyer d'un candidat non approuvé va dans le bucket privé `event-candidate-flyers`. L'approbation le copie dans `event-flyers`.
+- `SUPABASE_SERVICE_ROLE_KEY` sert au runner local uniquement. Pas dans le navigateur, pas sur Vercel.
+- La planification automatique est éteinte par défaut. Aucun worker hébergé : le bandeau dit hors ligne si le runner n'est pas lancé.

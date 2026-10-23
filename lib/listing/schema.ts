@@ -20,8 +20,8 @@ export type SlugCategorie = (typeof CATEGORIES)[number]["slug"];
 export const TYPES_ARTISTE = ["DJ", "groupe", "chanteur"] as const;
 export const TYPES_LIEU = ["bar", "club", "restaurant", "salle"] as const;
 export const SOURCES = ["instagram", "facebook", "eventbrite", "manuel"] as const;
-export const PLATEFORMES = ["instagram", "facebook", "eventbrite"] as const;
-export const TYPES_COMPTE = ["lieu", "artiste", "promoteur"] as const;
+export const PLATEFORMES = ["instagram", "facebook", "eventbrite", "website", "rss", "manual"] as const;
+export const TYPES_COMPTE = ["lieu", "artiste", "promoteur", "media", "organisateur", "autre"] as const;
 
 export const FUSEAU_DEFAUT = "America/Port-au-Prince";
 

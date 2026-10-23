@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Deconnexion } from "@/components/admin/Deconnexion";
 import { SectionEvenements } from "@/components/admin/SectionEvenements";
@@ -43,6 +44,7 @@ export function DashboardListing({
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-2xl font-extrabold">Événements</h1>
           <p className="text-sm text-[var(--text-sec)]">{email} — rien n&apos;est publié sans un clic.</p>
+          <Link href="/admin/collecte-evenements" className="text-sm underline">Collecte — Événements</Link>
         </div>
         <Deconnexion />
       </header>
