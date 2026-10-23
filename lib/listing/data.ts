@@ -108,7 +108,7 @@ function evenementDe(brut: EvenementBrut): EvenementPublic {
     description: texte(brut.description),
     prix: texte(brut.prix),
     source: texte(brut.source),
-    source_url: texte(brut.source_url),
+    source_url: null,
     source_account: texte(brut.source_account),
     categorie: texte(brut.categorie),
     fuseau: texte(brut.fuseau) ?? "America/Port-au-Prince",
@@ -147,7 +147,7 @@ export interface Annuaire {
 
 export async function lireAnnuaire(): Promise<Annuaire> {
   const selectEvents = encodeURIComponent(
-    `id,slug,titre,date_debut,date_fin,ville,description,prix,source,source_url,source_account,categorie,fuseau,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,venues(${COLONNES_LIEU}),event_artists(artists(${COLONNES_ARTISTE}))`,
+    `id,slug,titre,date_debut,date_fin,ville,description,prix,source,source_account,categorie,fuseau,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,venues(${COLONNES_LIEU}),event_artists(artists(${COLONNES_ARTISTE}))`,
   );
   const [lieux, artistes, evenements, sponsors] = await Promise.all([
     lire<Record<string, unknown>[]>(`venues?select=${COLONNES_LIEU}&order=nom.asc`),
