@@ -59,5 +59,8 @@ function evenement(titre: string, url: string, width: number, height: number): E
     lieu: { id: "l", slug: "yanvalou", nom: "Yanvalou", ville: "Pétion-Ville", pays: "Haïti", adresse: null, type: null, description: null, instagram: null, facebook: null, site_web: null },
     artistes: [],
     flyer: { publicUrl: url, cardUrl: null, width, height, mimeType: "image/png", alt: `Flyer — ${titre}`, credit: "@apercu" },
+    sponsored_from: null,
+    sponsored_to: null,
+    vues: null,
   };
 }

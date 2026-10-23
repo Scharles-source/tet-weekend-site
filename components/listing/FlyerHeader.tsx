@@ -5,7 +5,7 @@ import { useState, type Ref } from "react";
 import { altFlyer, flyerFrameStyle } from "@/lib/listing/flyer";
 import type { FlyerPublic } from "@/lib/listing/types";
 
-const DEGRADE = "linear-gradient(145deg, #241433 0%, #6B8AFF 48%, #0A0A0C 100%)";
+const DEGRADE = "linear-gradient(150deg, #F97316, #E02B20 55%, #5B2EE5)";
 
 export function FlyerHeader({
   flyer,
@@ -30,14 +30,14 @@ export function FlyerHeader({
   const cadre = flyer ? flyerFrameStyle({ publicUrl: flyer.publicUrl, cardUrl: flyer.cardUrl }) : null;
   const style =
     variant === "carte"
-      ? { backgroundColor: "#0D0A14", aspectRatio: cadre?.aspectRatio ?? "4 / 3", borderTopLeftRadius: 18, borderTopRightRadius: 18 }
+      ? { backgroundColor: "#F3E6D8", aspectRatio: cadre?.aspectRatio ?? "4 / 3", borderTopLeftRadius: 20, borderTopRightRadius: 20 }
       : {
           width: "100%",
           minHeight: 240,
           maxHeight: 680,
           height: hauteurBanniere(flyer?.width, flyer?.height),
-          backgroundColor: "#0D0A14",
-          borderRadius: 18,
+          backgroundColor: "#F3E6D8",
+          borderRadius: 20,
         };
 
   return (
@@ -69,9 +69,11 @@ export function FlyerHeader({
           </button>
         </>
       ) : (
-        <div className="absolute inset-0" style={{ background: DEGRADE }} />
+        <div className="absolute inset-0 flex items-center justify-center px-6 text-center" style={{ background: DEGRADE }}>
+          <p className="font-[family-name:var(--font-display)] text-[22px] font-black text-white">{title}</p>
+        </div>
       )}
-      <span className="pointer-events-none absolute top-3 left-3 z-20 rounded-full bg-[#FF7A1A] px-2.5 py-1 text-xs font-medium text-black">
+      <span className="pointer-events-none absolute top-3 left-3 z-20 rounded-full bg-[#191410] px-2.5 py-1 text-xs font-semibold text-white">
         {dateLabel}
       </span>
     </div>

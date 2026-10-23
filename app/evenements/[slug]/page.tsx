@@ -79,19 +79,19 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <article>
         {termine && (
-          <p className="mb-3 rounded-xl border border-amber-200/30 bg-amber-200/10 px-3 py-2 text-sm text-amber-100">
+          <p className="mb-3 rounded-xl bg-[#FDECEA] px-3 py-2 text-sm font-semibold text-[#B91C1C]">
             Événement terminé
           </p>
         )}
         <ZoneFlyer evenement={evenement} />
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight">{evenement.titre}</h1>
-        <p className="mt-2 text-[var(--text-sec)]">{formaterQuand(evenement.date_debut, evenement.fuseau)}</p>
+        <h1 className="font-[family-name:var(--font-display)] text-3xl font-black leading-tight text-[#191410]">{evenement.titre}</h1>
+        <p className="mt-2 text-[#4A4136]">{formaterQuand(evenement.date_debut, evenement.fuseau)}</p>
         {evenement.date_fin && (
           <p className="text-sm text-[var(--text-sec)]">Fin : {formaterQuand(evenement.date_fin, evenement.fuseau)}</p>
         )}
         {categorie && (
           <p className="mt-2">
-            <Link href={`/categories/${evenement.categorie}`} className="text-sm underline">
+            <Link href={`/categories/${evenement.categorie}`} className="text-sm font-semibold text-[#E02B20] no-underline">
               {categorie}
             </Link>
           </p>
@@ -118,7 +118,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           <ul className="mt-3 flex flex-wrap gap-2 text-sm">
             {evenement.artistes.map((a) => (
               <li key={a.id}>
-                <Link href={`/artistes/${a.slug}`} className="rounded-full border border-white/15 px-3 py-1">
+                <Link href={`/artistes/${a.slug}`} className="rounded-full border border-[#EFE5D2] bg-white px-3 py-1 text-[#4A4136] no-underline">
                   {a.nom}
                 </Link>
               </li>
@@ -129,16 +129,16 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
         {evenement.description && <p className="mt-4 whitespace-pre-wrap text-[15px]">{evenement.description}</p>}
         {evenement.source_url && (
           <p className="mt-4">
-            <a href={evenement.source_url} className="underline" rel="noreferrer">
+            <a href={evenement.source_url} className="font-semibold text-[#E02B20] no-underline" rel="noreferrer">
               Voir le post d&apos;origine
             </a>
           </p>
         )}
         <div className="mt-6 flex flex-wrap gap-2">
-          <a href={lienGoogleAgenda(evenement, url)} className="min-h-11 rounded-xl bg-[var(--blue)] px-4 py-3 text-sm font-medium text-black">
+          <a href={lienGoogleAgenda(evenement, url)} className="min-h-11 rounded-full bg-[#E02B20] px-4 py-3 text-sm font-semibold text-white">
             Ajouter à Google Agenda
           </a>
-          <a href={`/evenements/${evenement.slug}/calendrier`} className="min-h-11 rounded-xl border border-white/15 px-4 py-3 text-sm">
+          <a href={`/evenements/${evenement.slug}/calendrier`} className="min-h-11 rounded-full border border-[#EFE5D2] bg-white px-4 py-3 text-sm text-[#191410]">
             Télécharger .ics
           </a>
         </div>
@@ -146,7 +146,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           <iframe
             title={`Carte : ${evenement.titre}`}
             src={`https://maps.google.com/maps?q=${encodeURIComponent(questionCarte)}&z=15&output=embed`}
-            className="mt-6 h-56 w-full rounded-2xl border border-white/10"
+            className="mt-6 h-56 w-full rounded-[20px] border border-[#EFE5D2]"
             loading="lazy"
           />
         )}

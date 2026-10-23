@@ -130,15 +130,10 @@ export async function enregistrerEvenement(input: {
       }
     }
     const { artist_ids, ...ligne } = evenement;
-    let id = input.id ?? null;
-    if (id) {
-      const { error } = await supabase.from("events").update(ligne).eq("id", id);
-      if (error) return { ok: false, erreur: erreurDe(error) };
-    } else {
-      const { data, error } = await supabase.from("events").insert(ligne).select("id").single();
-      if (error) return { ok: false, erreur: erreurDe(error) };
-      id = data.id as string;
-    }
+    const ecrit = await ecrireEvenement(supabase, input.id ?? null, ligne);
+    if (!ecrit.ok && !ecrit.id) return { ok: false, erreur: ecrit.erreur };
+    const id = ecrit.id;
+    if (!id) return { ok: false, erreur: "Enregistrement impossible." };
     const { error: suppression } = await supabase.from("event_artists").delete().eq("event_id", id);
     if (suppression) return { ok: false, erreur: erreurDe(suppression) };
     if (artist_ids.length > 0) {
@@ -146,10 +141,43 @@ export async function enregistrerEvenement(input: {
       if (error) return { ok: false, erreur: erreurDe(error) };
     }
     rafraichir();
+    if (!ecrit.ok) return { ok: false, erreur: ecrit.erreur };
     return { ok: true, id, artist_ids, venue_id: evenement.venue_id };
   } catch (e) {
     return { ok: false, erreur: erreurDe(e) };
   }
+}
+
+async function ecrireEvenement(
+  supabase: Awaited<ReturnType<typeof clientServeur>>,
+  id: string | null,
+  ligne: Omit<EvenementSaisi, "artist_ids">,
+): Promise<{ ok: true; id: string; erreur?: undefined } | { ok: false; id: string | null; erreur: string }> {
+  const premier = await uneEcriture(supabase, id, ligne);
+  if (!premier.erreur && premier.id) return { ok: true, id: premier.id };
+  if (!premier.erreur || !/sponsored_from|sponsored_to/.test(premier.erreur.message)) {
+    return { ok: false, id: null, erreur: erreurDe(premier.erreur ?? new Error("Enregistrement impossible.")) };
+  }
+  const { sponsored_from, sponsored_to, ...reste } = ligne;
+  const second = await uneEcriture(supabase, id, reste);
+  if (second.erreur || !second.id) return { ok: false, id: null, erreur: erreurDe(second.erreur ?? new Error("Enregistrement impossible.")) };
+  if (sponsored_from || sponsored_to) {
+    return { ok: false, id: second.id, erreur: "L'événement est enregistré. Le sponsoring attend la migration SQL." };
+  }
+  return { ok: true, id: second.id };
+}
+
+async function uneEcriture(
+  supabase: Awaited<ReturnType<typeof clientServeur>>,
+  id: string | null,
+  ligne: Record<string, unknown>,
+): Promise<{ id: string | null; erreur: { message: string } | null }> {
+  if (id) {
+    const { error } = await supabase.from("events").update(ligne).eq("id", id);
+    return { id, erreur: error };
+  }
+  const { data, error } = await supabase.from("events").insert(ligne).select("id").single();
+  return { id: (data?.id as string | undefined) ?? null, erreur: error };
 }
 
 async function creerLieu(brut?: Record<string, unknown> | null): Promise<{ id: string; ville: string | null } | null> {

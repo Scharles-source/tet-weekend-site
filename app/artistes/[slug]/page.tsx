@@ -58,7 +58,7 @@ export default async function PageArtiste({ params }: { params: Promise<{ slug: 
             <ul className="flex flex-wrap gap-2 text-sm">
               {[...lieux.values()].map((l) => (
                 <li key={l.slug}>
-                  <Link href={`/lieux/${l.slug}`} className="rounded-full border border-white/15 px-3 py-1">{l.nom}</Link>
+                  <Link href={`/lieux/${l.slug}`} className="rounded-full border border-[#EFE5D2] bg-white px-3 py-1 text-[#4A4136] no-underline">{l.nom}</Link>
                 </li>
               ))}
             </ul>
