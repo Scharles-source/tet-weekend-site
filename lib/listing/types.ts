@@ -51,4 +51,7 @@ export interface EvenementPublic {
   lieu: LieuPublic | null;
   artistes: ArtistePublic[];
   flyer: FlyerPublic | null;
+  sponsored_from: string | null;
+  sponsored_to: string | null;
+  vues: number | null;
 }

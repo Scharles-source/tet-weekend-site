@@ -28,7 +28,7 @@ export default async function PageArtistes() {
         ) : (
           <ul className="space-y-3">
             {artistes.map((artiste) => (
-              <li key={artiste.id} className="rounded-2xl border border-white/10 bg-[var(--surface)] p-4">
+              <li key={artiste.id} className="rounded-[20px] border-[1.5px] border-[#EFE5D2] bg-white p-4 shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
                 <Link href={`/artistes/${artiste.slug}`} className="font-medium hover:underline">
                   {artiste.nom}
                 </Link>

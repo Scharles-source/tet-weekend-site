@@ -70,6 +70,8 @@ interface Formulaire {
   flyer_credit: string;
   flyer_hidden_at: string;
   flyer_hidden_reason: string;
+  sponsored_from: string;
+  sponsored_to: string;
   apercuLocal: string;
 }
 
@@ -112,6 +114,8 @@ const vide: Formulaire = {
   flyer_credit: "",
   flyer_hidden_at: "",
   flyer_hidden_reason: "",
+  sponsored_from: "",
+  sponsored_to: "",
   apercuLocal: "",
 };
 
@@ -251,6 +255,9 @@ export function SectionEvenements({
           <select className={champ} value={f.fuseau} onChange={(e) => set("fuseau", e.target.value)}>
             {FUSEAUX.map((z) => <option key={z.id} value={z.id}>{z.nom}</option>)}
           </select>
+          <label className="block text-sm">Sponsorisé du<input type="datetime-local" className={champ} value={f.sponsored_from} onChange={(e) => set("sponsored_from", e.target.value)} /></label>
+          <label className="block text-sm">Sponsorisé jusqu&apos;au<input type="datetime-local" className={champ} value={f.sponsored_to} onChange={(e) => set("sponsored_to", e.target.value)} /></label>
+          <p className="text-sm text-[var(--text-sec)]">Affiche l&apos;événement dans la bannière d&apos;accueil pendant cette période.</p>
           <input className={champ} placeholder="Ville" value={f.ville} onChange={(e) => set("ville", e.target.value)} />
           <select className={champ} value={f.venue_id} disabled={f.nouveauLieu} onChange={(e) => set("venue_id", e.target.value)}>
             <option value="">Lieu existant (aucun)</option>
@@ -528,6 +535,8 @@ function champsDepuis(f: Formulaire): Record<string, unknown> {
     flyer_credit: f.flyer_credit,
     flyer_hidden_at: f.flyer_hidden_at,
     flyer_hidden_reason: f.flyer_hidden_reason,
+    sponsored_from: f.sponsored_from,
+    sponsored_to: f.sponsored_to,
   };
 }
 
@@ -566,6 +575,8 @@ function depuisEvenement(e: EvenementAdmin): Formulaire {
     flyer_credit: e.flyer_credit ?? "",
     flyer_hidden_at: e.flyer_hidden_at ?? "",
     flyer_hidden_reason: e.flyer_hidden_reason ?? "",
+    sponsored_from: e.sponsored_from ? saisieDepuisInstant(e.sponsored_from, e.fuseau) : "",
+    sponsored_to: e.sponsored_to ? saisieDepuisInstant(e.sponsored_to, e.fuseau) : "",
   };
 }
 
@@ -614,6 +625,9 @@ function apercuDepuis(f: Formulaire, lieux: LieuAdmin[], artistes: ArtisteAdmin[
       ...f.artistesNouveaux.map((a, i) => ({ id: `nouveau-${i}`, slug: a.slug || "nouveau", nom: a.nom, type: a.type || null, ville_base: null, bio: null, instagram: null, facebook: null, site_web: null })),
     ],
     flyer,
+    sponsored_from: null,
+    sponsored_to: null,
+    vues: null,
   };
 }
 

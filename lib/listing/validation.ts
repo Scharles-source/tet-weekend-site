@@ -131,6 +131,8 @@ export interface EvenementSaisi {
   flyer_credit: string | null;
   flyer_hidden_at: string | null;
   flyer_hidden_reason: string | null;
+  sponsored_from: string | null;
+  sponsored_to: string | null;
 }
 
 export function validerEvenement(brut: Record<string, unknown>): EvenementSaisi {
@@ -167,6 +169,22 @@ export function validerEvenement(brut: Record<string, unknown>): EvenementSaisi 
       throw new SaisieInvalide("Date de repérage invalide.");
     }
   }
+  const sponsorDebut = texteOuNull(brut.sponsored_from);
+  const sponsorFin = texteOuNull(brut.sponsored_to);
+  let sponsored_from: string | null = null;
+  let sponsored_to: string | null = null;
+  try {
+    sponsored_from = sponsorDebut ? instantDepuisSaisie(sponsorDebut, fuseau) : null;
+    sponsored_to = sponsorFin ? instantDepuisSaisie(sponsorFin, fuseau) : null;
+  } catch {
+    throw new SaisieInvalide("Période de sponsoring invalide.");
+  }
+  if ((sponsored_from && !sponsored_to) || (!sponsored_from && sponsored_to)) {
+    throw new SaisieInvalide("Indiquez le début et la fin du sponsoring.");
+  }
+  if (sponsored_from && sponsored_to && sponsored_to < sponsored_from) {
+    throw new SaisieInvalide("La fin du sponsoring ne peut pas précéder le début.");
+  }
   return {
     titre,
     slug: slugObligatoire(brut.slug),
@@ -195,6 +213,8 @@ export function validerEvenement(brut: Record<string, unknown>): EvenementSaisi 
     flyer_credit: texteOuNull(brut.flyer_credit),
     flyer_hidden_at: instantOuNull(brut.flyer_hidden_at),
     flyer_hidden_reason: texteOuNull(brut.flyer_hidden_reason),
+    sponsored_from,
+    sponsored_to,
   };
 }
 

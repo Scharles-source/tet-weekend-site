@@ -107,6 +107,40 @@ export function dansLeWeekend(
   return t >= debut.getTime() && t <= fin.getTime();
 }
 
+const JOUR_COURT: Record<string, string> = {
+  Sun: "dim.",
+  Mon: "lun.",
+  Tue: "mar.",
+  Wed: "mer.",
+  Thu: "jeu.",
+  Fri: "ven.",
+  Sat: "sam.",
+};
+const MOIS_COURT = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+
+/** Badge de carte : « ven. 23 oct. · 23h00 ». */
+export function formaterBadge(iso: string, fuseau: string = FUSEAU_DEFAUT): string {
+  const p = parties(new Date(iso), fuseau);
+  const heure = String(p.hour).padStart(2, "0");
+  const minute = String(p.minute).padStart(2, "0");
+  return `${JOUR_COURT[p.weekday] ?? ""} ${p.day} ${MOIS_COURT[p.month - 1]} · ${heure}h${minute}`;
+}
+
+/** Kicker de bannière : « SAM. 14 NOV. 2026 · 22H00 ». */
+export function formaterKicker(iso: string, fuseau: string = FUSEAU_DEFAUT): string {
+  const p = parties(new Date(iso), fuseau);
+  const jour = (JOUR_COURT[p.weekday] ?? "").replace(".", "").toUpperCase();
+  const mois = (MOIS_COURT[p.month - 1] ?? "").toUpperCase();
+  const heure = String(p.hour).padStart(2, "0");
+  const minute = String(p.minute).padStart(2, "0");
+  return `${jour}. ${p.day} ${mois} ${p.year} · ${heure}H${minute}`;
+}
+
+export function formaterPastille(iso: string, fuseau: string = FUSEAU_DEFAUT): { jour: string; mois: string } {
+  const p = parties(new Date(iso), fuseau);
+  return { jour: String(p.day), mois: MOIS_COURT[p.month - 1] ?? "" };
+}
+
 export function formatIcs(iso: string): string {
   return new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }

@@ -67,7 +67,7 @@ export default async function PageLieu({ params }: { params: Promise<{ slug: str
           <iframe
             title={`Carte : ${lieu.nom}`}
             src={`https://maps.google.com/maps?q=${encodeURIComponent(question)}&z=15&output=embed`}
-            className="mt-6 h-56 w-full rounded-2xl border border-white/10"
+            className="mt-6 h-56 w-full rounded-[20px] border border-[#EFE5D2]"
             loading="lazy"
           />
         )}

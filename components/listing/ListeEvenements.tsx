@@ -22,10 +22,10 @@ export function ListeEvenements({ evenements, vide }: { evenements: EvenementPub
         value={recherche}
         onChange={(e) => setRecherche(e.target.value)}
         placeholder="Nom de l'événement, du DJ, de la ville…"
-        className="min-h-11 w-full rounded-xl border border-white/15 bg-[var(--black)] px-3"
+        className="min-h-11 w-full rounded-[14px] border border-[#EFE5D2] bg-white px-3 text-[#191410] outline-none placeholder:text-[#8A7B66]"
       />
       {filtres.length === 0 ? (
-        <p className="text-sm text-[var(--text-sec)]">{vide}</p>
+        <p className="text-sm text-[#8A7B66]">{vide}</p>
       ) : (
         filtres.map((e) => <CarteEvenement key={e.id} evenement={e} />)
       )}

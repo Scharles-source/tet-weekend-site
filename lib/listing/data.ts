@@ -115,6 +115,9 @@ function evenementDe(brut: EvenementBrut): EvenementPublic {
     lieu: lieuDe(venueBrut ?? null),
     artistes,
     flyer: null,
+    sponsored_from: null,
+    sponsored_to: null,
+    vues: null,
   };
   const lieu = evenement.lieu?.nom ?? evenement.ville;
   evenement.flyer = flyerDe(brut, evenement.titre, lieu, formaterQuand(evenement.date_debut, evenement.fuseau));
@@ -146,16 +149,52 @@ export async function lireAnnuaire(): Promise<Annuaire> {
   const selectEvents = encodeURIComponent(
     `id,slug,titre,date_debut,date_fin,ville,description,prix,source,source_url,source_account,categorie,fuseau,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,venues(${COLONNES_LIEU}),event_artists(artists(${COLONNES_ARTISTE}))`,
   );
-  const [lieux, artistes, evenements] = await Promise.all([
+  const [lieux, artistes, evenements, sponsors] = await Promise.all([
     lire<Record<string, unknown>[]>(`venues?select=${COLONNES_LIEU}&order=nom.asc`),
     lire<Record<string, unknown>[]>(`artists?select=${COLONNES_ARTISTE}&order=nom.asc`),
     lire<EvenementBrut[]>(`events?select=${selectEvents}&order=date_debut.asc`),
+    lireSponsors(),
   ]);
   return {
     lieux: lieux.map((l) => lieuDe(l)).filter((l): l is LieuPublic => Boolean(l)),
     artistes: artistes.filter((a) => typeof a.id === "string").map(artisteDe),
-    evenements: evenements.map(evenementDe),
+    evenements: evenements.map((brut) => {
+      const evenement = evenementDe(brut);
+      const sponsor = sponsors.get(evenement.id);
+      if (sponsor) {
+        evenement.sponsored_from = sponsor.sponsored_from;
+        evenement.sponsored_to = sponsor.sponsored_to;
+      }
+      return evenement;
+    }),
   };
+}
+
+/** Lecture séparée : si les colonnes n'existent pas encore, la bannière reste en trending. */
+async function lireSponsors(): Promise<Map<string, { sponsored_from: string | null; sponsored_to: string | null }>> {
+  const { url, cle } = configuration();
+  try {
+    const res = await fetch(`${url}/rest/v1/events?select=id,sponsored_from,sponsored_to`, {
+      headers: { apikey: cle, Authorization: `Bearer ${cle}`, Accept: "application/json" },
+      next: { revalidate: 300, tags: [TAG] },
+    });
+    if (!res.ok) return new Map();
+    const rows = (await res.json()) as { id: string; sponsored_from: string | null; sponsored_to: string | null }[];
+    return new Map(rows.map((row) => [row.id, { sponsored_from: row.sponsored_from, sponsored_to: row.sponsored_to }]));
+  } catch {
+    return new Map();
+  }
+}
+
+export async function emailContact(): Promise<string> {
+  try {
+    const rows = await lire<{ valeur: string }[]>("settings?select=valeur&cle=eq.contact_email");
+    const valeur = rows[0]?.valeur?.trim() ?? "";
+    if (valeur.includes("@")) return valeur;
+  } catch {
+    /* repli sur l'adresse déjà utilisée pour l'admin du site */
+  }
+  return "smithcharles8484@gmail.com";
 }
 
 export async function chargerAnnuaire(): Promise<{ ok: true; annuaire: Annuaire } | { ok: false; erreur: unknown }> {

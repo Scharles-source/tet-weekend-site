@@ -57,6 +57,8 @@ export interface EvenementAdmin {
   flyer_credit: string | null;
   flyer_hidden_at: string | null;
   flyer_hidden_reason: string | null;
+  sponsored_from: string | null;
+  sponsored_to: string | null;
 }
 
 export interface CompteAdmin {
@@ -75,15 +77,20 @@ export async function chargerListing(): Promise<{
   comptes: CompteAdmin[];
 }> {
   const supabase = await clientServeur();
-  const [lieux, artistes, evenements, comptes] = await Promise.all([
+  const colonnes = "id,slug,titre,date_debut,date_fin,venue_id,ville,description,prix,source,source_url,source_account,spotted_at,categorie,fuseau,a_verifier,statut,flyer_storage_path,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,flyer_hidden_at,flyer_hidden_reason,event_artists(artist_id)";
+  const [lieux, artistes, comptes] = await Promise.all([
     supabase.from("venues").select("id,slug,nom,ville,pays,adresse,type,description,instagram,facebook,site_web,statut").order("nom"),
     supabase.from("artists").select("id,slug,nom,type,ville_base,bio,instagram,facebook,site_web,statut").order("nom"),
-    supabase
-      .from("events")
-      .select("id,slug,titre,date_debut,date_fin,venue_id,ville,description,prix,source,source_url,source_account,spotted_at,categorie,fuseau,a_verifier,statut,flyer_storage_path,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,flyer_hidden_at,flyer_hidden_reason,event_artists(artist_id)")
-      .order("date_debut", { ascending: false }),
     supabase.from("watch_accounts").select("id,plateforme,handle,url,type,actif").order("created_at", { ascending: false }),
   ]);
+  type ReponseEvents = { data: Record<string, unknown>[] | null; error: { message: string } | null };
+  let evenements = await supabase
+    .from("events")
+    .select(`sponsored_from,sponsored_to,${colonnes}`)
+    .order("date_debut", { ascending: false }) as unknown as ReponseEvents;
+  if (evenements.error && /sponsored_from|sponsored_to/.test(evenements.error.message)) {
+    evenements = await supabase.from("events").select(colonnes).order("date_debut", { ascending: false }) as unknown as ReponseEvents;
+  }
   for (const res of [lieux, artistes, evenements, comptes]) {
     if (res.error) throw new Error(res.error.message);
   }
@@ -92,8 +99,13 @@ export async function chargerListing(): Promise<{
     artistes: (artistes.data ?? []) as ArtisteAdmin[],
     evenements: ((evenements.data ?? []) as (Omit<EvenementAdmin, "artist_ids"> & { event_artists?: { artist_id: string }[] })[]).map(
       (e) => {
-        const { event_artists, ...reste } = e;
-        return { ...reste, artist_ids: (event_artists ?? []).map((l) => l.artist_id) };
+        const { event_artists, sponsored_from, sponsored_to, ...reste } = e;
+        return {
+          ...reste,
+          sponsored_from: typeof sponsored_from === "string" ? sponsored_from : null,
+          sponsored_to: typeof sponsored_to === "string" ? sponsored_to : null,
+          artist_ids: (event_artists ?? []).map((l) => l.artist_id),
+        };
       },
     ),
     comptes: (comptes.data ?? []) as CompteAdmin[],

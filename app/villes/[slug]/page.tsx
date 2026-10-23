@@ -42,7 +42,7 @@ export default async function PageVille({ params }: { params: Promise<{ slug: st
       <Gabarit>
         <h1 className="mb-6 font-[family-name:var(--font-display)] text-3xl font-extrabold">Événements haïtiens à {ville.nom}</h1>
         <section className="space-y-3">
-          <h2 className="text-lg font-bold">Ce weekend</h2>
+          <h2 className="font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">Ce week-end</h2>
           {weekend.length === 0 ? (
             <p className="text-sm text-[var(--text-sec)]">Rien de publié pour ce weekend.</p>
           ) : (
@@ -50,7 +50,7 @@ export default async function PageVille({ params }: { params: Promise<{ slug: st
           )}
         </section>
         <section className="mt-8 space-y-3">
-          <h2 className="text-lg font-bold">À venir</h2>
+          <h2 className="font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">À venir</h2>
           {aVenir.length === 0 ? (
             <p className="text-sm text-[var(--text-sec)]">Aucun événement à venir.</p>
           ) : (
