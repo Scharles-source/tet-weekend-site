@@ -30,7 +30,7 @@ export default function ApercuTheme() {
           <BanniereVide email={EMAIL} />
         </div>
       </Gabarit>
-      <div id="admin-sponsoring" className="bg-[#0A0A0C] px-4 py-8 text-[#F5F2ED]">
+      <div id="admin-sponsoring" className="bg-[#FBF7EF] px-4 py-8 text-[#191410]">
         <SectionEvenements lieux={[]} artistes={[]} evenements={[]} />
       </div>
     </>

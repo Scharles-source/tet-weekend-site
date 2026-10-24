@@ -1,16 +1,18 @@
 "use client";
 
+import { LogOut } from "lucide-react";
 import { getApps } from "firebase/app";
 import { getAuth, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { clientNavigateur } from "@/lib/admin/browser";
+import { BTN_SECONDAIRE } from "@/components/admin/styles";
 
 export function Deconnexion() {
   const router = useRouter();
   return (
     <button
       type="button"
-      className="min-h-11 rounded-xl border border-white/15 px-4 text-sm"
+      className={`${BTN_SECONDAIRE} w-full`}
       onClick={async () => {
         await clientNavigateur().auth.signOut();
         if (getApps().length > 0) await signOut(getAuth(getApps()[0])).catch(() => undefined);
@@ -18,6 +20,7 @@ export function Deconnexion() {
         router.refresh();
       }}
     >
+      <LogOut size={16} aria-hidden />
       Déconnexion
     </button>
   );

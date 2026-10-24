@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { CollecteEvenements } from "@/components/admin/CollecteEvenements";
+import { Coquille } from "@/components/admin/Coquille";
 import { Deconnexion } from "@/components/admin/Deconnexion";
 import { chargerCollecte } from "@/lib/crawlers/charger";
 import { erreurPublique } from "@/lib/crawlers/serveur";
@@ -22,10 +23,14 @@ export default async function PageCollecteEvenements() {
     return (
       <main className="mx-auto max-w-lg pt-10">
         <h1 className="mb-3 text-2xl font-extrabold">Collecte — Événements</h1>
-        <p className="text-sm text-amber-100">{erreur}</p>
+        <p className="text-sm text-[#92400E]">{erreur}</p>
         <div className="mt-6"><Deconnexion /></div>
       </main>
     );
   }
-  return <CollecteEvenements donnees={donnees} />;
+  return (
+    <Coquille actif="collecte" email={donnees.email} titre="Collecte">
+      <CollecteEvenements donnees={donnees} />
+    </Coquille>
+  );
 }
