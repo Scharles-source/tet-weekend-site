@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { BanniereAccueil, type Panneau } from "@/components/listing/BanniereAccueil";
 import { CarteEvenementCompacte, LigneEvenement } from "@/components/listing/CarteEvenement";
 import { dansLeWeekend } from "@/lib/listing/dates";
@@ -20,13 +21,37 @@ export function AccueilPublic({
 }) {
   const weekend = evenements.filter((e) => dansLeWeekend(e.date_debut));
 
+  // Mobile : à l'ouverture, léger défilement initial pour amener le navigateur
+  // à replier sa barre d'adresse et dégager le carrousel « À la une ».
+  // Annulé dès que le visiteur touche ou fait défiler lui-même.
+  useEffect(() => {
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+    if (window.scrollY > 0) return;
+    let annule = false;
+    const annuler = () => {
+      annule = true;
+    };
+    window.addEventListener("touchstart", annuler, { once: true, passive: true });
+    window.addEventListener("wheel", annuler, { once: true, passive: true });
+    const timer = window.setTimeout(() => {
+      if (!annule && window.scrollY === 0) {
+        window.scrollTo({ top: 56, behavior: "smooth" });
+      }
+    }, 450);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("touchstart", annuler);
+      window.removeEventListener("wheel", annuler);
+    };
+  }, []);
+
   return (
     <div>
       {/* Héros + À la une : empilés sur mobile, côte à côte sur desktop */}
       <div className="lg:grid lg:grid-cols-[400px_1fr] lg:items-center lg:gap-9">
-        <div className="mb-6 lg:mb-0">
+        <div className="mb-4 lg:mb-0">
           <header>
-            <h1 className="font-[family-name:var(--font-display)] text-[34px] leading-[1.08] font-black text-[#191410] lg:text-[52px] lg:leading-[1.06]">
+            <h1 className="font-[family-name:var(--font-display)] text-[28px] leading-[1.1] font-black text-[#191410] lg:text-[52px] lg:leading-[1.06]">
               Partying in <span className="text-[#E02B20]">Haiti</span>.
             </h1>
           </header>

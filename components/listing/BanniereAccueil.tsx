@@ -88,9 +88,9 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
           <div className="flex items-center justify-center px-5 pt-5 lg:py-[30px] lg:pr-0 lg:pl-[34px]">
             {e.flyer ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={e.flyer.publicUrl} alt={e.titre} className="h-[320px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
+              <img src={e.flyer.publicUrl} alt={e.titre} className="h-[272px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
             ) : (
-              <div className="flex h-[320px] w-[240px] items-center justify-center rounded-[14px] bg-[rgba(0,0,0,.25)] px-4 text-center">
+              <div className="flex h-[272px] w-[240px] items-center justify-center rounded-[14px] bg-[rgba(0,0,0,.25)] px-4 text-center lg:h-[320px]">
                 <p className="font-[family-name:var(--font-display)] text-[22px] font-black text-white">{e.titre}</p>
               </div>
             )}
