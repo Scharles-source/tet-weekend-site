@@ -71,7 +71,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
       </div>
 
       <article
-        className="relative overflow-hidden rounded-[26px] shadow-[0_6px_24px_rgba(28,23,16,.08)]"
+        className="relative overflow-hidden rounded-[26px] shadow-[0_24px_48px_rgba(28,23,16,.20),0_8px_18px_rgba(28,23,16,.10)]"
         onTouchStart={(ev) => setDepart(ev.changedTouches[0]?.clientX ?? null)}
         onTouchEnd={(ev) => glisser(ev.changedTouches[0]?.clientX ?? 0)}
       >
