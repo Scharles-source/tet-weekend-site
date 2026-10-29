@@ -51,7 +51,7 @@ export function AccueilPublic({
       <div className="lg:grid lg:grid-cols-[400px_1fr] lg:items-center lg:gap-9">
         <div className="mb-4 lg:mb-0">
           <header>
-            <h1 className="font-[family-name:var(--font-display)] text-[28px] leading-[1.1] font-black text-[#191410] lg:text-[52px] lg:leading-[1.06]">
+            <h1 className="font-[family-name:var(--font-display)] text-[26px] leading-[1.1] font-black text-[#191410] lg:text-[52px] lg:leading-[1.06]">
               Partying in <span className="text-[#E02B20]">Haiti</span>.
             </h1>
           </header>

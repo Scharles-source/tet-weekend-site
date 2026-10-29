@@ -85,19 +85,19 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
 
         <div className="relative flex flex-col lg:min-h-[380px] lg:flex-row lg:items-center">
           {/* Flyer entier, jamais recadré */}
-          <div className="flex items-center justify-center px-5 pt-5 lg:py-[30px] lg:pr-0 lg:pl-[34px]">
+          <div className="flex items-center justify-center px-4 pt-4 lg:py-[30px] lg:pr-0 lg:pl-[34px]">
             {e.flyer ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={e.flyer.publicUrl} alt={e.titre} className="h-[272px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
+              <img src={e.flyer.publicUrl} alt={e.titre} className="h-[220px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
             ) : (
-              <div className="flex h-[272px] w-[240px] items-center justify-center rounded-[14px] bg-[rgba(0,0,0,.25)] px-4 text-center lg:h-[320px]">
+              <div className="flex h-[220px] w-[240px] items-center justify-center rounded-[14px] bg-[rgba(0,0,0,.25)] px-4 text-center lg:h-[320px]">
                 <p className="font-[family-name:var(--font-display)] text-[22px] font-black text-white">{e.titre}</p>
               </div>
             )}
           </div>
 
           {/* Informations : bloc blanc sur mobile, texte blanc sur le fond flouté sur desktop */}
-          <div className="mt-5 bg-white p-5 lg:mt-0 lg:flex-1 lg:bg-transparent lg:py-[30px] lg:pr-[34px] lg:pl-7">
+          <div className="mt-4 bg-white p-4 lg:mt-0 lg:flex-1 lg:bg-transparent lg:py-[30px] lg:pr-[34px] lg:pl-7">
             <div className="mb-3 hidden items-center gap-3 lg:flex">
               <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-[2.5px] text-white">
                 <span className="h-[9px] w-[9px] rounded-full bg-[#E02B20]" />
@@ -108,7 +108,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
             <p className="text-[13px] font-extrabold tracking-[1.2px] text-[#C21810] uppercase lg:text-[14.5px] lg:text-[#FFC9C4]">
               {formaterKicker(e.date_debut, e.fuseau)}
             </p>
-            <h2 className="mt-2 font-[family-name:var(--font-display)] text-[24px] font-black leading-tight text-[#191410] lg:text-[37px] lg:leading-[1.12] lg:text-white">
+            <h2 className="mt-2 font-[family-name:var(--font-display)] text-[22px] font-black leading-tight text-[#191410] lg:text-[37px] lg:leading-[1.12] lg:text-white">
               {e.titre}
             </h2>
             <p className="mt-2 flex items-center gap-1.5 text-[14px] text-[#6E6252] lg:text-[16.5px] lg:text-[#E9E2D2]">
