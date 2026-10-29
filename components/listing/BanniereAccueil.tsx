@@ -106,14 +106,14 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
               <MapPin size={16} aria-hidden className="shrink-0" />
               {lieu}
             </p>
-            <div className="mt-5 flex items-center gap-5">
+            <div className="mt-5 flex items-center gap-5 pr-[172px] lg:pr-0">
               {e.prix ? (
                 <div>
                   <p className="text-[11px] font-bold tracking-[1.5px] text-[#CFC6B0]">ENTRÉE</p>
                   <p className="font-[family-name:var(--font-display)] text-[20px] font-black text-white lg:text-[26px]">{e.prix}</p>
                 </div>
               ) : null}
-              <Link href={`/evenements/${e.slug}`} className="inline-flex min-h-11 items-center rounded-[14px] bg-[#E02B20] px-[30px] text-[15px] font-bold text-white shadow-[0_10px_24px_rgba(224,43,32,.45)] no-underline lg:min-h-[52px] lg:text-base">
+              <Link href={`/evenements/${e.slug}`} className="absolute right-5 bottom-5 inline-flex min-h-11 items-center rounded-[14px] bg-[#E02B20] px-[30px] text-[15px] font-bold text-white shadow-[0_10px_24px_rgba(224,43,32,.45)] no-underline lg:static lg:ml-auto lg:min-h-[52px] lg:text-base">
                 Voir l&apos;événement
               </Link>
             </div>
