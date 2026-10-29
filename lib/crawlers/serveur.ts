@@ -250,6 +250,13 @@ export async function approuverCandidat(id: string, requete: Request): Promise<R
     const titre = String(fields.titre ?? candidat.title ?? "").trim();
     const dateDebut = String(fields.dateDebut ?? "").trim();
     if (!titre || !dateDebut) return Response.json({ ok: false, erreur: "Le titre et la date sont obligatoires pour créer le brouillon." }, { status: 400 });
+    // Règle (Smith, 28 oct. 2026) : un candidat sans flyer ne devient pas un événement.
+    if (!candidat.flyer_storage_path) {
+      return Response.json(
+        { ok: false, erreur: "Approbation refusée : ce candidat n'a pas de flyer (règle : aucun événement sans flyer)." },
+        { status: 400 },
+      );
+    }
     const flyer = await promouvoirFlyer(candidat.flyer_storage_path as string | null);
     const artistes = String(fields.artistes ?? candidat.artists_text ?? "").trim();
     const lieu = String(fields.lieu ?? candidat.venue_name ?? "").trim();

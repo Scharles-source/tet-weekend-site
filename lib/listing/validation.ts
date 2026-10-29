@@ -159,6 +159,10 @@ export function validerEvenement(brut: Record<string, unknown>): EvenementSaisi 
   }
   const flyer_url = urlOuNull(brut.flyer_url, "Flyer");
   const flyer_storage_path = cheminFlyer(brut.flyer_storage_path);
+  // Règle (Smith, 28 oct. 2026) : aucun événement publié sans flyer.
+  if (publication === "publie" && !flyer_storage_path && !flyer_url) {
+    throw new SaisieInvalide("Publication refusée : un flyer est obligatoire pour publier un événement.");
+  }
   const ville = texteOuNull(brut.ville);
   const spotted = texteOuNull(brut.spotted_at);
   let spotted_at: string | null = null;

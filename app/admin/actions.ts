@@ -51,6 +51,13 @@ export async function changerStatut(input: {
     await exigerAdmin();
     if (!TABLES.includes(input.table)) return { ok: false, erreur: "Table inconnue." };
     const statut = statutValide(input.statut);
+    // Règle (Smith, 28 oct. 2026) : aucun événement publié sans flyer.
+    if (input.table === "events" && statut === "publie") {
+      const { data: evt } = await (await clientServeur()).from("events").select("flyer_storage_path, flyer_url").eq("id", input.id).maybeSingle();
+      if (!evt?.flyer_storage_path && !evt?.flyer_url) {
+        return { ok: false, erreur: "Publication refusée : un flyer est obligatoire pour publier un événement." };
+      }
+    }
     const patch: Record<string, string | null> = { statut };
     if (statut === "retire") {
       patch.motif_retrait = input.motif?.trim() ? input.motif.trim() : null;

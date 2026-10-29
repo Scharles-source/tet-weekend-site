@@ -33,3 +33,24 @@ test("événement : le prix vide reste vide, rien n'est inventé", () => {
   assert.equal(e.date_debut, "2026-10-25T01:00:00.000Z");
   assert.throws(() => validerEvenement({ ...e, titre: "" }), SaisieInvalide);
 });
+
+test("événement : publication refusée sans flyer, autorisée avec flyer", () => {
+  const base = {
+    titre: "Bal du samedi",
+    slug: "bal-du-samedi",
+    date_debut: "2026-10-24T21:00",
+    ville: "Pétion-Ville",
+    source: "manuel",
+    categorie: "bals",
+    fuseau: "America/Port-au-Prince",
+    a_verifier: false,
+    artist_ids: [],
+  };
+  // Brouillon sans flyer : accepté (on peut préparer, puis joindre le flyer).
+  assert.equal(validerEvenement({ ...base, statut: "brouillon" }).statut, "brouillon");
+  // Publié sans flyer : refusé (règle Smith, 28 oct. 2026).
+  assert.throws(() => validerEvenement({ ...base, statut: "publie" }), SaisieInvalide);
+  // Publié avec un flyer (URL ou fichier déposé) : accepté.
+  assert.equal(validerEvenement({ ...base, statut: "publie", flyer_url: "https://exemple.com/flyer.jpg" }).statut, "publie");
+  assert.equal(validerEvenement({ ...base, statut: "publie", flyer_storage_path: "flyers/abc.jpg" }).statut, "publie");
+});
