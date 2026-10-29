@@ -61,15 +61,6 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
 
   return (
     <section aria-roledescription="carrousel" aria-label="À la une" className="relative">
-      {/* Libellé au-dessus de la carte (mobile) */}
-      <div className="mb-3 flex items-center justify-between gap-3 lg:hidden">
-        <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-[2.5px] text-[#191410]">
-          <span className="h-[9px] w-[9px] rounded-full bg-[#E02B20]" />
-          À LA UNE
-        </p>
-        {badge}
-      </div>
-
       <article
         className="relative overflow-hidden rounded-[26px] shadow-[0_24px_48px_rgba(28,23,16,.20),0_8px_18px_rgba(28,23,16,.10)]"
         onTouchStart={(ev) => setDepart(ev.changedTouches[0]?.clientX ?? null)}
@@ -97,29 +88,29 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
           </div>
 
           {/* Informations : bloc blanc sur mobile, texte blanc sur le fond flouté sur desktop */}
-          <div className="mt-4 bg-white p-4 lg:mt-0 lg:flex-1 lg:bg-transparent lg:py-[30px] lg:pr-[34px] lg:pl-7">
-            <div className="mb-3 hidden items-center gap-3 lg:flex">
+          <div className="flex-1 px-5 pt-1 pb-6 lg:py-[30px] lg:pr-[34px] lg:pl-7">
+            <div className="mb-3 flex items-center gap-3">
               <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-[2.5px] text-white">
                 <span className="h-[9px] w-[9px] rounded-full bg-[#E02B20]" />
                 À LA UNE
               </p>
               {badge}
             </div>
-            <p className="text-[13px] font-extrabold tracking-[1.2px] text-[#C21810] uppercase lg:text-[14.5px] lg:text-[#FFC9C4]">
+            <p className="text-[13px] font-extrabold tracking-[1.2px] text-[#FFC9C4] uppercase lg:text-[14.5px]">
               {formaterKicker(e.date_debut, e.fuseau)}
             </p>
-            <h2 className="mt-2 font-[family-name:var(--font-display)] text-[22px] font-black leading-tight text-[#191410] lg:text-[37px] lg:leading-[1.12] lg:text-white">
+            <h2 className="mt-2 font-[family-name:var(--font-display)] text-[22px] font-black leading-tight text-white lg:text-[37px] lg:leading-[1.12]">
               {e.titre}
             </h2>
-            <p className="mt-2 flex items-center gap-1.5 text-[14px] text-[#6E6252] lg:text-[16.5px] lg:text-[#E9E2D2]">
+            <p className="mt-2 flex items-center gap-1.5 text-[14px] text-[#E9E2D2] lg:text-[16.5px]">
               <MapPin size={16} aria-hidden className="shrink-0" />
               {lieu}
             </p>
             <div className="mt-5 flex items-center gap-5">
               {e.prix ? (
                 <div>
-                  <p className="text-[11px] font-bold tracking-[1.5px] text-[#8A7B66] lg:text-[#CFC6B0]">ENTRÉE</p>
-                  <p className="font-[family-name:var(--font-display)] text-[20px] font-black text-[#191410] lg:text-[26px] lg:text-white">{e.prix}</p>
+                  <p className="text-[11px] font-bold tracking-[1.5px] text-[#CFC6B0]">ENTRÉE</p>
+                  <p className="font-[family-name:var(--font-display)] text-[20px] font-black text-white lg:text-[26px]">{e.prix}</p>
                 </div>
               ) : null}
               <Link href={`/evenements/${e.slug}`} className="inline-flex min-h-11 items-center rounded-[14px] bg-[#E02B20] px-[30px] text-[15px] font-bold text-white shadow-[0_10px_24px_rgba(224,43,32,.45)] no-underline lg:min-h-[52px] lg:text-base">
