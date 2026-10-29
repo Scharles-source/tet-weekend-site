@@ -24,9 +24,9 @@ export function NavBasse() {
   const plusActif = PLUS.some((l) => pathname.startsWith(l.href));
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#EFE5D2] bg-white md:hidden" aria-label="Navigation">
+    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-3 md:hidden" aria-label="Navigation">
       {plus && (
-        <div className="border-b border-[#EFE5D2] px-4 py-2">
+        <div className="pointer-events-auto mb-2 rounded-[24px] border border-[#EFE5D2]/70 bg-white/85 px-4 py-2 shadow-[0_12px_32px_rgba(28,23,16,.16)] backdrop-blur-xl">
           {PLUS.map((lien) => (
             <Link key={lien.href} href={lien.href} onClick={() => setPlus(false)} className="block py-2 text-sm font-semibold text-[#191410] no-underline">
               {lien.label}
@@ -34,7 +34,7 @@ export function NavBasse() {
           ))}
         </div>
       )}
-      <ul className="grid grid-cols-5">
+      <ul className="pointer-events-auto grid grid-cols-5 overflow-hidden rounded-full border border-[#EFE5D2]/70 bg-white/75 shadow-[0_12px_32px_rgba(28,23,16,.18)] backdrop-blur-xl">
         {ENTREES.map((entree) => {
           const actif = !entree.action && (entree.exact ? pathname === entree.href : pathname.startsWith(entree.href));
           const Icone = entree.icone;
