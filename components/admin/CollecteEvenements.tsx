@@ -1,19 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saisieDepuisInstant } from "@/lib/listing/dates";
 import { CATEGORIES, FUSEAUX } from "@/lib/listing/schema";
 import { AIDE, BTN_PRIMAIRE, BTN_SECONDAIRE, CARTE, CHAMP } from "@/components/admin/styles";
 import {
-  FREQUENCES,
-  LIMITES_VISIBLES,
   PLATEFORMES_SOURCE,
   TYPES_SOURCE,
-  frequenceLibelle,
   libelleConfiance,
-  libelleStatutJob,
   type VueCandidat,
   type VueCollecte,
   type VueSource,
@@ -25,10 +21,7 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(apercu ? "Aperçu local, hors production." : null);
   const [pending, setPending] = useState(false);
-  const [filtreStatut, setFiltreStatut] = useState("");
-  const [filtreSource, setFiltreSource] = useState("");
   const [selection, setSelection] = useState<string[]>([]);
-  const [url, setUrl] = useState("");
 
   async function agir(chemin: string, body?: unknown) {
     setMessage(null);
@@ -39,7 +32,7 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
     setPending(true);
     try {
       const reponse = await fetch(chemin, {
-        method: body ? "POST" : "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body ?? {}),
       });
@@ -72,80 +65,13 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
     }
   }
 
-  const jobs = useMemo(
-    () => donnees.jobs.filter((j) => (!filtreStatut || j.status === filtreStatut) && (!filtreSource || j.sourceId === filtreSource)),
-    [donnees.jobs, filtreStatut, filtreSource],
-  );
-
   return (
     <div className="space-y-6">
-      <p className={AIDE}>{donnees.email} — rien n&apos;est publié sans un clic d&apos;approbation. <Link href="/admin" className="font-semibold text-[#E02B20] no-underline">Retour aux événements</Link></p>
+      <p className={AIDE}>{donnees.email} — la collecte est assurée par Jarvis, chaque jour à 21 h : les événements repérés sur Instagram et Facebook arrivent ci-dessous avec leur flyer. Rien n&apos;est publié sans un clic d&apos;approbation. <Link href="/admin" className="font-semibold text-[#E02B20] no-underline">Retour aux événements</Link></p>
       {message && <p className="text-sm font-semibold text-[#92400E]">{message}</p>}
-      <section id="bandeau" className="grid gap-3 sm:grid-cols-4">
-        <Carte titre="Crawler" valeur={donnees.globalEnabled ? "Activé" : "Pause globale"} />
-        <Carte titre="Runner" valeur={donnees.runnerEnLigne ? "En ligne" : "Hors ligne"} detail={donnees.heartbeatAt ? `Dernier battement ${donnees.heartbeatAt}` : "Aucun battement"} />
-        <Carte titre="Jobs" valeur={`${donnees.comptes.queued} en file`} detail={`${donnees.comptes.running} en cours · ${donnees.comptes.blocked} bloqués · ${donnees.comptes.failed} échoués`} />
-        <Carte titre="À valider" valeur={String(donnees.aValider)} />
-      </section>
-      <section className={`${CARTE} p-4 text-sm text-[#8A7B66]`}>
-        <ul className="list-disc space-y-1 pl-5">
-          {LIMITES_VISIBLES.map((ligne) => <li key={ligne}>{ligne}</li>)}
-        </ul>
-      </section>
-      <section className="flex flex-wrap gap-2">
-        <button type="button" disabled={pending} className={BTN_PRIMAIRE} onClick={() => agir("/api/admin/crawlers/jobs", { jobType: "scan_all" })}>Scanner toutes les sources actives</button>
-        <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agirMethode("/api/admin/crawlers/settings", "PATCH", { globalEnabled: !donnees.globalEnabled })}>{donnees.globalEnabled ? "Pause globale" : "Reprendre"}</button>
-        <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agirMethode("/api/admin/crawlers/settings", "PATCH", { schedulerEnabled: !donnees.schedulerEnabled })}>Planification automatique : {donnees.schedulerEnabled ? "oui" : "non"}</button>
-      </section>
-      <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); void agir("/api/admin/crawlers/jobs", { jobType: "import_url", inputUrl: url }); }}>
-        <input className={`${champ} max-w-xl`} placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)} aria-label="URL à importer" />
-        <button type="submit" disabled={pending} className={BTN_SECONDAIRE}>Importer une URL</button>
-      </form>
-      <FormulaireSource pending={pending} onCreer={(body) => agir("/api/admin/watch-accounts", body)} />
-      <section id="sources" className="space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">Sources</h2>
-        {donnees.sources.length === 0 && <p className="text-sm text-[#8A7B66]">Aucune source.</p>}
-        {donnees.sources.map((source) => (
-          <article key={source.id} className={`${CARTE} p-4 text-sm`}>
-            <p className="font-semibold">{source.displayName || source.handle || source.profileUrl} · {source.platform}</p>
-            <p className="text-[#8A7B66]">{source.sourceType} · {[source.city, source.country].filter(Boolean).join(", ") || "Ville non indiquée"} · {frequenceLibelle(source.scanFrequencyMinutes)} · {source.active ? "active" : "en pause"}</p>
-            <p className="text-[#8A7B66]">Dernier scan : {source.lastScannedAt ?? "jamais"} · succès : {source.lastSuccessAt ?? "jamais"} · candidats : {source.candidats}</p>
-            {source.lastError && <p className="text-[#92400E]">{source.lastError}</p>}
-            <div className="mt-2 flex flex-wrap gap-2">
-              <button type="button" disabled={pending || !source.active} className={BTN_SECONDAIRE} onClick={() => agir("/api/admin/crawlers/jobs", { jobType: "scan_source", sourceId: source.id })}>Scanner</button>
-              <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agirMethode(`/api/admin/watch-accounts/${source.id}`, "PATCH", { active: !source.active })}>{source.active ? "Mettre en pause" : "Réactiver"}</button>
-            </div>
-            <EditionSource source={source} pending={pending} onSauver={(body) => agirMethode(`/api/admin/watch-accounts/${source.id}`, "PATCH", body)} />
-          </article>
-        ))}
-      </section>
-      <section id="jobs" className="space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">Jobs</h2>
-        <div className="flex flex-wrap gap-2">
-          <select className={champ} aria-label="Filtrer par statut" value={filtreStatut} onChange={(e) => setFiltreStatut(e.target.value)}>
-            <option value="">Tous les statuts</option>
-            {["queued", "running", "blocked", "failed", "succeeded", "cancelled"].map((s) => <option key={s} value={s}>{libelleStatutJob(s)}</option>)}
-          </select>
-          <select className={champ} aria-label="Filtrer par source" value={filtreSource} onChange={(e) => setFiltreSource(e.target.value)}>
-            <option value="">Toutes les sources</option>
-            {donnees.sources.map((s) => <option key={s.id} value={s.id}>{s.displayName || s.handle || s.platform}</option>)}
-          </select>
-        </div>
-        {jobs.map((job) => (
-          <details key={job.id} open={apercu} className={`${CARTE} p-4 text-sm`}>
-            <summary className="cursor-pointer">{new Date(job.createdAt).toLocaleString("fr-FR")} · {job.jobType} · {job.sourceNom ?? job.inputUrl ?? "—"} · {libelleStatutJob(job.status)}</summary>
-            <p className="mt-2 text-[#8A7B66]">scannés {job.counts.scanned ?? 0} · nouveaux {job.counts.newCandidates ?? 0} · doublons {job.counts.duplicates ?? 0} · ignorés {job.counts.ignored ?? 0} · erreurs {job.counts.errors ?? 0}</p>
-            {job.errorMessage && <p className="text-[#92400E]">{job.errorMessage}</p>}
-            <ul className="mt-2 space-y-1">{job.logs.map((log) => <li key={log.id}>{new Date(log.createdAt).toLocaleString("fr-FR")} · {log.level} · {log.message}</li>)}</ul>
-            <div className="mt-2 flex gap-2">
-              {["queued", "running"].includes(job.status) && <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agir(`/api/admin/crawlers/jobs/${job.id}/cancel`)}>Annuler</button>}
-              {["failed", "blocked"].includes(job.status) && <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agir(`/api/admin/crawlers/jobs/${job.id}/retry`)}>Réessayer</button>}
-            </div>
-          </details>
-        ))}
-      </section>
       <section id="a-valider" className="space-y-4">
-        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">À valider</h2>
+        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">À valider ({donnees.aValider})</h2>
+        {donnees.candidats.length === 0 && <p className="text-sm text-[#8A7B66]">Aucun événement en attente de validation.</p>}
         {selection.length > 0 && (
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agir("/api/admin/event-candidates/bulk", { ids: selection, action: "reject" })}>Rejeter la sélection</button>
@@ -156,17 +82,24 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
           <CandidatCarte key={candidat.id} candidat={candidat} lieux={donnees.lieux} pending={pending} coche={selection.includes(candidat.id)} onCoche={(oui) => setSelection((liste) => oui ? [...liste, candidat.id] : liste.filter((id) => id !== candidat.id))} onAction={agirMethode} />
         ))}
       </section>
+      <FormulaireSource pending={pending} onCreer={(body) => agir("/api/admin/watch-accounts", body)} />
+      <section id="sources" className="space-y-3">
+        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">Sources surveillées</h2>
+        <p className="text-sm text-[#8A7B66]">C&apos;est la liste que Jarvis parcourt chaque soir — ajoute un compte ici pour l&apos;inclure à la veille.</p>
+        {donnees.sources.length === 0 && <p className="text-sm text-[#8A7B66]">Aucune source.</p>}
+        {donnees.sources.map((source) => (
+          <article key={source.id} className={`${CARTE} p-4 text-sm`}>
+            <p className="font-semibold">{source.displayName || source.handle || source.profileUrl} · {source.platform}</p>
+            <p className="text-[#8A7B66]">{source.sourceType} · {[source.city, source.country].filter(Boolean).join(", ") || "Ville non indiquée"} · {source.active ? "active" : "en pause"} · candidats : {source.candidats}</p>
+            {source.notes && <p className="text-[#8A7B66]">{source.notes}</p>}
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agirMethode(`/api/admin/watch-accounts/${source.id}`, "PATCH", { active: !source.active })}>{source.active ? "Mettre en pause" : "Réactiver"}</button>
+            </div>
+            <EditionSource source={source} pending={pending} onSauver={(body) => agirMethode(`/api/admin/watch-accounts/${source.id}`, "PATCH", body)} />
+          </article>
+        ))}
+      </section>
     </div>
-  );
-}
-
-function Carte({ titre, valeur, detail }: { titre: string; valeur: string; detail?: string }) {
-  return (
-    <article className={`${CARTE} p-4`}>
-      <p className="text-xs uppercase tracking-wide text-[#8A7B66]">{titre}</p>
-      <p className="text-lg font-bold">{valeur}</p>
-      {detail && <p className="text-xs text-[#8A7B66]">{detail}</p>}
-    </article>
   );
 }
 
@@ -185,8 +118,6 @@ function FormulaireSource({ pending, onCreer }: { pending: boolean; onCreer: (bo
       <input name="displayName" className={champ} placeholder="Nom affiché" aria-label="Nom affiché" />
       <input name="city" className={champ} placeholder="Ville" aria-label="Ville" />
       <input name="country" className={champ} placeholder="Pays" aria-label="Pays" />
-      <select name="scanFrequencyMinutes" className={champ} defaultValue="1440" aria-label="Fréquence">{FREQUENCES.map((f) => <option key={f.minutes} value={f.minutes}>{f.libelle}</option>)}</select>
-      <input name="maxPostsPerScan" className={champ} defaultValue="20" aria-label="Maximum de posts" />
       <input name="notes" className={champ} placeholder="Notes" aria-label="Notes" />
       <button type="submit" disabled={pending} className={BTN_PRIMAIRE}>Ajouter</button>
     </form>
@@ -205,8 +136,6 @@ function EditionSource({ source, pending, onSauver }: { source: VueSource; pendi
         <input name="displayName" defaultValue={source.displayName ?? ""} className={champ} aria-label="Nom affiché" />
         <input name="city" defaultValue={source.city ?? ""} className={champ} aria-label="Ville" />
         <input name="country" defaultValue={source.country ?? ""} className={champ} aria-label="Pays" />
-        <select name="scanFrequencyMinutes" defaultValue={String(source.scanFrequencyMinutes)} className={champ} aria-label="Fréquence">{FREQUENCES.map((f) => <option key={f.minutes} value={f.minutes}>{f.libelle}</option>)}</select>
-        <input name="maxPostsPerScan" defaultValue={String(source.maxPostsPerScan)} className={champ} aria-label="Maximum de posts" />
         <input name="notes" defaultValue={source.notes ?? ""} className={champ} aria-label="Notes" />
         <button type="submit" disabled={pending} className={BTN_SECONDAIRE}>Enregistrer la source</button>
       </form>
