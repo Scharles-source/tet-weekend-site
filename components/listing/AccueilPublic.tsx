@@ -33,7 +33,7 @@ export function AccueilPublic({
           {/* Filtres : dans la colonne du héros sur desktop, sous la bannière sur mobile */}
           <FiltresCategories className="mt-5 hidden gap-2 lg:flex lg:flex-wrap" />
           <p className="mt-6 hidden max-w-[340px] text-[14.5px] leading-relaxed text-[#6E6252] lg:block">
-            Bals, concerts, soirées kompa et festivals de la communauté haïtienne — en Haïti comme dans la diaspora, réunis au même endroit.
+            Bals, concerts, soirées kompa &amp; festivals. Ayiti ak dyaspora, all in one place.
           </p>
         </div>
         <BanniereAccueil panneaux={panneaux} email={email} auto={auto} />
