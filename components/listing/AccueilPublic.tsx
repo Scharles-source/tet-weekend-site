@@ -27,7 +27,7 @@ export function AccueilPublic({
         <div className="mb-6 lg:mb-0">
           <header>
             <h1 className="font-[family-name:var(--font-display)] text-[34px] leading-[1.08] font-black text-[#191410] lg:text-[52px] lg:leading-[1.06]">
-              Les événements haïtiens, <span className="text-[#E02B20]">partout</span>.
+              Partying in <span className="text-[#E02B20]">Haiti</span>.
             </h1>
             <p className="mt-3 text-[14px] text-[#6E6252] lg:mt-4 lg:text-[15.5px]">Haïti · Montréal · Miami · New York · Boston · Paris</p>
           </header>
