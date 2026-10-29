@@ -22,12 +22,22 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
   const [message, setMessage] = useState<string | null>(apercu ? "Aperçu local, hors production." : null);
   const [pending, setPending] = useState(false);
   const [selection, setSelection] = useState<string[]>([]);
+  // Règle (Smith, 29 oct. 2026) : dès qu'un candidat est traité (approuvé —
+  // brouillon ou publié —, rejeté ou marqué doublon), il quitte la section
+  // « À valider » immédiatement, sans attendre le rechargement des données.
+  // Côté serveur, son statut n'est déjà plus « needs_review » : il ne
+  // réapparaîtra pas au prochain chargement.
+  const [retires, setRetires] = useState<string[]>([]);
+  const visibles = donnees.candidats.filter((c) => !retires.includes(c.id));
+  function retirer(ids: string[]) {
+    setRetires((liste) => [...liste, ...ids.filter((id) => !liste.includes(id))]);
+  }
 
-  async function agir(chemin: string, body?: unknown) {
+  async function agir(chemin: string, body?: unknown): Promise<boolean> {
     setMessage(null);
     if (apercu) {
       setMessage("Aperçu : aucune écriture.");
-      return;
+      return false;
     }
     setPending(true);
     try {
@@ -39,18 +49,20 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
       const json = (await reponse.json()) as { ok?: boolean; erreur?: string };
       setMessage(json.ok ? "Enregistré." : json.erreur ?? "Erreur.");
       if (json.ok) router.refresh();
+      return json.ok === true;
     } catch {
       setMessage("Le serveur n'a pas répondu.");
+      return false;
     } finally {
       setPending(false);
     }
   }
 
-  async function agirMethode(chemin: string, method: "POST" | "PATCH", body?: unknown) {
+  async function agirMethode(chemin: string, method: "POST" | "PATCH", body?: unknown): Promise<boolean> {
     setMessage(null);
     if (apercu) {
       setMessage("Aperçu : aucune écriture.");
-      return;
+      return false;
     }
     setPending(true);
     try {
@@ -58,8 +70,10 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
       const json = (await reponse.json()) as { ok?: boolean; erreur?: string };
       setMessage(json.ok ? "Enregistré." : json.erreur ?? "Erreur.");
       if (json.ok) router.refresh();
+      return json.ok === true;
     } catch {
       setMessage("Le serveur n'a pas répondu.");
+      return false;
     } finally {
       setPending(false);
     }
@@ -70,16 +84,16 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
       <p className={AIDE}>{donnees.email} — la collecte est assurée par Jarvis, chaque jour à 21 h : les événements repérés sur Instagram et Facebook arrivent ci-dessous avec leur flyer. Rien n&apos;est publié sans un clic d&apos;approbation. <Link href="/admin" className="font-semibold text-[#E02B20] no-underline">Retour aux événements</Link></p>
       {message && <p className="text-sm font-semibold text-[#92400E]">{message}</p>}
       <section id="a-valider" className="space-y-4">
-        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">À valider ({donnees.aValider})</h2>
-        {donnees.candidats.length === 0 && <p className="text-sm text-[#8A7B66]">Aucun événement en attente de validation.</p>}
+        <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">À valider ({visibles.length})</h2>
+        {visibles.length === 0 && <p className="text-sm text-[#8A7B66]">Aucun événement en attente de validation.</p>}
         {selection.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agir("/api/admin/event-candidates/bulk", { ids: selection, action: "reject" })}>Rejeter la sélection</button>
-            <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agir("/api/admin/event-candidates/bulk", { ids: selection, action: "duplicate" })}>Marquer la sélection comme doublon</button>
+            <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={async () => { if (await agir("/api/admin/event-candidates/bulk", { ids: selection, action: "reject" })) { retirer(selection); setSelection([]); } }}>Rejeter la sélection</button>
+            <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={async () => { if (await agir("/api/admin/event-candidates/bulk", { ids: selection, action: "duplicate" })) { retirer(selection); setSelection([]); } }}>Marquer la sélection comme doublon</button>
           </div>
         )}
-        {donnees.candidats.map((candidat) => (
-          <CandidatCarte key={candidat.id} candidat={candidat} lieux={donnees.lieux} pending={pending} coche={selection.includes(candidat.id)} onCoche={(oui) => setSelection((liste) => oui ? [...liste, candidat.id] : liste.filter((id) => id !== candidat.id))} onAction={agirMethode} />
+        {visibles.map((candidat) => (
+          <CandidatCarte key={candidat.id} candidat={candidat} lieux={donnees.lieux} pending={pending} coche={selection.includes(candidat.id)} onCoche={(oui) => setSelection((liste) => oui ? [...liste, candidat.id] : liste.filter((id) => id !== candidat.id))} onAction={agirMethode} onRetire={() => retirer([candidat.id])} />
         ))}
       </section>
       <FormulaireSource pending={pending} onCreer={(body) => agir("/api/admin/watch-accounts", body)} />
@@ -150,13 +164,15 @@ function CandidatCarte({
   coche,
   onCoche,
   onAction,
+  onRetire,
 }: {
   candidat: VueCandidat;
   lieux: { id: string; nom: string; ville: string | null }[];
   pending: boolean;
   coche: boolean;
   onCoche: (oui: boolean) => void;
-  onAction: (chemin: string, method: "POST" | "PATCH", body?: unknown) => void;
+  onAction: (chemin: string, method: "POST" | "PATCH", body?: unknown) => Promise<boolean>;
+  onRetire: () => void;
 }) {
   const [publier, setPublier] = useState(false);
   const debut = candidat.startsAt ? saisieDepuisInstant(candidat.startsAt, candidat.timezone ?? "America/Port-au-Prince") : "";
@@ -182,7 +198,7 @@ function CandidatCarte({
         )}
         {candidat.caption && <p className="mt-3 whitespace-pre-wrap text-sm text-[#8A7B66]">{candidat.caption}</p>}
       </div>
-      <form className="space-y-2" onSubmit={(e) => { e.preventDefault(); onAction(`/api/admin/event-candidates/${candidat.id}/approve`, "POST", champs(e.currentTarget)); }}>
+      <form className="space-y-2" onSubmit={async (e) => { e.preventDefault(); if (await onAction(`/api/admin/event-candidates/${candidat.id}/approve`, "POST", champs(e.currentTarget))) onRetire(); }}>
         <p className="text-sm"><a className="underline" href={candidat.sourcePostUrl} target="_blank" rel="noreferrer">{candidat.platform}</a> · {candidat.compte ?? "compte non indiqué"}</p>
         <p className="text-xs text-[#8A7B66]">Titre {libelleConfiance(candidat.confidence.titre?.niveau)} · Date {libelleConfiance(candidat.confidence.date?.niveau)} · Lieu {libelleConfiance(candidat.confidence.lieu?.niveau)}</p>
         {(candidat.duplicateOfEventId || candidat.duplicateOfCandidateId) && <p className="text-sm text-[#92400E]">Doublon probable. {candidat.duplicateOfEventId ? `Événement ${candidat.duplicateOfEventId}` : `Candidat ${candidat.duplicateOfCandidateId}`}</p>}
@@ -202,8 +218,8 @@ function CandidatCarte({
         <div className="flex flex-wrap gap-2">
           <button type="submit" disabled={pending} className={BTN_PRIMAIRE}>{publier ? "Approuver et publier" : "Approuver comme brouillon"}</button>
           <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={(e) => onAction(`/api/admin/event-candidates/${candidat.id}`, "PATCH", champs(e.currentTarget.form!))}>Enregistrer les corrections</button>
-          <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => onAction(`/api/admin/event-candidates/${candidat.id}/reject`, "POST", { reason: "" })}>Rejeter</button>
-          <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => onAction(`/api/admin/event-candidates/${candidat.id}/duplicate`, "POST", {})}>Marquer comme doublon</button>
+          <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={async () => { if (await onAction(`/api/admin/event-candidates/${candidat.id}/reject`, "POST", { reason: "" })) onRetire(); }}>Rejeter</button>
+          <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={async () => { if (await onAction(`/api/admin/event-candidates/${candidat.id}/duplicate`, "POST", {})) onRetire(); }}>Marquer comme doublon</button>
         </div>
       </form>
     </article>
