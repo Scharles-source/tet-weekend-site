@@ -29,7 +29,6 @@ export function AccueilPublic({
             <h1 className="font-[family-name:var(--font-display)] text-[34px] leading-[1.08] font-black text-[#191410] lg:text-[52px] lg:leading-[1.06]">
               Partying in <span className="text-[#E02B20]">Haiti</span>.
             </h1>
-            <p className="mt-3 text-[14px] text-[#6E6252] lg:mt-4 lg:text-[15.5px]">Haïti · Montréal · Miami · New York · Boston · Paris</p>
           </header>
           {/* Filtres : dans la colonne du héros sur desktop, sous la bannière sur mobile */}
           <FiltresCategories className="mt-5 hidden gap-2 lg:flex lg:flex-wrap" />
