@@ -10,8 +10,22 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  const charge = await chargerAnnuaire();
+  const artiste = charge.ok ? charge.annuaire.artistes.find((a) => a.slug === slug) : undefined;
+  if (!artiste) {
+    return {
+      title: "Artiste — Tèt Weekend",
+      alternates: { canonical: `https://www.tetweekend.com/artistes/${slug}` },
+    };
+  }
+  const typeLabel = artiste.type === "groupe" ? "Groupe haïtien" : artiste.type === "chanteur" ? "Chanteur haïtien" : artiste.type === "DJ" ? "DJ haïtien" : "Artiste haïtien";
+  const base = artiste.ville_base ? ` basé à ${artiste.ville_base}` : "";
+  const description = artiste.bio?.trim()
+    ? artiste.bio.trim().slice(0, 155)
+    : `${artiste.nom} (${typeLabel.toLowerCase()})${base} : ses prochains concerts, bals et soirées haïtiens, sur Tèt Weekend.`;
   return {
-    title: `${slug} — Artiste — Tèt Weekend`,
+    title: `${artiste.nom} — ${typeLabel} — Tèt Weekend`,
+    description,
     alternates: { canonical: `https://www.tetweekend.com/artistes/${slug}` },
   };
 }

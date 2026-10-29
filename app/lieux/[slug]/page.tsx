@@ -10,7 +10,23 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  return { title: `${slug} — Lieu — Tèt Weekend`, alternates: { canonical: `https://www.tetweekend.com/lieux/${slug}` } };
+  const charge = await chargerAnnuaire();
+  const lieu = charge.ok ? charge.annuaire.lieux.find((l) => l.slug === slug) : undefined;
+  if (!lieu) {
+    return {
+      title: "Lieu — Tèt Weekend",
+      alternates: { canonical: `https://www.tetweekend.com/lieux/${slug}` },
+    };
+  }
+  const ou = lieu.ville ? ` à ${lieu.ville}` : "";
+  const description = lieu.description?.trim()
+    ? lieu.description.trim().slice(0, 155)
+    : `${lieu.nom}${ou} : concerts, bals et soirées haïtiens à venir dans ce lieu, sur Tèt Weekend.`;
+  return {
+    title: `${lieu.nom} — Événements haïtiens${ou} — Tèt Weekend`,
+    description,
+    alternates: { canonical: `https://www.tetweekend.com/lieux/${slug}` },
+  };
 }
 
 export default async function PageLieu({ params }: { params: Promise<{ slug: string }> }) {

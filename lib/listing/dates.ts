@@ -144,3 +144,27 @@ export function formaterPastille(iso: string, fuseau: string = FUSEAU_DEFAUT): {
 export function formatIcs(iso: string): string {
   return new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }
+
+/** Date locale (dans le fuseau de l'événement) décomposée — pour les filtres par période. */
+export function dateLocale(iso: string, fuseau: string = FUSEAU_DEFAUT): { annee: number; mois: number; jour: number } {
+  const morceaux = new Intl.DateTimeFormat("en-CA", {
+    timeZone: fuseau,
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).formatToParts(new Date(iso));
+  const lire = (type: string) => Number(morceaux.find((m) => m.type === type)?.value ?? 0);
+  return { annee: lire("year"), mois: lire("month"), jour: lire("day") };
+}
+
+/** L'événement tombe-t-il en décembre de l'année donnée (dans son propre fuseau) ? */
+export function estEnDecembre(e: { date_debut: string; fuseau: string }, annee: number): boolean {
+  const d = dateLocale(e.date_debut, e.fuseau);
+  return d.mois === 12 && d.annee === annee;
+}
+
+/** Réveillon : 31 décembre de l'année donnée ou 1er janvier de l'année suivante (fuseau de l'événement). */
+export function estReveillon(e: { date_debut: string; fuseau: string }, annee: number): boolean {
+  const d = dateLocale(e.date_debut, e.fuseau);
+  return (d.mois === 12 && d.jour === 31 && d.annee === annee) || (d.mois === 1 && d.jour === 1 && d.annee === annee + 1);
+}
