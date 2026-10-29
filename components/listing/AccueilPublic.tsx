@@ -31,26 +31,17 @@ export function AccueilPublic({
             </h1>
             <p className="mt-3 text-[14px] text-[#6E6252] lg:mt-4 lg:text-[15.5px]">Haïti · Montréal · Miami · New York · Boston · Paris</p>
           </header>
-          <ul className="mt-5 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
-            <li>
-              <a href="#ce-weekend" className="inline-flex whitespace-nowrap rounded-full bg-[#E02B20] px-4 py-2.5 text-[13px] font-semibold text-white no-underline">
-                Ce week-end
-              </a>
-            </li>
-            {CATEGORIES.map((c) => (
-              <li key={c.slug}>
-                <Link href={`/categories/${c.slug}`} className="inline-flex whitespace-nowrap rounded-full border border-[#EFE5D2] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#4A4136] no-underline">
-                  {c.nom}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {/* Filtres : dans la colonne du héros sur desktop, sous la bannière sur mobile */}
+          <FiltresCategories className="mt-5 hidden gap-2 lg:flex lg:flex-wrap" />
           <p className="mt-6 hidden max-w-[340px] text-[14.5px] leading-relaxed text-[#6E6252] lg:block">
             Bals, concerts, soirées kompa et festivals de la communauté haïtienne — en Haïti comme dans la diaspora, réunis au même endroit.
           </p>
         </div>
         <BanniereAccueil panneaux={panneaux} email={email} auto={auto} />
       </div>
+
+      {/* Filtres sur mobile : sous « À la une » */}
+      <FiltresCategories className="mt-6 flex gap-2 overflow-x-auto pb-1 lg:hidden" />
 
       {/* Ce week-end */}
       <section id="ce-weekend" className="mt-10 lg:mt-[52px]">
@@ -83,6 +74,25 @@ export function AccueilPublic({
         <BlocOrganisateurs email={email} />
       </div>
     </div>
+  );
+}
+
+function FiltresCategories({ className }: { className: string }) {
+  return (
+    <ul className={className}>
+      <li>
+        <a href="#ce-weekend" className="inline-flex whitespace-nowrap rounded-full bg-[#E02B20] px-4 py-2.5 text-[13px] font-semibold text-white no-underline">
+          Ce week-end
+        </a>
+      </li>
+      {CATEGORIES.map((c) => (
+        <li key={c.slug}>
+          <Link href={`/categories/${c.slug}`} className="inline-flex whitespace-nowrap rounded-full border border-[#EFE5D2] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#4A4136] no-underline">
+            {c.nom}
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
