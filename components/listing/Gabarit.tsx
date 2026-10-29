@@ -1,19 +1,33 @@
+import Link from "next/link";
 import { EnTete } from "@/components/listing/EnTete";
 import { Logo } from "@/components/listing/Logo";
 import { NavBasse } from "@/components/listing/NavBasse";
-import { ConfigurationSupabaseManquante } from "@/lib/listing/data";
+import { ConfigurationSupabaseManquante, emailContact } from "@/lib/listing/data";
 
-export function Gabarit({ children }: { children: React.ReactNode }) {
+export async function Gabarit({ children, large = false }: { children: React.ReactNode; large?: boolean }) {
+  const email = await emailContact();
+  const largeur = large ? "max-w-[1240px]" : "max-w-3xl";
   return (
     <div className="theme-clair min-h-dvh">
-      <EnTete />
+      <EnTete large={large} email={email} />
       <main className="pb-24 md:pb-10">
-        <div className="mx-auto w-full max-w-3xl px-[var(--page-px)] py-6">{children}</div>
+        <div className={`mx-auto w-full ${largeur} px-[var(--page-px)] py-6`}>{children}</div>
       </main>
       <footer className="hidden border-t border-[#EFE5D2] px-[var(--page-px)] py-8 md:block">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4">
-          <Logo compact />
-          <p className="text-xs text-[#8A7B66]">© {new Date().getFullYear()} Tèt Weekend</p>
+        <div className={`mx-auto flex w-full ${largeur} items-center justify-between gap-4`}>
+          <div className="flex items-center gap-4">
+            <Logo compact />
+            <p className="text-xs text-[#8A7B66]">
+              Tèt Weekend — les événements haïtiens, partout.
+              <br />© {new Date().getFullYear()} Tèt Weekend
+            </p>
+          </div>
+          <nav className="flex gap-6 text-[13.5px] font-semibold text-[#6E6252]" aria-label="Pied de page">
+            <Link href="/evenements" className="no-underline">Événements</Link>
+            <Link href="/villes" className="no-underline">Villes</Link>
+            <Link href="/lieux" className="no-underline">Lieux</Link>
+            <Link href="/artistes" className="no-underline">Artistes</Link>
+          </nav>
         </div>
       </footer>
       <NavBasse />

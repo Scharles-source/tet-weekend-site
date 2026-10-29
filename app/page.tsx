@@ -17,7 +17,7 @@ export default async function Accueil() {
   const charge = await chargerAnnuaire();
   if (!charge.ok) {
     return (
-      <Gabarit>
+      <Gabarit large>
         <MessageErreurDonnees erreur={charge.erreur} />
       </Gabarit>
     );
@@ -25,7 +25,7 @@ export default async function Accueil() {
   const aVenir = charge.annuaire.evenements.filter((e) => !estTermine(e));
   const email = await emailContact();
   return (
-    <Gabarit>
+    <Gabarit large>
       <AccueilPublic evenements={aVenir} panneaux={choisirBanniere(aVenir)} email={email} />
     </Gabarit>
   );

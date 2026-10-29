@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, Home, MapPin, MoreHorizontal } from "lucide-react";
+import { CalendarDays, Home, MapPin, MoreHorizontal, Search } from "lucide-react";
 import { useState } from "react";
 
 const ENTREES = [
-  { href: "/", label: "Accueil", icone: Home, exact: true },
-  { href: "/evenements", label: "Explorer", icone: Compass, exact: false },
-  { href: "/villes", label: "Villes", icone: MapPin, exact: false },
+  { href: "/", label: "Accueil", icone: Home, exact: true, action: false },
+  { href: "/evenements", label: "Événements", icone: CalendarDays, exact: false, action: false },
+  { href: "/evenements?recherche=1", label: "Recherche", icone: Search, exact: false, action: true },
+  { href: "/villes", label: "Villes", icone: MapPin, exact: false, action: false },
 ] as const;
 
 const PLUS = [
@@ -33,12 +34,12 @@ export function NavBasse() {
           ))}
         </div>
       )}
-      <ul className="grid grid-cols-4">
+      <ul className="grid grid-cols-5">
         {ENTREES.map((entree) => {
-          const actif = entree.exact ? pathname === entree.href : pathname.startsWith(entree.href);
+          const actif = !entree.action && (entree.exact ? pathname === entree.href : pathname.startsWith(entree.href));
           const Icone = entree.icone;
           return (
-            <li key={entree.href}>
+            <li key={entree.label}>
               <Link href={entree.href} className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold no-underline ${actif ? "text-[#E02B20]" : "text-[#9A8B74]"}`}>
                 <Icone size={20} aria-hidden />
                 {entree.label}

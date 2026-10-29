@@ -1,11 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CarteEvenement } from "@/components/listing/CarteEvenement";
 import type { EvenementPublic } from "@/lib/listing/types";
 
 export function ListeEvenements({ evenements, vide }: { evenements: EvenementPublic[]; vide: string }) {
   const [recherche, setRecherche] = useState("");
+  const champRef = useRef<HTMLInputElement>(null);
+
+  // Arrivée via l'entrée « Recherche » de la navigation : on place le curseur dans le champ.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("recherche") === "1") {
+      champRef.current?.focus();
+      champRef.current?.scrollIntoView({ block: "center" });
+    }
+  }, []);
   const filtres = useMemo(() => {
     const q = recherche.trim().toLowerCase();
     if (!q) return evenements;
@@ -18,6 +27,7 @@ export function ListeEvenements({ evenements, vide }: { evenements: EvenementPub
   return (
     <div className="space-y-4">
       <input
+        ref={champRef}
         type="search"
         value={recherche}
         onChange={(e) => setRecherche(e.target.value)}
