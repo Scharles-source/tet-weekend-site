@@ -10,7 +10,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Tèt Weekend — Événements haïtiens",
   description:
-    "Où et quand ont lieu les bals, concerts et soirées haïtiens, en Haïti et dans la diaspora. Tèt Weekend ne vend pas de billets.",
+    "Où et quand ont lieu les bals, concerts et soirées haïtiens, en Haïti et dans la diaspora. Tèt Weekend ne vend pas de billets. Haitian events this weekend — kompa parties, concerts and festivals, in Haiti and across the diaspora.",
 };
 
 export default async function Accueil() {

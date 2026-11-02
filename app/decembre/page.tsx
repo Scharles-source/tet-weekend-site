@@ -13,7 +13,7 @@ const SITE = "https://www.tetweekend.com";
 
 export const metadata: Metadata = {
   title: `Événements haïtiens en décembre ${ANNEE} — Bals, concerts & réveillon — Tèt Weekend`,
-  description: `Tous les événements haïtiens de décembre ${ANNEE} : bals, concerts kompa, soirées et le réveillon du 31 décembre, en Haïti et dans la diaspora.`,
+  description: `Tous les événements haïtiens de décembre ${ANNEE} : bals, concerts kompa, soirées et le réveillon du 31 décembre, en Haïti et dans la diaspora. Haitian events in December — parties, concerts and the New Year's Eve bals.`,
   alternates: { canonical: `${SITE}/decembre` },
   openGraph: {
     title: `Décembre ${ANNEE} — Événements haïtiens`,

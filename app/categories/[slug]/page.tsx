@@ -8,12 +8,19 @@ import { nomCategorie } from "@/lib/listing/schema";
 
 export const revalidate = 300;
 
+const DESCRIPTIONS: Record<string, string> = {
+  bals: "Bals haïtiens à venir : dates, lieux et artistes. Haitian bals and kompa parties — this weekend and coming up.",
+  concerts: "Concerts haïtiens à venir : dates, lieux et artistes. Haitian concerts — kompa, rasin, rap kreyòl and more.",
+  "soirees-kompa": "Soirées kompa à venir : dates, lieux et artistes. Kompa parties — tonight, this weekend and coming up.",
+  festivals: "Festivals haïtiens à venir, en Haïti et dans la diaspora : dates, lieux et artistes. Haitian festivals — music, culture and food.",
+};
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const nom = nomCategorie(slug) ?? "Catégorie";
   return {
     title: `${nom} haïtiens — Tèt Weekend`,
-    description: `${nom} : dates, lieux et artistes.`,
+    description: DESCRIPTIONS[slug] ?? `${nom} : dates, lieux et artistes.`,
     alternates: { canonical: `https://www.tetweekend.com/categories/${slug}` },
   };
 }

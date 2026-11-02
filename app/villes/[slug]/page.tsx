@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const nom = ville?.nom ?? slug;
   return {
     title: `Événements haïtiens à ${nom} — Tèt Weekend`,
-    description: `Bals, concerts et soirées haïtiens à ${nom}.`,
+    description: `Bals, concerts et soirées haïtiens à ${nom}. Haitian events in ${nom} this weekend: kompa parties, concerts and festivals.`,
     alternates: { canonical: `https://www.tetweekend.com/villes/${slug}` },
   };
 }
@@ -40,7 +40,8 @@ export default async function PageVille({ params }: { params: Promise<{ slug: st
     const lieux = annuaire.lieux.filter((l) => l.ville && slugifier(l.ville) === slug);
     return (
       <Gabarit>
-        <h1 className="mb-6 font-[family-name:var(--font-display)] text-3xl font-extrabold">Événements haïtiens à {ville.nom}</h1>
+        <h1 className="mb-2 font-[family-name:var(--font-display)] text-3xl font-extrabold">Événements haïtiens à {ville.nom}</h1>
+        <p className="mb-6 text-[15px] text-[#4A4136]">Haitian events in {ville.nom} — this weekend and coming up.</p>
         <section className="space-y-3">
           <h2 className="font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">Ce week-end</h2>
           {weekend.length === 0 ? (

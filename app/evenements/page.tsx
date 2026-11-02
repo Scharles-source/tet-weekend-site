@@ -7,8 +7,9 @@ import { estTermine } from "@/lib/listing/dates";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Événements haïtiens — Tèt Weekend",
-  description: "Les événements haïtiens à venir, en Haïti et dans la diaspora.",
+  title: "Événements haïtiens — ce week-end et à venir — Tèt Weekend",
+  description:
+    "Les événements haïtiens à venir, en Haïti et dans la diaspora : bals, concerts kompa, soirées et festivals. Haitian events this weekend and tonight — parties, concerts and kompa nights.",
 };
 
 export default async function PageEvenements() {
@@ -26,6 +27,10 @@ export default async function PageEvenements() {
     return (
       <Gabarit>
         <h1 className="mb-4 font-[family-name:var(--font-display)] text-3xl font-extrabold">Événements</h1>
+        <p className="mb-6 max-w-2xl text-[15px] leading-relaxed text-[#4A4136]">
+          Bals, concerts, soirées kompa et festivals haïtiens — ce week-end, ce soir et dans les semaines qui viennent, en Haïti comme dans la
+          diaspora. Looking for Haitian events this weekend? You&apos;re in the right place.
+        </p>
         <ListeEvenements evenements={aVenir} vide="Aucun événement à venir pour le moment." />
         {termines.length > 0 && (
           <section className="mt-10">

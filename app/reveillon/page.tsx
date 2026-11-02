@@ -12,7 +12,7 @@ const SITE = "https://www.tetweekend.com";
 
 export const metadata: Metadata = {
   title: `Réveillon haïtien ${ANNEE} — Bals du 31 décembre & fêtes du 1er janvier — Tèt Weekend`,
-  description: `Où fêter le réveillon en mode haïtien ? Bals du 31 décembre ${ANNEE} et fêtes du 1er janvier ${ANNEE + 1} (soup joumou), en Haïti et dans la diaspora.`,
+  description: `Où fêter le réveillon en mode haïtien ? Bals du 31 décembre ${ANNEE} et fêtes du 1er janvier ${ANNEE + 1} (soup joumou), en Haïti et dans la diaspora. Haitian New Year's Eve parties and January 1st celebrations.`,
   alternates: { canonical: `${SITE}/reveillon` },
   openGraph: {
     title: `Réveillon haïtien ${ANNEE} — 31 décembre & 1er janvier`,
