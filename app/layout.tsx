@@ -7,6 +7,7 @@ const archivoBlack = Archivo_Black({ subsets: ["latin"], weight: "400", variable
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.tetweekend.com"),
   title: "Tèt Weekend — Kote fèt la?",
   description: "Découvre les meilleurs événements haïtiens près de toi. Concerts, soirées, festivals — ne rate plus rien.",
   icons: {
@@ -17,6 +18,16 @@ export const metadata: Metadata = {
     title: "Tèt Weekend",
     description: "La référence des événements haïtiens & diaspora.",
     type: "website",
+    url: "https://www.tetweekend.com",
+    siteName: "Tèt Weekend",
+    locale: "fr_FR",
+    images: [{ url: "/logotetweekend.png", width: 2000, height: 2000, alt: "Tèt Weekend" }],
+  },
+  twitter: {
+    card: "summary",
+    title: "Tèt Weekend",
+    description: "La référence des événements haïtiens & diaspora.",
+    images: ["/logotetweekend.png"],
   },
 };
 

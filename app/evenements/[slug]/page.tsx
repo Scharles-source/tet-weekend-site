@@ -22,23 +22,41 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const evenement = evenements.find((e) => e.slug === slug);
     if (!evenement) return { title: "Événement — Tèt Weekend" };
     const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(", ");
-    const description = [evenement.description, ou].filter(Boolean).join(" — ") || evenement.titre;
+    const descriptionBrute = [evenement.description, ou].filter(Boolean).join(" — ") || evenement.titre;
+    const description = descriptionBrute.length > 160 ? `${descriptionBrute.slice(0, 157).trimEnd()}…` : descriptionBrute;
+    const url = `${SITE}/evenements/${evenement.slug}`;
     return {
       title: `${evenement.titre} — Tèt Weekend`,
       description,
-      alternates: { canonical: `${SITE}/evenements/${evenement.slug}` },
-      openGraph: evenement.flyer
+      alternates: { canonical: url },
+      openGraph: {
+        title: evenement.titre,
+        description,
+        url,
+        type: "website",
+        ...(evenement.flyer
+          ? {
+              images: [{
+                url: evenement.flyer.publicUrl,
+                width: evenement.flyer.width ?? undefined,
+                height: evenement.flyer.height ?? undefined,
+                alt: evenement.flyer.alt,
+              }],
+            }
+          : {}),
+      },
+      twitter: evenement.flyer
         ? {
+            card: "summary_large_image",
             title: evenement.titre,
             description,
-            images: [{
-              url: evenement.flyer.publicUrl,
-              width: evenement.flyer.width ?? undefined,
-              height: evenement.flyer.height ?? undefined,
-              alt: evenement.flyer.alt,
-            }],
+            images: [evenement.flyer.publicUrl],
           }
-        : undefined,
+        : {
+            card: "summary",
+            title: evenement.titre,
+            description,
+          },
     };
   } catch {
     return { title: "Événement — Tèt Weekend" };
