@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], 
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.tetweekend.com"),
+  verification: {
+    google: "z0RYQLMp3mSHvtPSquY51QKux-vOoNwak_phgEBB5Uk",
+  },
   title: "Tèt Weekend — Kote fèt la?",
   description: "Découvre les meilleurs événements haïtiens près de toi. Concerts, soirées, festivals — ne rate plus rien.",
   icons: {
