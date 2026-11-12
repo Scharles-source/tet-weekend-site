@@ -97,59 +97,80 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <article>
         {termine && (
-          <p className="mb-3 rounded-xl bg-[#FDECEA] px-3 py-2 text-sm font-semibold text-[#B91C1C]">
+          <p className="mb-3 rounded-xl bg-[rgba(255,77,63,0.16)] px-3 py-2 text-sm font-semibold text-[var(--accent-texte)]">
             Événement terminé
           </p>
         )}
         <ZoneFlyer evenement={evenement} />
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-black leading-tight text-[#191410]">{evenement.titre}</h1>
-        <p className="mt-2 text-[#4A4136]">{formaterQuand(evenement.date_debut, evenement.fuseau)}</p>
-        {evenement.date_fin && (
-          <p className="text-sm text-[var(--text-sec)]">Fin : {formaterQuand(evenement.date_fin, evenement.fuseau)}</p>
-        )}
         {categorie && (
-          <p className="mt-2">
-            <Link href={`/categories/${evenement.categorie}`} className="text-sm font-semibold text-[#E02B20] no-underline">
+          <p className="mb-2">
+            <Link href={`/categories/${evenement.categorie}`} className="inline-flex min-h-8 items-center rounded-full border border-[#6B5B4D] px-3 text-xs font-bold tracking-[0.08em] text-[var(--nuit-texte2)] uppercase no-underline">
               {categorie}
             </Link>
           </p>
         )}
-        <p className="mt-4">
-          {evenement.lieu ? (
-            <Link href={`/lieux/${evenement.lieu.slug}`} className="font-medium underline">
-              {evenement.lieu.nom}
-            </Link>
-          ) : (
-            "Lieu non indiqué"
-          )}
-          {evenement.ville && (
-            <>
-              {" · "}
-              <Link href={`/villes/${slugifier(evenement.ville)}`} className="underline">
-                {evenement.ville}
-              </Link>
-            </>
-          )}
-        </p>
-        {evenement.lieu?.adresse && <p className="text-sm text-[var(--text-sec)]">{evenement.lieu.adresse}</p>}
-        {evenement.artistes.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-2 text-sm">
-            {evenement.artistes.map((a) => (
-              <li key={a.id}>
-                <Link href={`/artistes/${a.slug}`} className="rounded-full border border-[#EFE5D2] bg-white px-3 py-1 text-[#4A4136] no-underline">
-                  {a.nom}
+        <h1 className="font-[family-name:var(--font-display)] text-[34px] leading-[1.03] font-black tracking-tight text-[var(--nuit-texte)]">{evenement.titre}</h1>
+
+        <div className="mt-5 space-y-2.5">
+          <div className="rounded-2xl border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-3.5">
+            <p className="text-[15px] font-bold text-[var(--nuit-texte)]">{formaterQuand(evenement.date_debut, evenement.fuseau)}</p>
+            <p className="text-[13px] text-[var(--nuit-muet)]">
+              {evenement.date_fin ? `Fin : ${formaterQuand(evenement.date_fin, evenement.fuseau)} · ` : ""}Heure d&apos;Haïti
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-3.5">
+            <p className="text-[15px] font-bold text-[var(--nuit-texte)]">
+              {evenement.lieu ? (
+                <Link href={`/lieux/${evenement.lieu.slug}`} className="text-[var(--nuit-texte)] underline">
+                  {evenement.lieu.nom}
                 </Link>
-              </li>
-            ))}
-          </ul>
+              ) : (
+                "Lieu non indiqué"
+              )}
+              {evenement.ville && (
+                <>
+                  {" · "}
+                  <Link href={`/villes/${slugifier(evenement.ville)}`} className="text-[var(--nuit-texte)] underline">
+                    {evenement.ville}
+                  </Link>
+                </>
+              )}
+            </p>
+            {evenement.lieu?.adresse && <p className="text-[13px] text-[var(--nuit-muet)]">{evenement.lieu.adresse}</p>}
+          </div>
+          {evenement.prix && (
+            <div className="rounded-2xl border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-3.5">
+              <p className="text-[15px] font-bold text-[var(--or)]">Entrée : {evenement.prix}</p>
+              <p className="text-[13px] text-[var(--nuit-muet)]">Tarif donné par l&apos;organisateur. Tèt Weekend ne vend pas de billets.</p>
+            </div>
+          )}
+        </div>
+
+        {evenement.artistes.length > 0 && (
+          <div className="mt-6">
+            <h2 className="mb-2.5 font-[family-name:var(--font-display)] text-xl font-black text-[var(--nuit-texte)]">À l&apos;affiche</h2>
+            <ul className="flex flex-wrap gap-2 text-sm">
+              {evenement.artistes.map((a) => (
+                <li key={a.id}>
+                  <Link href={`/artistes/${a.slug}`} className="flex min-h-11 items-center rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-4 font-semibold text-[var(--nuit-texte)] no-underline">
+                    {a.nom}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
-        {evenement.prix && <p className="mt-4">Entrée : {evenement.prix}</p>}
-        {evenement.description && <p className="mt-4 whitespace-pre-wrap text-[15px]">{evenement.description}</p>}
+        {evenement.description && (
+          <div className="mt-6">
+            <h2 className="mb-2 font-[family-name:var(--font-display)] text-xl font-black text-[var(--nuit-texte)]">Infos</h2>
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-[var(--nuit-texte2)]">{evenement.description}</p>
+          </div>
+        )}
         <div className="mt-6 flex flex-wrap gap-2">
-          <a href={lienGoogleAgenda(evenement, url)} className="min-h-11 rounded-full bg-[#E02B20] px-4 py-3 text-sm font-semibold text-white">
+          <a href={lienGoogleAgenda(evenement, url)} className="inline-flex min-h-12 items-center rounded-[14px] bg-[var(--accent)] px-5 text-[15px] font-extrabold text-white no-underline">
             Ajouter à Google Agenda
           </a>
-          <a href={`/evenements/${evenement.slug}/calendrier`} className="min-h-11 rounded-full border border-[#EFE5D2] bg-white px-4 py-3 text-sm text-[#191410]">
+          <a href={`/evenements/${evenement.slug}/calendrier`} className="inline-flex min-h-12 items-center rounded-[14px] border border-[#6B5B4D] px-5 text-[15px] font-bold text-[var(--nuit-texte)] no-underline">
             Télécharger .ics
           </a>
         </div>
@@ -157,7 +178,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           <iframe
             title={`Carte : ${evenement.titre}`}
             src={`https://maps.google.com/maps?q=${encodeURIComponent(questionCarte)}&z=15&output=embed`}
-            className="mt-6 h-56 w-full rounded-[20px] border border-[#EFE5D2]"
+            className="mt-6 h-56 w-full rounded-[20px] border border-[var(--nuit-ligne)]"
             loading="lazy"
           />
         )}
