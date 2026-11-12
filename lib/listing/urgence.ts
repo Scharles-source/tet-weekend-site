@@ -35,3 +35,13 @@ export function urgenceDe(
   if (debut <= demain.fin.getTime()) return { texte: `Demain · ${heureLocale(e.date_debut, e.fuseau)}`, urgent: false };
   return null;
 }
+
+const QUARANTE_HUIT_HEURES = 48 * 3_600_000;
+
+/** « Nouveau » : ajouté il y a moins de 48 h et pas encore passé. */
+export function estNouveau(e: { ajoute_le?: string | null; date_debut: string }, maintenant = new Date()): boolean {
+  if (!e.ajoute_le) return false;
+  const ajout = Date.parse(e.ajoute_le);
+  const t = maintenant.getTime();
+  return Number.isFinite(ajout) && ajout <= t && t - ajout < QUARANTE_HUIT_HEURES && Date.parse(e.date_debut) > t;
+}
