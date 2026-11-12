@@ -52,12 +52,12 @@ export function AccueilPublic({
   return (
     <div>
       <header className="max-w-[640px]">
-        <p className="text-xs font-bold tracking-[0.16em] text-[var(--or)] uppercase">Haïti · diaspora</p>
+        <p className="text-xs font-bold tracking-[0.16em] text-[var(--or)] uppercase">Kote fèt la ?</p>
         <h1 className="mt-2 font-[family-name:var(--font-display)] text-[40px] leading-[1.02] font-black tracking-tight text-balance text-[var(--nuit-texte)] lg:text-[60px]">
-          Kote fèt la ? <span className="text-[var(--accent-texte)]">Trouve ta soirée.</span>
+          Partying <span className="text-[var(--accent-texte)]">in Haiti</span>
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-[var(--nuit-muet)] lg:text-[17px]">
-          Bals, concerts, soirées kompa et festivals, au même endroit. Ici, pas de billets à acheter : on te dit où, quand et avec qui.
+          Trouve ta soirée, en Haïti et ailleurs. Bals, concerts, soirées kompa et festivals, au même endroit. Ici, pas de billets à acheter : on te dit où, quand et avec qui.
         </p>
       </header>
 
