@@ -30,14 +30,14 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
           </nav>
         </div>
       </footer>
-      <NavBasse />
+      <NavBasse email={email} />
     </div>
   );
 }
 
 export function MessageEtat({ titre, texte }: { titre: string; texte: string }) {
   return (
-    <div role="status" className="rounded-[20px] border-[1.5px] border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-6 text-center">
+    <div role="status" className="rounded-[20px] border-[1.5px] border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-6 text-center shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
       <h2 className="mb-2 font-[family-name:var(--font-display)] text-lg font-black">{titre}</h2>
       <p className="text-sm text-[var(--nuit-texte2)]">{texte}</p>
     </div>
