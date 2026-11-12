@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Urgence } from "@/components/listing/Urgence";
 import { formaterBadge } from "@/lib/listing/dates";
 import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
@@ -36,6 +37,7 @@ export function Affiche({ evenement, className = "" }: { evenement: EvenementPub
         <span className="absolute top-2.5 left-2.5 rounded-full bg-[rgba(15,12,11,0.82)] px-2.5 py-1 text-xs font-bold text-[var(--nuit-texte)]">
           {formaterBadge(evenement.date_debut, evenement.fuseau)}
         </span>
+        <Urgence evenement={evenement} className="absolute top-2.5 right-2.5" />
       </div>
       <div className="flex flex-col gap-0.5 px-0.5">
         <span className="line-clamp-2 text-[15px] leading-snug font-bold text-[var(--nuit-texte)]">{evenement.titre}</span>

@@ -38,7 +38,7 @@ export function AccueilPublic({
   const villes = useMemo(() => {
     const compte = new Map<string, number>();
     for (const e of evenements) if (e.ville) compte.set(e.ville, (compte.get(e.ville) ?? 0) + 1);
-    return [...compte.entries()].sort((a, b) => b[1] - a[1]).map(([nom]) => nom);
+    return [...compte.entries()].sort((a, b) => b[1] - a[1]);
   }, [evenements]);
 
   const filtres = periode !== "tout" || ville !== null;
@@ -66,9 +66,9 @@ export function AccueilPublic({
         <button type="button" className={ville === null ? ZONE_ON : ZONE_OFF} aria-pressed={ville === null} onClick={() => setVille(null)}>
           Toutes les villes
         </button>
-        {villes.map((nom) => (
+        {villes.map(([nom, n]) => (
           <button key={nom} type="button" className={ville === nom ? ZONE_ON : ZONE_OFF} aria-pressed={ville === nom} onClick={() => setVille(nom)}>
-            {nom}
+            {nom} <span className="ml-1.5 opacity-70">{n}</span>
           </button>
         ))}
       </div>
