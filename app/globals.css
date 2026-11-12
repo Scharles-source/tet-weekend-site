@@ -126,10 +126,22 @@ body {
   .trending-home-title { font-size: 24px !important; gap: 8px !important; }
 }
 
-.theme-clair {
-  --text-sec: #4A4136;
-  --surface: #FFFFFF;
-  background: #FBF7EF;
-  color: #191410;
+/* Thème « nuit » des pages publiques (l'accent se change ici, en un seul endroit). */
+.theme-nuit {
+  --nuit-fond: #0F0C0B;
+  --nuit-carte: #1B1613;
+  --nuit-carte2: #261E19;
+  --nuit-ligne: #3A2F28;
+  --nuit-texte: #FBF7EF;
+  --nuit-texte2: #D9CBB8;
+  --nuit-muet: #B9AB9A;
+  --accent: #E02B20;
+  --accent-texte: #FF6A5C;
+  --or: #FFC247;
+  --text-sec: #B9AB9A;
+  --surface: #1B1613;
+  background: var(--nuit-fond);
+  color: var(--nuit-texte);
   font-family: var(--font-body);
+  color-scheme: dark;
 }
