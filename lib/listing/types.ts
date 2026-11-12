@@ -56,4 +56,6 @@ export interface EvenementPublic {
   vues: number | null;
   /** Date d'ajout sur le site (sert au badge « Nouveau »). Absente si la base ne la fournit pas. */
   ajoute_le?: string | null;
+  /** Nombre de « J'y vais » (null tant que la base ne le fournit pas). */
+  interets?: number | null;
 }

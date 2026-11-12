@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { CarteEvenement, ZoneFlyer } from "@/components/listing/CarteEvenement";
+import { Engagement } from "@/components/listing/Engagement";
 import { lienGoogleAgenda } from "@/lib/listing/calendrier";
 import { lireAnnuaire, chargerAnnuaire } from "@/lib/listing/data";
 import { estTermine, formaterQuand } from "@/lib/listing/dates";
@@ -166,6 +167,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
             <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-[var(--nuit-texte2)]">{evenement.description}</p>
           </div>
         )}
+        <Engagement evenementId={evenement.id} interetsInitiaux={evenement.interets ?? null} termine={termine} />
         <div className="mt-6 flex flex-wrap gap-2">
           <a href={lienGoogleAgenda(evenement, url)} className="inline-flex min-h-12 items-center rounded-[14px] bg-[var(--accent)] px-5 text-[15px] font-extrabold text-white no-underline">
             Ajouter à Google Agenda

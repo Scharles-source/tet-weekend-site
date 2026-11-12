@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Urgence } from "@/components/listing/Urgence";
 import { formaterBadge } from "@/lib/listing/dates";
+import { estTresConsulte } from "@/lib/listing/engagement";
 import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 
@@ -43,6 +44,7 @@ export function Affiche({ evenement, className = "" }: { evenement: EvenementPub
         <span className="line-clamp-2 text-[15px] leading-snug font-bold text-[var(--nuit-texte)]">{evenement.titre}</span>
         <span className="truncate text-[13.5px] text-[var(--nuit-muet)]">{ou}</span>
         {evenement.prix && <span className="truncate text-[13px] font-semibold text-[var(--or)]">{evenement.prix}</span>}
+        {estTresConsulte(evenement.vues) && <span className="text-xs font-bold text-[var(--accent-texte)]">Très consulté</span>}
       </div>
     </Link>
   );
