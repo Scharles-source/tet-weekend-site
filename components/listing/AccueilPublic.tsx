@@ -17,7 +17,7 @@ const PERIODES: { valeur: Periode; label: string }[] = [
   { valeur: "ce-weekend", label: "Ce week-end" },
 ];
 
-const PUCE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-xl bg-[var(--nuit-texte)] px-4 text-sm font-extrabold text-[#191410]";
+const PUCE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-xl bg-[var(--nuit-texte)] px-4 text-sm font-extrabold text-[var(--encre)]";
 const PUCE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-xl border border-[#6B5B4D] px-4 text-sm font-semibold text-[var(--nuit-texte)]";
 const ZONE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-[var(--accent)] px-[18px] text-sm font-bold text-white";
 const ZONE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-[18px] text-sm font-semibold text-[var(--nuit-texte)]";
@@ -181,9 +181,9 @@ function EnteteSection({ titre, href }: { titre: string; href: string }) {
 function BlocOrganisateurs({ email, className = "" }: { email: string; className?: string }) {
   return (
     <section className={`mt-9 lg:mt-0 ${className}`}>
-      <div className="rounded-[24px] bg-[#FBF7EF] p-[22px] text-[#191410]">
+      <div className="rounded-[24px] bg-[var(--creme)] p-[22px] text-[var(--encre)]">
         <h2 className="font-[family-name:var(--font-display)] text-[26px] leading-[1.05] font-black tracking-tight">Tu organises une soirée ?</h2>
-        <p className="mt-2.5 text-[14.5px] leading-relaxed text-[#4A4136]">
+        <p className="mt-2.5 text-[14.5px] leading-relaxed text-[var(--encre2)]">
           Fais apparaître ton événement devant toute la communauté, en Haïti comme dans la diaspora.
         </p>
         <a
