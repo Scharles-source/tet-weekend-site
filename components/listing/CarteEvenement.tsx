@@ -2,21 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { BandeEvenement } from "@/components/listing/BandeEvenement";
 import { FlyerHeader } from "@/components/listing/FlyerHeader";
 import { FlyerViewer } from "@/components/listing/FlyerViewer";
-import { estTermine, formaterBadge, formaterPastille, formaterQuand } from "@/lib/listing/dates";
+import { formaterBadge, formaterPastille } from "@/lib/listing/dates";
 import { creditPublic } from "@/lib/listing/flyer";
-import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 
 const CARTE = "overflow-hidden rounded-[20px] border-[1.5px] border-[#EFE5D2] bg-white shadow-[0_3px_14px_rgba(80,55,10,0.06)]";
 
 export function CarteEvenement({ evenement }: { evenement: EvenementPublic }) {
   const [ouvert, setOuvert] = useState(false);
-  const termine = estTermine(evenement);
-  const categorie = nomCategorie(evenement.categorie);
-  const quand = formaterQuand(evenement.date_debut, evenement.fuseau);
-  const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(" · ");
   return (
     <article className={CARTE}>
       <div style={{ containerType: "inline-size" }}>
@@ -29,23 +25,7 @@ export function CarteEvenement({ evenement }: { evenement: EvenementPublic }) {
           onOpen={() => setOuvert(true)}
         />
       </div>
-      <div className="p-4">
-        <p className="text-[10.5px] font-bold uppercase tracking-wide text-[#B91C1C]">
-          {quand}
-          {categorie ? ` · ${categorie}` : ""}
-          {termine ? " · Event ended" : ""}
-        </p>
-        <h2 className="mt-1 font-[family-name:var(--font-display)] text-[19.5px] font-black leading-tight text-[#191410]">
-          <Link href={`/evenements/${evenement.slug}`} className="text-[#191410] no-underline">
-            {evenement.titre}
-          </Link>
-        </h2>
-        <p className="mt-1 text-[13.5px] font-semibold text-[#4A4136]">{ou || "Venue not listed"}</p>
-        {evenement.artistes.length > 0 && (
-          <p className="mt-1 text-[12.5px] text-[#8A7B66]">{evenement.artistes.map((a) => a.nom).join(", ")}</p>
-        )}
-        {evenement.prix && <p className="mt-2 text-[13.5px] text-[#4A4136]">Admission: {evenement.prix}</p>}
-      </div>
+      <BandeEvenement evenement={evenement} />
       <FlyerViewer evenement={evenement} open={ouvert} onClose={() => setOuvert(false)} />
     </article>
   );
@@ -78,8 +58,6 @@ export function LigneEvenement({ evenement }: { evenement: EvenementPublic }) {
 
 export function CarteEvenementCompacte({ evenement }: { evenement: EvenementPublic }) {
   const [ouvert, setOuvert] = useState(false);
-  const quand = formaterQuand(evenement.date_debut, evenement.fuseau);
-  const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(" · ");
   const urlCouverture = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
   return (
     <article className={CARTE}>
@@ -111,19 +89,7 @@ export function CarteEvenementCompacte({ evenement }: { evenement: EvenementPubl
           {formaterBadge(evenement.date_debut, evenement.fuseau)}
         </span>
       </div>
-      <div className="p-3.5 lg:p-4">
-        <p className="text-[10.5px] font-bold tracking-wide text-[#B91C1C] uppercase">{quand}</p>
-        <h3 className="mt-1 font-[family-name:var(--font-display)] text-[16.5px] font-black leading-tight text-[#191410] lg:text-[18.5px]">
-          <Link href={`/evenements/${evenement.slug}`} className="text-[#191410] no-underline">
-            {evenement.titre}
-          </Link>
-        </h3>
-        <p className="mt-1 truncate text-[13px] font-semibold text-[#4A4136]">{ou || "Venue not listed"}</p>
-        {evenement.artistes.length > 0 && (
-          <p className="mt-1 truncate text-[12px] text-[#8A7B66]">{evenement.artistes.map((a) => a.nom).join(", ")}</p>
-        )}
-        {evenement.prix && <p className="mt-1.5 text-[13px] text-[#4A4136]">Admission: {evenement.prix}</p>}
-      </div>
+      <BandeEvenement evenement={evenement} compact />
       <FlyerViewer evenement={evenement} open={ouvert} onClose={() => setOuvert(false)} />
     </article>
   );

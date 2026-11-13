@@ -1,45 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { envoyer, ecrire, interets, lire, memoriserInteret, visiteur } from "@/lib/listing/engagement-client";
 import { libelleInteret } from "@/lib/listing/engagement";
-
-const CLE_VISITEUR = "tw_visiteur";
-const CLE_INTERETS = "tw_jy_vais";
-
-function lire(cle: string): string | null {
-  try {
-    return window.localStorage.getItem(cle);
-  } catch {
-    return null;
-  }
-}
-function ecrire(cle: string, valeur: string) {
-  try {
-    window.localStorage.setItem(cle, valeur);
-  } catch {
-    /* navigation privée : on continue sans mémoire locale */
-  }
-}
-function visiteur(): string {
-  let v = lire(CLE_VISITEUR);
-  if (!v) {
-    v = crypto.randomUUID();
-    ecrire(CLE_VISITEUR, v);
-  }
-  return v;
-}
-function interets(): string[] {
-  try {
-    const v = JSON.parse(lire(CLE_INTERETS) ?? "[]");
-    return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
-  } catch {
-    return [];
-  }
-}
-async function envoyer(corps: Record<string, string>) {
-  const res = await fetch("/api/engagement", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) });
-  return res.ok ? ((await res.json()) as { ok: boolean; interesse?: boolean; total?: number }) : null;
-}
 
 /** Compte une vue par jour et par visiteur, et propose « J'y vais » (anonyme, sans compte). */
 export function Engagement({ evenementId, interetsInitiaux, termine }: { evenementId: string; interetsInitiaux: number | null; termine: boolean }) {
@@ -68,8 +31,7 @@ export function Engagement({ evenementId, interetsInitiaux, termine }: { eveneme
       if (r?.ok) {
         setActif(Boolean(r.interesse));
         setTotal(r.total ?? null);
-        const autres = interets().filter((x) => x !== evenementId);
-        ecrire(CLE_INTERETS, JSON.stringify(r.interesse ? [...autres, evenementId] : autres));
+        memoriserInteret(evenementId, Boolean(r.interesse));
       }
     } catch {
       /* hors ligne : rien ne change */
