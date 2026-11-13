@@ -9,7 +9,7 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
   const email = await emailContact();
   const largeur = large ? "max-w-[1240px]" : "max-w-3xl";
   return (
-    <div className="theme-nuit min-h-dvh">
+    <div className="theme-clair min-h-dvh">
       <EnTete large={large} email={email} />
       <main className="pb-24 md:pb-10">
         <div className={`mx-auto w-full ${largeur} px-[var(--page-px)] py-6`}>{children}</div>
