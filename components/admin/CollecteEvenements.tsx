@@ -28,7 +28,14 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
   // Côté serveur, son statut n'est déjà plus « needs_review » : il ne
   // réapparaîtra pas au prochain chargement.
   const [retires, setRetires] = useState<string[]>([]);
+  const [page, setPage] = useState(0);
   const visibles = donnees.candidats.filter((c) => !retires.includes(c.id));
+  // Pagination (correctif du 12 nov. 2026) : la file complète peut dépasser
+  // 190 candidats ; affichage 20 par page, le titre garde le total réel.
+  const PAR_PAGE = 20;
+  const nombrePages = Math.max(1, Math.ceil(visibles.length / PAR_PAGE));
+  const pageActuelle = Math.min(page, nombrePages - 1);
+  const visiblesPage = visibles.slice(pageActuelle * PAR_PAGE, pageActuelle * PAR_PAGE + PAR_PAGE);
   function retirer(ids: string[]) {
     setRetires((liste) => [...liste, ...ids.filter((id) => !liste.includes(id))]);
   }
@@ -92,9 +99,16 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
             <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={async () => { if (await agir("/api/admin/event-candidates/bulk", { ids: selection, action: "duplicate" })) { retirer(selection); setSelection([]); } }}>Marquer la sélection comme doublon</button>
           </div>
         )}
-        {visibles.map((candidat) => (
+        {visiblesPage.map((candidat) => (
           <CandidatCarte key={candidat.id} candidat={candidat} lieux={donnees.lieux} pending={pending} coche={selection.includes(candidat.id)} onCoche={(oui) => setSelection((liste) => oui ? [...liste, candidat.id] : liste.filter((id) => id !== candidat.id))} onAction={agirMethode} onRetire={() => retirer([candidat.id])} />
         ))}
+        {nombrePages > 1 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" disabled={pageActuelle === 0} className={BTN_SECONDAIRE} onClick={() => setPage(pageActuelle - 1)}>Précédent</button>
+            <p className="text-sm text-[#8A7B66]">Page {pageActuelle + 1} sur {nombrePages} — {visibles.length} candidats en attente</p>
+            <button type="button" disabled={pageActuelle >= nombrePages - 1} className={BTN_SECONDAIRE} onClick={() => setPage(pageActuelle + 1)}>Suivant</button>
+          </div>
+        )}
       </section>
       <FormulaireSource pending={pending} onCreer={(body) => agir("/api/admin/watch-accounts", body)} />
       <section id="sources" className="space-y-3">
