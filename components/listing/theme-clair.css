@@ -1,0 +1,57 @@
+/* Thème clair des pages publiques (fond crème). Le thème sombre (.theme-nuit) reste dans globals.css
+   et dans boutons-sombres.css : pour proposer un réglage clair/sombre plus tard, il suffit de
+   changer la classe posée par le Gabarit. */
+.theme-clair {
+  --nuit-fond: #FBF7EF;
+  --nuit-carte: #FFFFFF;
+  --nuit-carte2: #F3E6D8;
+  --nuit-ligne: #E5D9BE;
+  --nuit-texte: #191410;
+  --nuit-texte2: #4A4136;
+  --nuit-muet: #6E6252;
+  --creme: #2E2622;
+  --encre: #FFFFFF;
+  --encre2: #D9CBB8;
+  --accent: #A63446;
+  --accent-texte: #A63446;
+  --bouton: #2E2622;
+  --or: #FFC247;
+  --text-sec: #6E6252;
+  --surface: #FFFFFF;
+  background: var(--nuit-fond);
+  color: var(--nuit-texte);
+  font-family: var(--font-body);
+  color-scheme: light;
+}
+body:has(.theme-clair) { background: #FBF7EF; }
+
+/* Boutons, filtres actifs et pastilles : graphite sombre (les flyers apportent déjà les couleurs vives). */
+.theme-clair .bg-\[var\(--accent\)\],
+.theme-clair .bg-\[\#A63446\] {
+  background-color: var(--bouton);
+  color: #FFFFFF;
+}
+.theme-clair .border-\[var\(--accent\)\] { border-color: var(--bouton); }
+
+/* Pastille « sélectionnée » : graphite avec texte clair. */
+.theme-clair [class*="bg-[var(--creme)]"] { background-color: #2E2622; color: #FFFFFF; }
+.theme-clair [class*="bg-[var(--nuit-texte)]"] { color: #FFFFFF; }
+
+/* Texte doré : trop pâle sur fond clair. */
+.theme-clair [class*="text-[var(--or)]"] { color: #8A5A00; }
+
+/* Barre du bas et menu « Plus » : blanc au lieu du verre sombre. */
+.theme-clair [class*="bg-[rgba(27,22,19,0.96)]"] {
+  background-color: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 12px 30px rgba(25, 20, 16, 0.16);
+}
+.theme-clair nav a[aria-label="Rechercher"] { box-shadow: 0 8px 22px rgba(25, 20, 16, 0.28); }
+
+/* Pastille d'urgence discrète : reste sombre avec texte clair. */
+.theme-clair [class*="bg-[rgba(15,12,11,0.82)]"] { color: #FBF7EF; }
+
+/* Bannière « À la une » : toujours sombre (flyer floué), texte clair. */
+.theme-clair section[aria-roledescription="carousel"] article { background-color: #2E2622; }
+
+/* Bouton « Devenir partenaire » : une seule ligne. */
+.theme-clair header a[href^="mailto"] { white-space: nowrap; }
