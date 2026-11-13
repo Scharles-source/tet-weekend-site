@@ -22,20 +22,13 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
   const [message, setMessage] = useState<string | null>(apercu ? "Aperçu local, hors production." : null);
   const [pending, setPending] = useState(false);
   const [selection, setSelection] = useState<string[]>([]);
-  // Règle (Smith, 29 oct. 2026) : dès qu'un candidat est traité (approuvé —
-  // brouillon ou publié —, rejeté ou marqué doublon), il quitte la section
+  // Règle (Smith, 29 oct. 2026) : dès qu'un candidat est traité (approuvé
+  // — brouillon ou publié —, rejeté ou marqué doublon), il quitte la section
   // « À valider » immédiatement, sans attendre le rechargement des données.
   // Côté serveur, son statut n'est déjà plus « needs_review » : il ne
   // réapparaîtra pas au prochain chargement.
   const [retires, setRetires] = useState<string[]>([]);
-  const [page, setPage] = useState(0);
   const visibles = donnees.candidats.filter((c) => !retires.includes(c.id));
-  // Pagination (correctif du 12 nov. 2026) : la file complète peut dépasser
-  // 190 candidats ; affichage 20 par page, le titre garde le total réel.
-  const PAR_PAGE = 20;
-  const nombrePages = Math.max(1, Math.ceil(visibles.length / PAR_PAGE));
-  const pageActuelle = Math.min(page, nombrePages - 1);
-  const visiblesPage = visibles.slice(pageActuelle * PAR_PAGE, pageActuelle * PAR_PAGE + PAR_PAGE);
   function retirer(ids: string[]) {
     setRetires((liste) => [...liste, ...ids.filter((id) => !liste.includes(id))]);
   }
@@ -88,38 +81,31 @@ export function CollecteEvenements({ donnees, apercu = false }: { donnees: VueCo
 
   return (
     <div className="space-y-6">
-      <p className={AIDE}>{donnees.email} — la collecte est assurée par Jarvis, chaque jour à 21 h : les événements repérés sur Instagram et Facebook arrivent ci-dessous avec leur flyer. Rien n&apos;est publié sans un clic d&apos;approbation. <Link href="/admin" className="font-semibold text-[#E02B20] no-underline">Retour aux événements</Link></p>
+      <p className={AIDE}>{donnees.email} — la collecte est assurée par Jarvis, chaque jour à 21 h : les événements repérés sur Instagram et Facebook arrivent ci-dessous avec leur flyer. Rien n&apos;est publié sans un clic d&apos;approbation. <Link href="/admin?section=evenements" className="font-semibold text-[#1D3FD8] no-underline">Retour aux événements</Link></p>
       {message && <p className="text-sm font-semibold text-[#92400E]">{message}</p>}
       <section id="a-valider" className="space-y-4">
         <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">À valider ({visibles.length})</h2>
-        {visibles.length === 0 && <p className="text-sm text-[#8A7B66]">Aucun événement en attente de validation.</p>}
+        {visibles.length === 0 && <p className="text-sm text-[#5B6472]">Aucun événement en attente de validation.</p>}
         {selection.length > 0 && (
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={async () => { if (await agir("/api/admin/event-candidates/bulk", { ids: selection, action: "reject" })) { retirer(selection); setSelection([]); } }}>Rejeter la sélection</button>
             <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={async () => { if (await agir("/api/admin/event-candidates/bulk", { ids: selection, action: "duplicate" })) { retirer(selection); setSelection([]); } }}>Marquer la sélection comme doublon</button>
           </div>
         )}
-        {visiblesPage.map((candidat) => (
+        {visibles.map((candidat) => (
           <CandidatCarte key={candidat.id} candidat={candidat} lieux={donnees.lieux} pending={pending} coche={selection.includes(candidat.id)} onCoche={(oui) => setSelection((liste) => oui ? [...liste, candidat.id] : liste.filter((id) => id !== candidat.id))} onAction={agirMethode} onRetire={() => retirer([candidat.id])} />
         ))}
-        {nombrePages > 1 && (
-          <div className="flex flex-wrap items-center gap-2">
-            <button type="button" disabled={pageActuelle === 0} className={BTN_SECONDAIRE} onClick={() => setPage(pageActuelle - 1)}>Précédent</button>
-            <p className="text-sm text-[#8A7B66]">Page {pageActuelle + 1} sur {nombrePages} — {visibles.length} candidats en attente</p>
-            <button type="button" disabled={pageActuelle >= nombrePages - 1} className={BTN_SECONDAIRE} onClick={() => setPage(pageActuelle + 1)}>Suivant</button>
-          </div>
-        )}
       </section>
       <FormulaireSource pending={pending} onCreer={(body) => agir("/api/admin/watch-accounts", body)} />
       <section id="sources" className="space-y-3">
         <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">Sources surveillées</h2>
-        <p className="text-sm text-[#8A7B66]">C&apos;est la liste que Jarvis parcourt chaque soir — ajoute un compte ici pour l&apos;inclure à la veille.</p>
-        {donnees.sources.length === 0 && <p className="text-sm text-[#8A7B66]">Aucune source.</p>}
+        <p className="text-sm text-[#5B6472]">C&apos;est la liste que Jarvis parcourt chaque soir — ajoute un compte ici pour l&apos;inclure à la veille.</p>
+        {donnees.sources.length === 0 && <p className="text-sm text-[#5B6472]">Aucune source.</p>}
         {donnees.sources.map((source) => (
           <article key={source.id} className={`${CARTE} p-4 text-sm`}>
             <p className="font-semibold">{source.displayName || source.handle || source.profileUrl} · {source.platform}</p>
-            <p className="text-[#8A7B66]">{source.sourceType} · {[source.city, source.country].filter(Boolean).join(", ") || "Ville non indiquée"} · {source.active ? "active" : "en pause"} · candidats : {source.candidats}</p>
-            {source.notes && <p className="text-[#8A7B66]">{source.notes}</p>}
+            <p className="text-[#5B6472]">{source.sourceType} · {[source.city, source.country].filter(Boolean).join(", ") || "Ville non indiquée"} · {source.active ? "active" : "en pause"} · candidats : {source.candidats}</p>
+            {source.notes && <p className="text-[#5B6472]">{source.notes}</p>}
             <div className="mt-2 flex flex-wrap gap-2">
               <button type="button" disabled={pending} className={BTN_SECONDAIRE} onClick={() => agirMethode(`/api/admin/watch-accounts/${source.id}`, "PATCH", { active: !source.active })}>{source.active ? "Mettre en pause" : "Réactiver"}</button>
             </div>
@@ -202,19 +188,19 @@ function CandidatCarte({
           <a href={candidat.flyerUrl} target="_blank" rel="noreferrer">
             {/* Le flyer candidat est une URL signée ou locale : object-fit contain, pas de recadrage. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={candidat.flyerUrl} alt={`Flyer — ${candidat.title ?? "candidat"}`} className="max-h-[260px] w-full rounded-[12px] bg-[#F3E6D8] object-contain" />
+            <img src={candidat.flyerUrl} alt={`Flyer — ${candidat.title ?? "candidat"}`} className="max-h-[260px] w-full rounded-[12px] bg-[#E3E6EC] object-contain" />
           </a>
         ) : (
-          <div className="flex min-h-40 flex-col justify-center rounded-[12px] border-2 border-dashed border-[#D8C6A4] p-4 text-sm">
+          <div className="flex min-h-40 flex-col justify-center rounded-[12px] border-2 border-dashed border-[#AEB4C0] p-4 text-sm">
             <p>Aucun flyer récupéré</p>
             <a className="underline" href={candidat.sourcePostUrl} target="_blank" rel="noreferrer">Voir la source</a>
           </div>
         )}
-        {candidat.caption && <p className="mt-3 whitespace-pre-wrap text-sm text-[#8A7B66]">{candidat.caption}</p>}
+        {candidat.caption && <p className="mt-3 whitespace-pre-wrap text-sm text-[#5B6472]">{candidat.caption}</p>}
       </div>
       <form className="space-y-2" onSubmit={async (e) => { e.preventDefault(); if (await onAction(`/api/admin/event-candidates/${candidat.id}/approve`, "POST", champs(e.currentTarget))) onRetire(); }}>
         <p className="text-sm"><a className="underline" href={candidat.sourcePostUrl} target="_blank" rel="noreferrer">{candidat.platform}</a> · {candidat.compte ?? "compte non indiqué"}</p>
-        <p className="text-xs text-[#8A7B66]">Titre {libelleConfiance(candidat.confidence.titre?.niveau)} · Date {libelleConfiance(candidat.confidence.date?.niveau)} · Lieu {libelleConfiance(candidat.confidence.lieu?.niveau)}</p>
+        <p className="text-xs text-[#5B6472]">Titre {libelleConfiance(candidat.confidence.titre?.niveau)} · Date {libelleConfiance(candidat.confidence.date?.niveau)} · Lieu {libelleConfiance(candidat.confidence.lieu?.niveau)}</p>
         {(candidat.duplicateOfEventId || candidat.duplicateOfCandidateId) && <p className="text-sm text-[#92400E]">Doublon probable. {candidat.duplicateOfEventId ? `Événement ${candidat.duplicateOfEventId}` : `Candidat ${candidat.duplicateOfCandidateId}`}</p>}
         <input name="titre" defaultValue={candidat.title ?? ""} className={champ} aria-label="Titre" required />
         <input name="dateDebut" type="datetime-local" defaultValue={debut} className={champ} aria-label="Début" />
