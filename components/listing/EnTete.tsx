@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Logo } from "@/components/listing/Logo";
 
 const LIENS = [
@@ -23,13 +23,13 @@ export function EnTete({ large = false, email }: { large?: boolean; email?: stri
     <header className="sticky top-0 z-40 border-b border-[var(--nuit-ligne)] bg-[var(--nuit-fond)]">
       <div className={`mx-auto flex h-16 w-full ${largeur} items-center justify-between gap-4 px-[var(--page-px)]`}>
         <Logo />
-        {/* Mobile : accès direct à la recherche (la navigation vit dans la barre du bas) */}
+        {/* Mobile : proposer un événement (la recherche vit dans la barre du bas) */}
         <Link
-          href="/recherche"
-          aria-label="Search for an event"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-[0_4px_12px_rgba(166,52,70,.35)] no-underline md:hidden"
+          href="/ajouter-evenement"
+          className="flex h-10 items-center gap-1.5 rounded-full bg-[var(--accent)] px-4 text-[14px] font-extrabold text-white shadow-[0_4px_12px_rgba(166,52,70,.35)] no-underline md:hidden"
         >
-          <Search size={18} aria-hidden />
+          <Plus size={17} strokeWidth={2.8} aria-hidden />
+          Add an event
         </Link>
         {/* Desktop : navigation horizontale */}
         <nav className="hidden items-center gap-7 md:flex" aria-label="Main navigation">
@@ -46,6 +46,13 @@ export function EnTete({ large = false, email }: { large?: boolean; email?: stri
               </Link>
             );
           })}
+          <Link
+            href="/ajouter-evenement"
+            className="flex items-center gap-1.5 rounded-full border-2 border-[var(--accent)] px-5 py-2 text-[14px] font-bold text-[var(--accent-texte)] no-underline"
+          >
+            <Plus size={16} strokeWidth={2.8} aria-hidden />
+            Add an event
+          </Link>
           {email ? (
             <a
               href={`mailto:${email}?subject=Become%20a%20partner`}
