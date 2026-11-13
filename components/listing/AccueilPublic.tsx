@@ -61,7 +61,7 @@ export function AccueilPublic({
   return (
     <div>
       <header className="max-w-[640px]">
-        <p className="text-xs font-bold tracking-[0.16em] text-[var(--or)] uppercase">Where&apos;s the party?</p>
+        <p className="text-xs font-bold tracking-[0.16em] text-[var(--or)] uppercase">Where the party at?</p>
         <h1 className="mt-2 font-[family-name:var(--font-display)] text-[40px] leading-[1.02] font-black tracking-tight text-balance text-[var(--nuit-texte)] lg:text-[60px]">
           Partying <span className="text-[var(--accent-texte)]">in Haiti</span>
         </h1>
@@ -159,12 +159,12 @@ export function AccueilPublic({
                 </div>
               )}
             </section>
-            <BlocOrganisateurs email={email} />
+            <BlocOrganisateurs />
           </div>
         </>
       )}
 
-      {filtres && <BlocOrganisateurs email={email} className="mt-10" />}
+      {filtres && <BlocOrganisateurs className="mt-10" />}
     </div>
   );
 }
@@ -188,7 +188,7 @@ function EnteteSection({ titre, href }: { titre: string; href: string }) {
   );
 }
 
-function BlocOrganisateurs({ email, className = "" }: { email: string; className?: string }) {
+function BlocOrganisateurs({ className = "" }: { className?: string }) {
   return (
     <section className={`mt-9 lg:mt-0 ${className}`}>
       <div className="rounded-[24px] bg-[var(--creme)] p-[22px] text-[var(--encre)]">
@@ -196,12 +196,12 @@ function BlocOrganisateurs({ email, className = "" }: { email: string; className
         <p className="mt-2.5 text-[14.5px] leading-relaxed text-[var(--encre2)]">
           Put your event in front of the whole community, in Haiti and across the diaspora.
         </p>
-        <a
-          href={`mailto:${email}?subject=Submit%20my%20event`}
+        <Link
+          href="/ajouter-evenement"
           className="mt-4 flex min-h-12 items-center justify-center rounded-[14px] bg-[var(--accent)] px-6 text-[15px] font-extrabold text-white no-underline"
         >
           Submit my event
-        </a>
+        </Link>
       </div>
     </section>
   );
