@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { RapportSeoBloc } from "@/components/admin/RapportSeo";
 import { StatsAujourdhui } from "@/components/admin/StatsAujourdhui";
 import { CARTE } from "@/components/admin/styles";
+import type { RapportSeo } from "@/lib/admin/search-console-pures";
 import type { Statistiques } from "@/lib/admin/statistiques-pures";
 import type { ExtrasAccueil } from "@/lib/admin/accueil";
 import type { EvenementAdmin } from "@/lib/admin/charger";
@@ -12,7 +14,7 @@ function dateCourte(iso: string, fuseau: string): { jour: string; mois: string }
   return { jour: f({ day: "numeric" }), mois: f({ month: "short" }).replace(".", "") };
 }
 
-export function AccueilAdmin({ evenements, extras, maintenantIso, stats }: { evenements: EvenementAdmin[]; extras: ExtrasAccueil; maintenantIso: string; stats: Statistiques | null }) {
+export function AccueilAdmin({ evenements, extras, maintenantIso, stats, rapportSeo = null }: { evenements: EvenementAdmin[]; extras: ExtrasAccueil; maintenantIso: string; stats: Statistiques | null; rapportSeo?: RapportSeo | null }) {
   const maintenant = new Date(maintenantIso).getTime();
   const aVenir = evenements.filter((e) => new Date(e.date_fin ?? e.date_debut).getTime() >= maintenant);
   const publies = aVenir.filter((e) => e.statut === "publie").length;
@@ -42,6 +44,8 @@ export function AccueilAdmin({ evenements, extras, maintenantIso, stats }: { eve
       </Link>
 
       <StatsAujourdhui stats={stats} />
+
+      <RapportSeoBloc rapport={rapportSeo} />
 
       <div className="grid grid-cols-3 gap-2.5">
         <Compteur valeur={publies} libelle="Publiés à venir" href="/admin?section=evenements" />

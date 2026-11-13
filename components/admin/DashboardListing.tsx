@@ -10,6 +10,7 @@ import { AIDE, BTN_PRIMAIRE, BTN_SECONDAIRE, CARTE, CHAMP, LABEL, TITRE_BLOC } f
 import { changerStatut, enregistrerArtiste, enregistrerCompte, enregistrerLieu } from "@/app/admin/actions";
 import type { ExtrasAccueil } from "@/lib/admin/accueil";
 import type { ArtisteAdmin, CompteAdmin, EvenementAdmin, LieuAdmin } from "@/lib/admin/charger";
+import type { RapportSeo } from "@/lib/admin/search-console-pures";
 import type { Periode, Statistiques } from "@/lib/admin/statistiques-pures";
 import { CATEGORIES, LIBELLES_STATUT, PLATEFORMES, TYPES_ARTISTE, TYPES_COMPTE, TYPES_LIEU } from "@/lib/listing/schema";
 import { slugifier } from "@/lib/listing/slug";
@@ -25,6 +26,7 @@ export function DashboardListing({
   extras,
   maintenantIso,
   stats = null,
+  rapportSeo = null,
   periode = "aujourdhui",
   section = "accueil",
 }: {
@@ -36,6 +38,7 @@ export function DashboardListing({
   extras: ExtrasAccueil;
   maintenantIso: string;
   stats?: Statistiques | null;
+  rapportSeo?: RapportSeo | null;
   periode?: Periode;
   section?: string;
 }) {
@@ -75,7 +78,7 @@ export function DashboardListing({
     >
       {erreur && <p className="mb-4 text-[13px] text-[#D92D20]">{erreur}</p>}
       {pending && <p className="mb-4 text-[13px] text-[#5B6472]">Enregistrement…</p>}
-      {onglet === "accueil" && <AccueilAdmin evenements={evenements} extras={extras} maintenantIso={maintenantIso} stats={stats} />}
+      {onglet === "accueil" && <AccueilAdmin evenements={evenements} extras={extras} maintenantIso={maintenantIso} stats={stats} rapportSeo={rapportSeo} />}
       {onglet === "statistiques" && <SectionStatistiques stats={stats} periode={periode} />}
       {onglet === "evenements" && (
         <SectionEvenements
