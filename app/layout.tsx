@@ -14,8 +14,11 @@ export const metadata: Metadata = {
   title: "Tèt Weekend — Haitian Events",
   description: "Find the best Haitian events near you. Concerts, parties, festivals — never miss a night.",
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icone-tw-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icone-tw-180.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: "Tèt Weekend",
@@ -24,13 +27,13 @@ export const metadata: Metadata = {
     url: "https://www.tetweekend.com",
     siteName: "Tèt Weekend",
     locale: "en_US",
-    images: [{ url: "/logotetweekend.png", width: 2000, height: 2000, alt: "Tèt Weekend" }],
+    images: [{ url: "/partage-tw.png", width: 1200, height: 630, alt: "Tèt Weekend" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Tèt Weekend",
     description: "The reference for Haitian events, in Haiti and across the diaspora.",
-    images: ["/logotetweekend.png"],
+    images: ["/partage-tw.png"],
   },
 };
 
