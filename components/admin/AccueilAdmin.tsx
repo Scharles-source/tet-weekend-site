@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { StatsAujourdhui } from "@/components/admin/StatsAujourdhui";
 import { CARTE } from "@/components/admin/styles";
+import type { Statistiques } from "@/lib/admin/statistiques-pures";
 import type { ExtrasAccueil } from "@/lib/admin/accueil";
 import type { EvenementAdmin } from "@/lib/admin/charger";
 
@@ -10,7 +12,7 @@ function dateCourte(iso: string, fuseau: string): { jour: string; mois: string }
   return { jour: f({ day: "numeric" }), mois: f({ month: "short" }).replace(".", "") };
 }
 
-export function AccueilAdmin({ evenements, extras, maintenantIso }: { evenements: EvenementAdmin[]; extras: ExtrasAccueil; maintenantIso: string }) {
+export function AccueilAdmin({ evenements, extras, maintenantIso, stats }: { evenements: EvenementAdmin[]; extras: ExtrasAccueil; maintenantIso: string; stats: Statistiques | null }) {
   const maintenant = new Date(maintenantIso).getTime();
   const aVenir = evenements.filter((e) => new Date(e.date_fin ?? e.date_debut).getTime() >= maintenant);
   const publies = aVenir.filter((e) => e.statut === "publie").length;
@@ -20,14 +22,6 @@ export function AccueilAdmin({ evenements, extras, maintenantIso }: { evenements
     .filter((e) => e.statut !== "retire")
     .sort((a, b) => new Date(a.date_debut).getTime() - new Date(b.date_debut).getTime())
     .slice(0, 5);
-  const lignes = Object.values(extras.engagement);
-  const vues = lignes.reduce((n, l) => n + l.vues, 0);
-  const interets = lignes.reduce((n, l) => n + l.interets, 0);
-  const populaires = evenements
-    .map((e) => ({ e, n: extras.engagement[e.id]?.interets ?? 0 }))
-    .filter((x) => x.n > 0)
-    .sort((a, b) => b.n - a.n)
-    .slice(0, 3);
 
   return (
     <div className="mx-auto max-w-3xl space-y-3 lg:mx-0">
@@ -47,44 +41,13 @@ export function AccueilAdmin({ evenements, extras, maintenantIso }: { evenements
         <ChevronRight size={20} aria-hidden />
       </Link>
 
+      <StatsAujourdhui stats={stats} />
+
       <div className="grid grid-cols-3 gap-2.5">
         <Compteur valeur={publies} libelle="Publiés à venir" href="/admin?section=evenements" />
         <Compteur valeur={brouillons} libelle="Brouillons" href="/admin?section=evenements" />
         <Compteur valeur={aVerifier} libelle="À vérifier" href="/admin?section=evenements" />
       </div>
-
-      <section className={`${CARTE} p-4`}>
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-[15px] font-bold">Intérêt des visiteurs</h2>
-          <span className="text-[12px] font-semibold text-[#5B6472]">Depuis le début</span>
-        </div>
-        {lignes.length === 0 ? (
-          <p className="mt-2 text-[13px] text-[#5B6472]">Pas encore de données d&apos;engagement.</p>
-        ) : (
-          <>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <div>
-                <p className="font-[family-name:var(--font-display)] text-[26px] font-extrabold">{vues.toLocaleString("fr-FR")}</p>
-                <p className="text-[12px] font-semibold text-[#5B6472]">Vues de fiches</p>
-              </div>
-              <div>
-                <p className="font-[family-name:var(--font-display)] text-[26px] font-extrabold">{interets.toLocaleString("fr-FR")}</p>
-                <p className="text-[12px] font-semibold text-[#5B6472]">« J&apos;y vais »</p>
-              </div>
-            </div>
-            {populaires.length > 0 && (
-              <ul className="mt-3 space-y-2 border-t border-[#E3E6EC] pt-3">
-                {populaires.map(({ e, n }) => (
-                  <li key={e.id} className="flex items-center justify-between gap-3 text-[13px]">
-                    <span className="min-w-0 truncate font-semibold">{e.titre}</span>
-                    <span className="shrink-0 font-semibold text-[#5B6472]">{n} y vont</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-      </section>
 
       <section className={`${CARTE} p-4`}>
         <h2 className="mb-3 text-[15px] font-bold">Prochains événements</h2>

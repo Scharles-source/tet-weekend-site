@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { DashboardListing } from "@/components/admin/DashboardListing";
 import type { ArtisteAdmin, CompteAdmin, EvenementAdmin, LieuAdmin } from "@/lib/admin/charger";
+import { periodeValide, type Statistiques } from "@/lib/admin/statistiques-pures";
 
 export const dynamic = "force-dynamic";
 
@@ -63,12 +64,44 @@ function evenement(partiel: Partial<EvenementAdmin> & Pick<EvenementAdmin, "id" 
   };
 }
 
-export default function PageApercuAdmin() {
+/** Chiffres fictifs, pour voir la mise en page (page de développement uniquement). */
+const STATS: Statistiques = {
+  periode: "aujourdhui",
+  heure_actuelle: 14,
+  en_ligne: { total: 12, mobile: 9, ordinateur: 3 },
+  visiteurs: 148,
+  pages_vues: 391,
+  visiteurs_hier_meme_heure: 125,
+  pages_vues_hier_meme_heure: 358,
+  jy_vais: 23,
+  jy_vais_hier_meme_heure: 18,
+  actions: { agenda: 12, flyer: 18 },
+  serie_type: "heure",
+  serie: Array.from({ length: 24 }, (_, h) => ({ x: String(h), n: [2, 1, 1, 0, 0, 1, 3, 6, 9, 11, 13, 15, 18, 22, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0][h] })),
+  serie_precedente: [2, 2, 1, 1, 1, 2, 3, 5, 8, 10, 12, 14, 15, 17, 19, 21, 24, 28, 26, 22, 15, 9, 5, 3],
+  sources: [{ nom: "instagram", n: 68 }, { nom: "whatsapp", n: 40 }, { nom: "direct", n: 22 }, { nom: "google", n: 10 }, { nom: "facebook", n: 8 }],
+  pays: [{ code: "HT", n: 80 }, { code: "US", n: 41 }, { code: "CA", n: 18 }, { code: "FR", n: 9 }],
+  villes: [{ nom: "Port-au-Prince", pays: "HT", n: 47 }, { nom: "Miami", pays: "US", n: 23 }, { nom: "Montréal", pays: "CA", n: 15 }, { nom: "New York", pays: "US", n: 12 }],
+  localisation: { haiti: 80, diaspora: 68, inconnu: 0 },
+  appareils: { mobile: 120, ordinateur: 28 },
+  evenements: [
+    { id: "e2", titre: "Bal Kompa du Vendredi", ville: "Pétion-Ville", date_debut: "2026-11-14T23:00:00.000Z", statut: "publie", vues: 74, flyers: 18, agendas: 7, interets: 31 },
+    { id: "e3", titre: "Festival de Décembre", ville: "Jacmel", date_debut: "2026-12-06T20:00:00.000Z", statut: "publie", vues: 52, flyers: 11, agendas: 5, interets: 12 },
+    { id: "e4", titre: "Concert Plein Air", ville: "Cap-Haïtien", date_debut: "2026-11-15T22:00:00.000Z", statut: "publie", vues: 41, flyers: 6, agendas: 0, interets: 9 },
+  ],
+};
+
+export default async function PageApercuAdmin({ searchParams }: { searchParams: Promise<{ section?: string; periode?: string }> }) {
   if (process.env.NODE_ENV === "production") notFound();
+  const { section = "evenements", periode: brute } = await searchParams;
+  const periode = periodeValide(brute);
+  const stats: Statistiques = periode === "aujourdhui" ? STATS : { ...STATS, periode, serie_type: "jour", serie_precedente: null, serie: Array.from({ length: periode === "7j" ? 7 : 30 }, (_, i) => ({ x: `${String(i + 1).padStart(2, "0")}/11`, n: 80 + ((i * 37) % 70) })) };
   return (
     <DashboardListing
       email="apercu@local"
-      section="evenements"
+      section={section}
+      periode={periode}
+      stats={stats}
       extras={{ aValider: 3, engagement: {} }}
       maintenantIso={new Date().toISOString()}
       lieux={[lieu]}
