@@ -68,6 +68,9 @@ export default function PageApercuAdmin() {
   return (
     <DashboardListing
       email="apercu@local"
+      section="evenements"
+      extras={{ aValider: 3, engagement: {} }}
+      maintenantIso={new Date().toISOString()}
       lieux={[lieu]}
       artistes={[artiste]}
       comptes={[] as CompteAdmin[]}
