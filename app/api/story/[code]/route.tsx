@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { chargerAnnuaire } from "@/lib/listing/data";
 import { dateCarte, lieuCarte, taillePolice, typeImageOk } from "@/lib/listing/carte-story";
 import { codeCourt, estCodeCourt } from "@/lib/listing/lien-court";
+import { GET as logoSombre } from "@/app/logo-tw.png/route";
 
 export const revalidate = 3600;
 
@@ -23,7 +24,7 @@ async function flyerEnDonnees(url: string | null): Promise<string | null> {
   }
 }
 
-/** Carte verticale 1080×1920 pour une story Instagram ou un statut WhatsApp : flyer, date, « I'm in », lien. */
+/** Carte verticale 1080×1920 pour une story Instagram ou un statut WhatsApp : logo, flyer, date, « I'm in », lien. */
 export async function GET(_request: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code: brut } = await params;
   const code = brut.toLowerCase();
@@ -33,6 +34,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
   const e = charge.annuaire.evenements.find((x) => codeCourt(x.id) === code);
   if (!e) return new Response("Not found", { status: 404 });
 
+  const logo = `data:image/png;base64,${Buffer.from(await (await logoSombre()).arrayBuffer()).toString("base64")}`;
   const flyer = await flyerEnDonnees(e.flyer ? e.flyer.cardUrl || e.flyer.publicUrl : null);
   const { jour, heure } = dateCarte(e.date_debut, e.fuseau);
   const lieu = lieuCarte(e.lieu?.nom, e.ville);
@@ -53,16 +55,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
           fontWeight: 700,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", marginTop: 270 }}>
-          <div style={{ width: 60, height: 60, borderRadius: 18, background: "#A63446", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, fontWeight: 800 }}>T</div>
-          <div style={{ marginLeft: 20, fontSize: 46, fontWeight: 800 }}>Tèt Weekend</div>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={logo} alt="" width={309} height={171} style={{ marginTop: 250, width: 309, height: 171 }} />
 
         <div
           style={{
-            marginTop: 60,
-            width: 667,
-            height: 890,
+            marginTop: 22,
+            width: 624,
+            height: 832,
             display: "flex",
             transform: "rotate(-2.5deg)",
             borderRadius: 36,
@@ -73,9 +73,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
         >
           {flyer ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={flyer} alt="" width={667} height={890} style={{ width: 667, height: 890, objectFit: "cover" }} />
+            <img src={flyer} alt="" width={624} height={832} style={{ width: 624, height: 832, objectFit: "cover" }} />
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 48, width: 667, height: 890 }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 48, width: 624, height: 832 }}>
               <div style={{ fontSize: taillePolice(e.titre), fontWeight: 800, lineHeight: 1, textTransform: "uppercase" }}>{e.titre}</div>
             </div>
           )}
@@ -84,7 +84,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
         <div
           style={{
             position: "absolute",
-            top: 1140,
+            top: 1130,
             left: 96,
             display: "flex",
             alignItems: "center",
@@ -103,14 +103,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
           <div style={{ marginLeft: 20, fontSize: 64, fontWeight: 800 }}>I&apos;m in</div>
         </div>
 
-        <div style={{ position: "absolute", top: 1345, left: 60, right: 60, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+        <div style={{ position: "absolute", top: 1291, left: 60, right: 60, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
           <div style={{ fontSize: 84, fontWeight: 800, letterSpacing: 1 }}>{`${jour} · ${heure}`}</div>
           {lieu ? <div style={{ marginTop: 14, fontSize: 40, color: "#F1C9B8", fontWeight: 600 }}>{lieu}</div> : null}
         </div>
 
-        <div style={{ position: "absolute", bottom: 390, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{ position: "absolute", bottom: 267, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
           <div style={{ display: "flex", background: "#A63446", padding: "26px 52px", borderRadius: 999, fontSize: 44, fontWeight: 800 }}>{`tetweekend.com/e/${code}`}</div>
-          <div style={{ marginTop: 26, fontSize: 32, color: "#E8B9A8", letterSpacing: 4, textTransform: "uppercase", fontWeight: 700 }}>Where the party at?</div>
+          <div style={{ marginTop: 37, fontSize: 37, color: "#FFF7EF", letterSpacing: 4, textTransform: "uppercase", fontWeight: 700 }}>Where the party at?</div>
         </div>
       </div>
     ),
