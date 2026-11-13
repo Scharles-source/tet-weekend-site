@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Archivo_Black, Inter } from "next/font/google";
 import "./globals.css";
-
-const archivo = Archivo({ subsets: ["latin"], weight: ["800", "900"], variable: "--font-archivo", display: "swap" });
-const archivoBlack = Archivo_Black({ subsets: ["latin"], weight: "400", variable: "--font-archivo-black", display: "swap" });
-const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.tetweekend.com"),
@@ -39,9 +34,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${archivo.variable} ${archivoBlack.variable} ${inter.variable}`}>
+    <html lang="en">
       <head>
+        {/* Polices chargées par le navigateur (et non à la compilation) : un incident de téléchargement des polices ne peut plus faire échouer le déploiement. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap"
+        />
         <style dangerouslySetInnerHTML={{ __html: `
+          :root { --font-archivo: "Archivo"; --font-archivo-black: "Archivo Black", "Archivo", sans-serif; --font-inter: "Inter"; }
           :root { --page-px: 32px; }
           @media (max-width: 768px) {
             :root { --page-px: 20px; }
