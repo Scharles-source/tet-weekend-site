@@ -51,6 +51,13 @@ export async function POST(request: Request) {
   } else if (corps.type === "action" && (corps.action === "agenda" || corps.action === "flyer") && slug) {
     fonction = "enregistrer_action";
     args = { p_visiteur: corps.visiteur, p_type: corps.action, p_slug: slug };
+  } else if (corps.type === "app" && (corps.evenement === "installation" || corps.evenement === "ouverture")) {
+    fonction = "enregistrer_app";
+    args = {
+      p_visiteur: corps.visiteur,
+      p_type: corps.evenement,
+      p_plateforme: corps.plateforme === "android" || corps.plateforme === "ios" ? corps.plateforme : "autre",
+    };
   } else {
     return NextResponse.json({ ok: false }, { status: 400 });
   }

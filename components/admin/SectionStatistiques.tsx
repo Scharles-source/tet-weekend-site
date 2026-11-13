@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Actions, Appareils, Chiffres, Courbe, EnLigne, EvenementsPopulaires, Localisation, Pays, Sources, StatsIndisponibles } from "@/components/admin/StatsBlocs";
+import { Actions, Appareils, Chiffres, Courbe, EnLigne, EvenementsPopulaires, InstallationsApp, Localisation, Pays, Sources, StatsIndisponibles } from "@/components/admin/StatsBlocs";
 import { PERIODES, type Periode, type Statistiques } from "@/lib/admin/statistiques-pures";
 
 /** Section « Statistiques » : le détail par période. La période est dans l'adresse (?periode=7j). */
@@ -26,6 +26,7 @@ export function SectionStatistiques({ stats, periode }: { stats: Statistiques | 
             <EnLigne stats={stats} />
             <Chiffres stats={stats} />
           </div>
+          <div className="lg:col-span-2"><InstallationsApp stats={stats} /></div>
           <div className="lg:col-span-2"><Courbe stats={stats} /></div>
           <Actions stats={stats} />
           <EvenementsPopulaires stats={stats} />

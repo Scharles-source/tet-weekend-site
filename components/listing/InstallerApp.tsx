@@ -9,9 +9,13 @@ interface EvenementInstall extends Event {
 
 const CLE = "tw_install_ferme";
 
+const SEPT_JOURS = 7 * 24 * 3_600_000;
+
+/** « Not now » repousse l'invitation de sept jours. */
 function lireFerme(): boolean {
   try {
-    return window.localStorage.getItem(CLE) === "1";
+    const t = Number(window.localStorage.getItem(CLE));
+    return Number.isFinite(t) && t > 0 && Date.now() - t < SEPT_JOURS;
   } catch {
     return false;
   }
@@ -21,6 +25,7 @@ function lireFerme(): boolean {
 export function InstallerApp() {
   const [invite, setInvite] = useState<EvenementInstall | null>(null);
   const [ios, setIos] = useState(false);
+  const [mobile, setMobile] = useState(false);
   const [ferme, setFerme] = useState(true);
 
   useEffect(() => {
@@ -28,11 +33,13 @@ export function InstallerApp() {
 
     const installee = window.matchMedia("(display-mode: standalone)").matches || (navigator as unknown as { standalone?: boolean }).standalone === true;
     const ua = navigator.userAgent;
-    const appareilIos = /iPhone|iPad|iPod/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+    const appareilIos = /iPhone|iPad|iPod/.test(ua);
+    const tactile = window.matchMedia("(pointer: coarse)").matches;
     // Décision prise après le premier rendu (le serveur ne connaît ni l'appareil ni le stockage).
     const minuteur = window.setTimeout(() => {
       if (installee || lireFerme()) return;
       setIos(appareilIos);
+      setMobile(tactile);
       setFerme(false);
     }, 0);
 
@@ -53,7 +60,7 @@ export function InstallerApp() {
   function fermer() {
     setFerme(true);
     try {
-      window.localStorage.setItem(CLE, "1");
+      window.localStorage.setItem(CLE, String(Date.now()));
     } catch {
       /* sans stockage, la bannière reviendra à la prochaine visite */
     }
@@ -68,7 +75,7 @@ export function InstallerApp() {
     else fermer();
   }
 
-  if (ferme || (!invite && !ios)) return null;
+  if (ferme || !mobile) return null;
 
   return (
     <div className="fixed inset-x-3 bottom-24 z-30 rounded-[18px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-3.5 shadow-lg md:hidden" role="dialog" aria-label="Install the app">
@@ -77,11 +84,15 @@ export function InstallerApp() {
         <p className="mt-1 text-[13px] leading-snug text-[var(--nuit-texte2)]">
           Tap the Share button in Safari, then <strong>Add to Home Screen</strong>.
         </p>
-      ) : (
+      ) : invite ? (
         <p className="mt-1 text-[13px] leading-snug text-[var(--nuit-texte2)]">Add it to your home screen to open it in one tap, like any other app.</p>
+      ) : (
+        <p className="mt-1 text-[13px] leading-snug text-[var(--nuit-texte2)]">
+          Open your browser menu (⋮), then tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.
+        </p>
       )}
       <div className="mt-3 flex gap-2">
-        {!ios && (
+        {!ios && invite && (
           <button type="button" onClick={installer} className="min-h-11 flex-1 rounded-full bg-[var(--bouton)] px-4 text-[14px] font-extrabold text-white">
             Install
           </button>
