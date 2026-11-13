@@ -21,8 +21,8 @@ export class ErreurDonnees extends Error {
 
 const TAG = "evenements-public";
 
-const COLONNES_LIEU = "id,slug,nom,ville,pays,adresse,type,description,instagram,facebook,site_web";
-const COLONNES_ARTISTE = "id,slug,nom,type,ville_base,bio,instagram,facebook,site_web";
+const COLONNES_LIEU = "id,slug,nom,ville,pays,adresse,type,description,instagram,facebook,site_web,updated_at";
+const COLONNES_ARTISTE = "id,slug,nom,type,ville_base,bio,instagram,facebook,site_web,updated_at";
 
 function configuration() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -70,6 +70,7 @@ function lieuDe(brut: Record<string, unknown> | null): LieuPublic | null {
     instagram: texte(brut.instagram),
     facebook: texte(brut.facebook),
     site_web: texte(brut.site_web),
+    modifie_le: texte(brut.updated_at),
   };
 }
 
@@ -84,6 +85,7 @@ function artisteDe(brut: Record<string, unknown>): ArtistePublic {
     instagram: texte(brut.instagram),
     facebook: texte(brut.facebook),
     site_web: texte(brut.site_web),
+    modifie_le: texte(brut.updated_at),
   };
 }
 
@@ -136,6 +138,7 @@ function evenementDe(brut: EvenementBrut): EvenementPublic {
     sponsored_from: null,
     sponsored_to: null,
     vues: null,
+    modifie_le: texte(brut.updated_at),
   };
   const lieu = evenement.lieu?.nom ?? evenement.ville;
   evenement.flyer = flyerDe(brut, evenement.titre, lieu, formaterQuand(evenement.date_debut, evenement.fuseau));
@@ -165,7 +168,7 @@ export interface Annuaire {
 
 export async function lireAnnuaire(): Promise<Annuaire> {
   const selectEvents = encodeURIComponent(
-    `id,slug,titre,date_debut,date_fin,ville,description,prix,source,source_account,categorie,fuseau,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,venues(${COLONNES_LIEU}),event_artists(artists(${COLONNES_ARTISTE}))`,
+    `id,slug,titre,date_debut,date_fin,ville,description,prix,source,source_account,categorie,fuseau,updated_at,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,venues(${COLONNES_LIEU}),event_artists(artists(${COLONNES_ARTISTE}))`,
   );
   const [lieux, artistes, evenements, sponsors, ajouts, engagement] = await Promise.all([
     lire<Record<string, unknown>[]>(`venues?select=${COLONNES_LIEU}&order=nom.asc`),

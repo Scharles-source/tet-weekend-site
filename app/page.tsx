@@ -7,11 +7,54 @@ import { estTermine } from "@/lib/listing/dates";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: "Tèt Weekend — Événements haïtiens",
-  description:
-    "Où et quand ont lieu les bals, concerts et soirées haïtiens, en Haïti et dans la diaspora. Tèt Weekend ne vend pas de billets. Haitian events this weekend — kompa parties, concerts and festivals, in Haiti and across the diaspora.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const title = "Tèt Weekend — Événements haïtiens";
+  // Une seule langue et une longueur que Google ne tronque pas (correctif
+  // SEO, 13 nov. 2026) : l'ancienne description bilingue dépassait
+  // 270 caractères et était réécrite par le moteur.
+  const description =
+    "Bals, concerts et soirées haïtiens en Haïti et dans la diaspora : où et quand, ce week-end et à venir. Tèt Weekend ne vend pas de billets.";
+  // Image de partage : le flyer d'un événement à venir plutôt que le logo.
+  let image: string | null = null;
+  let imageAlt = "Tèt Weekend";
+  try {
+    const charge = await chargerAnnuaire();
+    if (charge.ok) {
+      const avecFlyer = charge.annuaire.evenements
+        .filter((e) => !estTermine(e))
+        .find((e) => e.flyer?.publicUrl);
+      if (avecFlyer?.flyer) {
+        image = avecFlyer.flyer.publicUrl;
+        imageAlt = avecFlyer.flyer.alt;
+      }
+    }
+  } catch {
+    /* repli sur le logo ci-dessous */
+  }
+  const images = image
+    ? [{ url: image, alt: imageAlt }]
+    : [{ url: "/logotetweekend.png", width: 2000, height: 2000, alt: "Tèt Weekend" }];
+  return {
+    title,
+    description,
+    alternates: { canonical: "https://www.tetweekend.com" },
+    openGraph: {
+      title,
+      description,
+      url: "https://www.tetweekend.com",
+      siteName: "Tèt Weekend",
+      locale: "fr_FR",
+      type: "website",
+      images,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image ?? "/logotetweekend.png"],
+    },
+  };
+}
 
 export default async function Accueil() {
   const charge = await chargerAnnuaire();

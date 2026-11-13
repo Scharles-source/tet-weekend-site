@@ -7,9 +7,10 @@ import { Engagement } from "@/components/listing/Engagement";
 import { lienGoogleAgenda } from "@/lib/listing/calendrier";
 import { lireAnnuaire, chargerAnnuaire } from "@/lib/listing/data";
 import { estTermine, formaterQuand } from "@/lib/listing/dates";
+import { artistesDepuisDescription, lieuDepuisDescription } from "@/lib/listing/faits";
 import { jsonLdEvenement } from "@/lib/listing/jsonld";
 import { nomCategorie } from "@/lib/listing/schema";
-import { slugifier } from "@/lib/listing/slug";
+import { nomVilleCanonique, slugVille } from "@/lib/listing/villes";
 import type { EvenementPublic } from "@/lib/listing/types";
 
 export const revalidate = 300;
@@ -22,8 +23,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const { evenements } = await lireAnnuaire();
     const evenement = evenements.find((e) => e.slug === slug);
     if (!evenement) return { title: "Événement — Tèt Weekend" };
-    const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(", ");
-    const descriptionBrute = [evenement.description, ou].filter(Boolean).join(" — ") || evenement.titre;
+    // Description rédigée (correctif SEO, 13 nov. 2026) : titre, date, lieu,
+    // ville et artistes dans une vraie phrase — l'ancien texte brut de la
+    // description (« Artistes : … Lieu : … ») était tronqué et réécrit par
+    // Google sans la date, l'information la plus cherchée pour un événement.
+    const lieuNom = evenement.lieu?.nom ?? lieuDepuisDescription(evenement.description);
+    const ville = evenement.ville ? nomVilleCanonique(evenement.ville) : null;
+    const ou = [lieuNom, ville].filter(Boolean).join(", ");
+    const artistes =
+      evenement.artistes.length > 0
+        ? evenement.artistes.map((a) => a.nom)
+        : artistesDepuisDescription(evenement.description);
+    const segments = [
+      `${evenement.titre} — ${formaterQuand(evenement.date_debut, evenement.fuseau)}${ou ? `, ${ou}` : ""}.`,
+    ];
+    if (artistes.length > 0) segments.push(`Avec ${artistes.slice(0, 3).join(", ")}.`);
+    segments.push("Flyer, lieu et infos sur Tèt Weekend.");
+    const descriptionBrute = segments.join(" ");
     const description = descriptionBrute.length > 160 ? `${descriptionBrute.slice(0, 157).trimEnd()}…` : descriptionBrute;
     const url = `${SITE}/evenements/${evenement.slug}`;
     return {
@@ -131,7 +147,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
               {evenement.ville && (
                 <>
                   {" · "}
-                  <Link href={`/villes/${slugifier(evenement.ville)}`} className="text-[var(--nuit-texte)] underline">
+                  <Link href={`/villes/${slugVille(evenement.ville)}`} className="text-[var(--nuit-texte)] underline">
                     {evenement.ville}
                   </Link>
                 </>

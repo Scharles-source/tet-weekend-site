@@ -4,8 +4,7 @@ import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { CarteEvenement } from "@/components/listing/CarteEvenement";
 import { chargerAnnuaire } from "@/lib/listing/data";
 import { dansLeWeekend, estTermine } from "@/lib/listing/dates";
-import { slugifier } from "@/lib/listing/slug";
-import { villesDe } from "@/lib/listing/villes";
+import { slugVille, villesDe } from "@/lib/listing/villes";
 
 export const revalidate = 300;
 
@@ -34,10 +33,10 @@ export default async function PageVille({ params }: { params: Promise<{ slug: st
   const annuaire = charge.annuaire;
     const ville = villesDe(annuaire).find((v) => v.slug === slug);
     if (!ville) notFound();
-    const ici = annuaire.evenements.filter((e) => (e.ville ? slugifier(e.ville) : "") === slug);
+    const ici = annuaire.evenements.filter((e) => (e.ville ? slugVille(e.ville) : "") === slug);
     const weekend = ici.filter((e) => !estTermine(e) && dansLeWeekend(e.date_debut));
     const aVenir = ici.filter((e) => !estTermine(e));
-    const lieux = annuaire.lieux.filter((l) => l.ville && slugifier(l.ville) === slug);
+    const lieux = annuaire.lieux.filter((l) => l.ville && slugVille(l.ville) === slug);
     return (
       <Gabarit>
         <h1 className="mb-2 font-[family-name:var(--font-display)] text-3xl font-extrabold">Événements haïtiens à {ville.nom}</h1>

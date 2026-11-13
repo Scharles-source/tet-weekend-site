@@ -5,7 +5,7 @@ import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { chargerAnnuaire } from "@/lib/listing/data";
 import { dansLeWeekend, estTermine } from "@/lib/listing/dates";
 import { normaliser } from "@/lib/listing/recherche";
-import { slugifier } from "@/lib/listing/slug";
+import { nomVilleCanonique, slugVille } from "@/lib/listing/villes";
 
 export const revalidate = 300;
 
@@ -31,16 +31,20 @@ export default async function PageVilles() {
   const maintenant = new Date();
   const aVenir = evenements.filter((e) => !estTermine(e));
   const pays = new Map<string, string>();
-  for (const l of lieux) if (l.ville && l.pays) pays.set(slugifier(l.ville), normaliser(l.pays));
+  for (const l of lieux) if (l.ville && l.pays) pays.set(slugVille(l.ville), normaliser(l.pays));
 
   const m = new Map<string, Ville>();
   const noter = (nom: string | null | undefined) => {
     if (!nom) return null;
-    const slug = slugifier(nom);
-    if (!m.has(slug)) {
+    const slug = slugVille(nom);
+    const existante = m.get(slug);
+    if (!existante) {
+      const canonique = nomVilleCanonique(nom);
       const p = pays.get(slug);
-      const haiti = p ? p.includes("haiti") : VILLES_HAITI.includes(normaliser(nom).replace(/ /g, "-")) || VILLES_HAITI.includes(normaliser(nom));
-      m.set(slug, { slug, nom, haiti, total: 0, weekend: 0 });
+      const haiti = p ? p.includes("haiti") : VILLES_HAITI.includes(normaliser(canonique).replace(/ /g, "-")) || VILLES_HAITI.includes(normaliser(canonique));
+      m.set(slug, { slug, nom: canonique, haiti, total: 0, weekend: 0 });
+    } else if (nomVilleCanonique(nom).endsWith(", D.C.") && !existante.nom.endsWith(", D.C.")) {
+      existante.nom = nomVilleCanonique(nom);
     }
     return m.get(slug)!;
   };

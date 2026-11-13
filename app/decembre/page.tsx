@@ -4,7 +4,7 @@ import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { CarteEvenement } from "@/components/listing/CarteEvenement";
 import { chargerAnnuaire } from "@/lib/listing/data";
 import { estEnDecembre, estReveillon, estTermine } from "@/lib/listing/dates";
-import { slugifier } from "@/lib/listing/slug";
+import { nomVilleCanonique, slugVille } from "@/lib/listing/villes";
 
 export const revalidate = 300;
 
@@ -34,7 +34,7 @@ export default async function PageDecembre() {
   const parDate = (a: (typeof aVenir)[number], b: (typeof aVenir)[number]) => a.date_debut.localeCompare(b.date_debut);
   const reveillon = aVenir.filter((e) => estReveillon(e, ANNEE)).sort(parDate);
   const decembre = aVenir.filter((e) => estEnDecembre(e, ANNEE) && !estReveillon(e, ANNEE)).sort(parDate);
-  const villes = [...new Map([...reveillon, ...decembre].filter((e) => e.ville).map((e) => [slugifier(e.ville as string), e.ville as string])).entries()].sort((a, b) =>
+  const villes = [...new Map([...reveillon, ...decembre].filter((e) => e.ville).map((e) => [slugVille(e.ville as string), nomVilleCanonique(e.ville as string)])).entries()].sort((a, b) =>
     a[1].localeCompare(b[1], "fr"),
   );
   const tous = [...reveillon, ...decembre].sort(parDate);
