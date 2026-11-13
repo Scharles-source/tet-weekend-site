@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CarteStory } from "@/components/listing/CarteStory";
 import { estTermine, formaterQuand } from "@/lib/listing/dates";
 import { envoyer, interets, memoriserInteret, visiteur } from "@/lib/listing/engagement-client";
 import { lienCourt } from "@/lib/listing/lien-court";
@@ -28,6 +29,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   const [total, setTotal] = useState<number | null>(evenement.interets ?? null);
   const [occupe, setOccupe] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [carte, setCarte] = useState(false);
 
   useEffect(() => {
     setDedans(interets().includes(evenement.id));
@@ -45,6 +47,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
       const r = await envoyer({ type: "interet", evenementId: evenement.id, visiteur: visiteur() });
       if (r?.ok && r.interesse) {
         setTotal(r.total ?? (avant ?? 0) + 1);
+        setCarte(true);
       } else {
         throw new Error("non confirmé");
       }
@@ -162,6 +165,13 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
             {termine && "Share"}
           </button>
         </div>
+
+        {dedans && !termine && (
+          <button type="button" onClick={() => setCarte(true)} className="mt-2.5 text-[12.5px] font-extrabold underline underline-offset-2" style={{ color: OR }}>
+            Post my card to my story
+          </button>
+        )}
+        <CarteStory evenementId={evenement.id} titre={evenement.titre} ouvert={carte} onFermer={() => setCarte(false)} />
 
         {(message || preuve) && (
           <div className={`flex items-center gap-1.5 font-semibold ${etroit ? "mt-2 text-[12px]" : "mt-2.5 text-[12.5px]"}`} style={{ color: "rgba(255,255,255,0.88)" }} role="status">
