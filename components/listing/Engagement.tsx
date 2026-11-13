@@ -23,36 +23,44 @@ export function Engagement({ evenementId, interetsInitiaux, termine }: { eveneme
 
   if (termine) return null;
 
-  async function basculer() {
-    if (occupe) return;
+  /** « I'm in » est définitif : un seul clic par personne et par événement. */
+  async function confirmer() {
+    if (actif || occupe) return;
     setOccupe(true);
+    const avant = total;
+    setActif(true);
+    setTotal((avant ?? 0) + 1);
+    memoriserInteret(evenementId, true);
     try {
       const r = await envoyer({ type: "interet", evenementId, visiteur: visiteur() });
-      if (r?.ok) {
-        setActif(Boolean(r.interesse));
-        setTotal(r.total ?? null);
-        memoriserInteret(evenementId, Boolean(r.interesse));
-      }
+      if (r?.ok && r.interesse) setTotal(r.total ?? (avant ?? 0) + 1);
+      else throw new Error("non confirmé");
     } catch {
-      /* hors ligne : rien ne change */
+      setActif(false);
+      setTotal(avant);
+      memoriserInteret(evenementId, false);
     } finally {
       setOccupe(false);
     }
   }
 
-  const label = libelleInteret(total);
+  const nombre = libelleInteret(total) ? total : null;
   return (
     <div className="mt-6 flex flex-wrap items-center gap-3">
       <button
         type="button"
         aria-pressed={actif}
-        disabled={occupe}
-        onClick={basculer}
-        className={`inline-flex min-h-12 items-center rounded-[14px] px-5 text-[15px] font-extrabold ${actif ? "bg-[var(--creme)] text-[var(--encre)]" : "border-2 border-[var(--accent)] text-[var(--nuit-texte)]"}`}
+        aria-label={actif ? "You're in" : undefined}
+        disabled={occupe || actif}
+        onClick={confirmer}
+        className={`inline-flex min-h-12 items-center gap-2 rounded-[14px] px-5 text-[15px] font-extrabold ${actif ? "bg-[var(--creme)] text-[var(--encre)]" : "border-2 border-[var(--accent)] text-[var(--nuit-texte)]"}`}
       >
-        {actif ? "I'm going ✓" : "I'm going"}
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M20 6L9 17l-5-5" />
+        </svg>
+        {!actif && "I'm in"}
+        {nombre !== null && <span className="text-[13px] opacity-80">{nombre}</span>}
       </button>
-      {label && <span className="text-sm font-semibold text-[var(--or)]">{label}</span>}
     </div>
   );
 }
