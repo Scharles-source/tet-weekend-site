@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CarteStory } from "@/components/listing/CarteStory";
 import { envoyer, ecrire, interets, lire, memoriserInteret, visiteur } from "@/lib/listing/engagement-client";
 import { libelleInteret } from "@/lib/listing/engagement";
 
 /** Compte une vue par jour et par visiteur, et propose « J'y vais » (anonyme, sans compte). */
-export function Engagement({ evenementId, interetsInitiaux, termine }: { evenementId: string; interetsInitiaux: number | null; termine: boolean }) {
+export function Engagement({ evenementId, titre = "", interetsInitiaux, termine }: { evenementId: string; titre?: string; interetsInitiaux: number | null; termine: boolean }) {
   const [actif, setActif] = useState(false);
   const [total, setTotal] = useState<number | null>(interetsInitiaux);
   const [occupe, setOccupe] = useState(false);
+  const [carte, setCarte] = useState(false);
 
   useEffect(() => {
     const id = visiteur();
@@ -33,8 +35,10 @@ export function Engagement({ evenementId, interetsInitiaux, termine }: { eveneme
     memoriserInteret(evenementId, true);
     try {
       const r = await envoyer({ type: "interet", evenementId, visiteur: visiteur() });
-      if (r?.ok && r.interesse) setTotal(r.total ?? (avant ?? 0) + 1);
-      else throw new Error("non confirmé");
+      if (r?.ok && r.interesse) {
+        setTotal(r.total ?? (avant ?? 0) + 1);
+        setCarte(true);
+      } else throw new Error("non confirmé");
     } catch {
       setActif(false);
       setTotal(avant);
@@ -61,6 +65,12 @@ export function Engagement({ evenementId, interetsInitiaux, termine }: { eveneme
         {!actif && "I'm in"}
         {nombre !== null && <span className="text-[13px] opacity-80">{nombre}</span>}
       </button>
+      {actif && (
+        <button type="button" onClick={() => setCarte(true)} className="text-[13px] font-extrabold text-[var(--accent-texte)] underline underline-offset-2">
+          Post my card to my story
+        </button>
+      )}
+      <CarteStory evenementId={evenementId} titre={titre} ouvert={carte} onFermer={() => setCarte(false)} />
     </div>
   );
 }
