@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { BandeEvenement } from "@/components/listing/BandeEvenement";
 import { Urgence } from "@/components/listing/Urgence";
 import { formaterBadge } from "@/lib/listing/dates";
-import { estTresConsulte } from "@/lib/listing/engagement";
 import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 
@@ -18,14 +18,18 @@ function degrade(id: string): string {
   return DEGRADES[somme % DEGRADES.length];
 }
 
-/** Affiche portrait : le flyer d'abord, les infos dessous. Pensée pour défiler au pouce. */
+/** Affiche portrait : le flyer d'abord, puis la bande (infos, « I'm going », partage). Pensée pour défiler au pouce. */
 export function Affiche({ evenement, className = "" }: { evenement: EvenementPublic; className?: string }) {
   const url = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
   const categorie = nomCategorie(evenement.categorie);
-  const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(" · ") || "Venue not listed";
   return (
-    <Link href={`/evenements/${evenement.slug}`} className={`flex flex-col gap-2.5 text-inherit no-underline ${className}`}>
-      <div className="relative aspect-[4/5] overflow-hidden rounded-[22px] bg-[var(--nuit-carte2)]" style={url ? undefined : { background: degrade(evenement.id) }}>
+    <article className={`flex flex-col overflow-hidden rounded-[22px] bg-[#2A1F1B] ${className}`}>
+      <Link
+        href={`/evenements/${evenement.slug}`}
+        aria-label={evenement.titre}
+        className="relative block aspect-[4/5] overflow-hidden bg-[var(--nuit-carte2)] text-inherit no-underline"
+        style={url ? undefined : { background: degrade(evenement.id) }}
+      >
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={url} alt={evenement.flyer?.alt || evenement.titre} className="absolute inset-0 h-full w-full object-cover object-top" loading="lazy" />
@@ -39,15 +43,8 @@ export function Affiche({ evenement, className = "" }: { evenement: EvenementPub
           {formaterBadge(evenement.date_debut, evenement.fuseau)}
         </span>
         <Urgence evenement={evenement} className="absolute top-2.5 right-2.5" />
-      </div>
-      <div className="flex flex-col gap-0.5 px-0.5">
-        <span className="line-clamp-2 text-[15px] leading-snug font-bold text-[var(--nuit-texte)]">{evenement.titre}</span>
-        <span className="truncate text-[13.5px] text-[var(--nuit-muet)]">{ou}</span>
-        {evenement.prix && <span className="truncate text-[13px] font-semibold text-[var(--or)]">{evenement.prix}</span>}
-        {estTresConsulte(evenement.vues) && (
-          <span className="mt-1 w-fit rounded-full bg-[var(--or)] px-2.5 py-0.5 text-xs font-extrabold text-[var(--encre)]">Hot right now</span>
-        )}
-      </div>
-    </Link>
+      </Link>
+      <BandeEvenement evenement={evenement} etroit />
+    </article>
   );
 }
