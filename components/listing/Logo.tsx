@@ -1,16 +1,12 @@
+import "./boutons-sombres.css";
 import Link from "next/link";
 
+/** Logo officiel, détouré : lisible sur le fond sombre du site. */
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
-    <Link href="/" className="flex items-center gap-2 text-inherit no-underline">
-      <span className={`font-[family-name:var(--font-archivo-black)] leading-none tracking-tight ${compact ? "text-[22px]" : "text-[28px]"}`}>
-        <span className="text-[#191410]">T</span>
-        <span className="text-[#E02B20]">W</span>
-      </span>
-      <span className="leading-[1.05]">
-        <span className={`block font-[family-name:var(--font-display)] font-extrabold text-[#191410] ${compact ? "text-[13px]" : "text-[15px]"}`}>tèt</span>
-        <span className={`block font-[family-name:var(--font-display)] font-black tracking-[0.08em] text-[#E02B20] ${compact ? "text-[11px]" : "text-[13px]"}`}>WEEKEND</span>
-      </span>
+    <Link href="/" aria-label="Tèt Weekend, accueil" className="inline-flex shrink-0 items-center text-inherit no-underline">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/logo-tw.png" alt="Tèt Weekend" width={320} height={177} className={`w-auto ${compact ? "h-10" : "h-12"}`} />
     </Link>
   );
 }
