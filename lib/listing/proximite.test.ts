@@ -13,6 +13,8 @@ function ev(id: string, ville: string | null, pays: string | null = null): Evene
 }
 
 const brooklyn = { ville: "Brooklyn", region: "NY", pays: "US" };
+const atlanta = { ville: "Atlanta", region: "GA", pays: "US" };
+const montreal = { ville: null, region: "QC", pays: "CA" };
 const haiti = { ville: "Port-au-Prince", region: "OUEST", pays: "HT" };
 
 test("normalise les pays", () => {
@@ -32,6 +34,23 @@ test("Brooklyn : sa ville d'abord, puis New York, puis les États-Unis, puis le 
 test("Haïti : tous les événements d'Haïti avant les autres", () => {
   assert.equal(rangProximite(ev("a", "Pétion-Ville", "Haïti"), haiti), 1);
   assert.equal(rangProximite(ev("b", "Brooklyn"), haiti), 3);
+});
+
+test("le New Jersey fait partie de la zone de New York", () => {
+  assert.equal(rangProximite(ev("a", "Elizabeth, New Jersey"), brooklyn), 1);
+  assert.equal(rangProximite(ev("b", "Elizabeth"), { ville: "Newark", region: "NJ", pays: "US" }), 1);
+});
+
+test("Atlanta : Stone Mountain est dans sa zone ; Montréal : par la province", () => {
+  assert.equal(rangProximite(ev("a", "Stone Mountain, Géorgie (Atlanta)"), atlanta), 1);
+  assert.equal(rangProximite(ev("b", "Montréal, Québec"), montreal), 1);
+  assert.equal(rangProximite(ev("c", "Miami"), montreal), 3);
+});
+
+test("États sans zone : la ville seule, puis le pays", () => {
+  const inconnu = { ville: "Denver", region: "CO", pays: "US" };
+  assert.equal(rangProximite(ev("a", "Denver"), inconnu), 0);
+  assert.equal(rangProximite(ev("b", "Brooklyn"), inconnu), 2);
 });
 
 test("tri stable : l'ordre par date est conservé à rang égal", () => {
