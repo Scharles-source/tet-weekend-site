@@ -32,6 +32,23 @@ function Chiffre({ valeur, libelle, note }: { valeur: number; libelle: string; n
   );
 }
 
+/** Installations de la web app : visiteurs distincts ayant installé ou ouvert l'app depuis l'écran d'accueil. */
+export function InstallationsApp({ stats }: { stats: Statistiques }) {
+  const app = stats.app;
+  if (!app) return null;
+  return (
+    <section className={`${CARTE} p-4`} aria-label="Installations de l'app">
+      <h2 className="mb-3 text-[15px] font-bold text-[#12161F]">App installée</h2>
+      <div className="grid grid-cols-3 gap-2">
+        <Chiffre valeur={app.installations} libelle="Installations" note={app.nouvelles_aujourdhui > 0 ? `+${app.nouvelles_aujourdhui} aujourd'hui` : null} />
+        <Chiffre valeur={app.nouvelles_7j} libelle="Nouvelles (7 jours)" />
+        <Chiffre valeur={app.ouvertures_aujourdhui} libelle="Ouvertures aujourd'hui" />
+      </div>
+      <p className="mt-2 text-[11.5px] text-[#5B6472]">Android : {app.android} · iPhone : {app.ios}. Un iPhone est compté à sa première ouverture depuis l&apos;écran d&apos;accueil.</p>
+    </section>
+  );
+}
+
 export function Chiffres({ stats }: { stats: Statistiques }) {
   const comparer = stats.periode === "aujourdhui";
   return (

@@ -4,12 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { estTermine, formaterQuand } from "@/lib/listing/dates";
 import { envoyer, interets, memoriserInteret, visiteur } from "@/lib/listing/engagement-client";
+import { lienCourt } from "@/lib/listing/lien-court";
 import { preuveSociale } from "@/lib/listing/preuve";
 import { signauxRarete } from "@/lib/listing/rarete";
 import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 
-const SITE = "https://www.tetweekend.com";
 const OR = "#FFC247";
 
 /**
@@ -58,7 +58,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   }
 
   async function partager() {
-    const url = `${SITE}/evenements/${evenement.slug}`;
+    const url = lienCourt(evenement.id);
     try {
       if (typeof navigator.share === "function") {
         await navigator.share({ title: evenement.titre, text: `${evenement.titre} — ${quand}`, url });
