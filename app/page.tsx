@@ -32,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
   const images = image
     ? [{ url: image, alt: imageAlt }]
-    : [{ url: "/logotetweekend.png", width: 2000, height: 2000, alt: "Tèt Weekend" }];
+    : [{ url: "/partage-tw.png", width: 1200, height: 630, alt: "Tèt Weekend" }];
   return {
     title,
     description,
@@ -50,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: [image ?? "/logotetweekend.png"],
+      images: [image ?? "/partage-tw.png"],
     },
   };
 }
