@@ -130,7 +130,6 @@ export function Agenda({ evenements, maintenantIso, villes }: { evenements: Even
                         <span className="text-[11.5px] font-bold tracking-widest text-[var(--accent-texte)] uppercase">{CATEGORIES.find((k) => k.slug === e.categorie)?.nom ?? ""}</span>
                         <span className="text-base leading-tight font-bold text-[var(--nuit-texte)]">{e.titre}</span>
                         <span className="truncate text-[13px] text-[var(--nuit-muet)]">{[e.lieu?.nom, e.ville].filter(Boolean).join(" · ")}</span>
-                        {e.prix && <span className="text-[13px] font-semibold text-[var(--or)]">{e.prix}</span>}
                       </span>
                     </Link>
                   </li>
