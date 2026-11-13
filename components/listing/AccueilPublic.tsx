@@ -5,8 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Affiche } from "@/components/listing/Affiche";
 import { BanniereAccueil, type Panneau } from "@/components/listing/BanniereAccueil";
 import { LigneEvenement } from "@/components/listing/CarteEvenement";
+import { PastilleLieu, usePosition } from "@/components/listing/PositionFil";
 import { dansLeWeekend } from "@/lib/listing/dates";
 import { dansLaPeriode, type Periode } from "@/lib/listing/periode";
+import { trierParProximite } from "@/lib/listing/proximite";
 import { CATEGORIES } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 
@@ -23,7 +25,7 @@ const ZONE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap ro
 const ZONE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-[18px] text-sm font-semibold text-[var(--nuit-texte)]";
 
 export function AccueilPublic({
-  evenements,
+  evenements: evenementsParDate,
   panneaux,
   email,
 }: {
@@ -32,6 +34,9 @@ export function AccueilPublic({
   email: string;
   auto?: boolean;
 }) {
+  // Fil intelligent : les événements proches du visiteur d'abord (sa ville, sa zone, son pays), puis le reste, chacun par date.
+  const { position, choisie, choisir } = usePosition(evenementsParDate);
+  const evenements = useMemo(() => trierParProximite(evenementsParDate, position), [evenementsParDate, position]);
   const [periode, setPeriode] = useState<Periode>("tout");
   const [ville, setVille] = useState<string | null>(null);
 
@@ -69,6 +74,8 @@ export function AccueilPublic({
           Find your night out, in Haiti and across the diaspora, all in one place. No tickets sold here: we tell you where, when and with whom.
         </p>
       </header>
+
+      <PastilleLieu position={position} evenements={evenementsParDate} villes={villes.map(([nom]) => nom)} choisie={choisie} onChoisir={choisir} />
 
       {/* Zone + moment */}
       <div className="no-scrollbar -mx-[var(--page-px)] mt-5 flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Choose a city">
