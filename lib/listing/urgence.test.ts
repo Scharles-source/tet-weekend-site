@@ -8,7 +8,7 @@ const ev = (date_debut: string, date_fin: string | null = null) => ({ date_debut
 
 test("dans les minutes et les heures qui viennent", () => {
   assert.deepEqual(urgenceDe(ev("2026-11-12T15:20:00.000Z"), maintenant), { texte: "In 20 min", urgent: true });
-  assert.deepEqual(urgenceDe(ev("2026-11-12T17:30:00.000Z"), maintenant), { texte: "In 2 h", urgent: true });
+  assert.deepEqual(urgenceDe(ev("2026-11-12T17:30:00.000Z"), maintenant), { texte: "In 2 h 30 min", urgent: true });
 });
 
 test("plus tard aujourd'hui : « Ce soir », puis « Demain »", () => {
