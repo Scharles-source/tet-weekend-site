@@ -132,7 +132,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
               aria-label={dedans ? "You're in" : undefined}
               disabled={occupe || dedans}
               onClick={confirmer}
-              className={`flex flex-1 items-center justify-center rounded-full font-extrabold ${etroit ? "min-h-11 gap-1.5 text-[14px]" : "min-h-12 gap-2 text-[15px]"}`}
+              className={`flex items-center justify-center rounded-full font-extrabold ${etroit ? "min-h-11 gap-1.5 px-4 text-[14px]" : "min-h-12 gap-2 px-6 text-[15px]"}`}
               style={dedans ? { background: "transparent", color: OR, border: `2px solid ${OR}`, opacity: 1 } : { background: OR, color: "#191410" }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -150,7 +150,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
             type="button"
             aria-label={`Share ${evenement.titre}`}
             onClick={partager}
-            className={`flex shrink-0 items-center justify-center rounded-full ${etroit ? "h-11" : "h-12"} ${termine ? "flex-1 gap-2 px-5 text-[15px] font-extrabold" : etroit ? "w-11" : "w-12"}`}
+            className={`ml-auto flex shrink-0 items-center justify-center rounded-full ${etroit ? "h-11" : "h-12"} ${termine ? "flex-1 gap-2 px-5 text-[15px] font-extrabold" : etroit ? "w-11" : "w-12"}`}
             style={{ border: "1.5px solid rgba(255,255,255,0.5)", color: "#FFFFFF" }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
