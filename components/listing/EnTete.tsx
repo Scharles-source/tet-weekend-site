@@ -7,8 +7,8 @@ import { Logo } from "@/components/listing/Logo";
 
 const LIENS = [
   { href: "/", label: "Accueil", exact: true },
-  { href: "/evenements", label: "Événements", exact: false },
-  { href: "/evenements?recherche=1", label: "Recherche", exact: false, recherche: true },
+  { href: "/evenements", label: "Agenda", exact: false },
+  { href: "/recherche", label: "Recherche", exact: false, recherche: true },
   { href: "/villes", label: "Villes", exact: false },
   { href: "/lieux", label: "Lieux", exact: false },
   { href: "/artistes", label: "Artistes", exact: false },
@@ -20,14 +20,14 @@ export function EnTete({ large = false, email }: { large?: boolean; email?: stri
   const largeur = large ? "max-w-[1240px]" : "max-w-3xl";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#EFE5D2] bg-[#FBF7EF]">
+    <header className="sticky top-0 z-40 border-b border-[var(--nuit-ligne)] bg-[var(--nuit-fond)]">
       <div className={`mx-auto flex h-16 w-full ${largeur} items-center justify-between gap-4 px-[var(--page-px)]`}>
         <Logo />
         {/* Mobile : accès direct à la recherche (la navigation vit dans la barre du bas) */}
         <Link
-          href="/evenements?recherche=1"
+          href="/recherche"
           aria-label="Rechercher un événement"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E02B20] text-white shadow-[0_4px_12px_rgba(224,43,32,.35)] no-underline md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-[0_4px_12px_rgba(224,43,32,.35)] no-underline md:hidden"
         >
           <Search size={18} aria-hidden />
         </Link>
@@ -39,7 +39,7 @@ export function EnTete({ large = false, email }: { large?: boolean; email?: stri
               <Link
                 key={lien.label}
                 href={lien.href}
-                className={`flex items-center gap-1.5 text-[15px] font-semibold no-underline ${actif ? "text-[#E02B20]" : "text-[#4A4136]"}`}
+                className={`flex items-center gap-1.5 text-[15px] font-semibold no-underline ${actif ? "text-[var(--accent-texte)]" : "text-[var(--nuit-texte2)]"}`}
               >
                 {"recherche" in lien && lien.recherche ? <Search size={16} aria-hidden /> : null}
                 {lien.label}
@@ -49,7 +49,7 @@ export function EnTete({ large = false, email }: { large?: boolean; email?: stri
           {email ? (
             <a
               href={`mailto:${email}?subject=Devenir%20partenaire`}
-              className="rounded-full bg-[#E02B20] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_rgba(224,43,32,.3)] no-underline"
+              className="rounded-full bg-[var(--accent)] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_rgba(224,43,32,.3)] no-underline"
             >
               Devenir partenaire
             </a>

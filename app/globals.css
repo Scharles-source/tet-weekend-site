@@ -126,10 +126,41 @@ body {
   .trending-home-title { font-size: 24px !important; gap: 8px !important; }
 }
 
-.theme-clair {
-  --text-sec: #4A4136;
-  --surface: #FFFFFF;
-  background: #FBF7EF;
-  color: #191410;
+/* Thème « nuit » des pages publiques (l'accent se change ici, en un seul endroit). */
+.theme-nuit {
+  --nuit-fond: #0F0C0B;
+  --nuit-carte: #1B1613;
+  --nuit-carte2: #261E19;
+  --nuit-ligne: #3A2F28;
+  --nuit-texte: #FBF7EF;
+  --nuit-texte2: #D9CBB8;
+  --nuit-muet: #B9AB9A;
+  --creme: #FBF7EF;
+  --encre: #191410;
+  --encre2: #4A4136;
+  --accent: #E02B20;
+  --accent-texte: #FF6A5C;
+  --or: #FFC247;
+  --text-sec: #B9AB9A;
+  --surface: #1B1613;
+  background: var(--nuit-fond);
+  color: var(--nuit-texte);
   font-family: var(--font-body);
+  color-scheme: dark;
 }
+
+/* Pont temporaire : les anciennes classes « crème » prennent les couleurs du thème nuit.
+   À supprimer quand chaque composant utilisera directement les jetons --nuit-*. */
+.theme-nuit .bg-white { background-color: var(--nuit-carte); }
+.theme-nuit .bg-white\/75, .theme-nuit .bg-white\/85 { background-color: rgba(27, 22, 19, 0.94); }
+.theme-nuit .bg-\[\#FBF7EF\] { background-color: var(--nuit-fond); }
+.theme-nuit .bg-\[\#FFFDF8\] { background-color: var(--nuit-carte); }
+.theme-nuit .bg-\[\#F3E6D8\] { background-color: var(--nuit-carte2); }
+.theme-nuit .bg-\[\#191410\] { background-color: var(--nuit-carte2); }
+.theme-nuit .bg-\[\#FDECEA\] { background-color: rgba(255, 77, 63, 0.16); }
+.theme-nuit .bg-\[\#D8C6A4\] { background-color: var(--nuit-ligne); }
+.theme-nuit .text-\[\#191410\] { color: var(--nuit-texte); }
+.theme-nuit .text-\[\#4A4136\] { color: var(--nuit-texte2); }
+.theme-nuit .text-\[\#8A7B66\], .theme-nuit .text-\[\#6E6252\], .theme-nuit .text-\[\#9A8B74\] { color: var(--nuit-muet); }
+.theme-nuit .text-\[\#B91C1C\], .theme-nuit .text-\[\#E02B20\] { color: var(--accent-texte); }
+.theme-nuit .border-\[\#EFE5D2\], .theme-nuit .border-\[\#EFE5D2\]\/70, .theme-nuit .border-\[\#D8C6A4\], .theme-nuit .border-\[\#E5D9BE\] { border-color: var(--nuit-ligne); }

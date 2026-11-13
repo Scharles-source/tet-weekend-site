@@ -167,17 +167,25 @@ export async function lireAnnuaire(): Promise<Annuaire> {
   const selectEvents = encodeURIComponent(
     `id,slug,titre,date_debut,date_fin,ville,description,prix,source,source_account,categorie,fuseau,flyer_url,flyer_card_url,flyer_width,flyer_height,flyer_mime_type,flyer_alt,flyer_credit,venues(${COLONNES_LIEU}),event_artists(artists(${COLONNES_ARTISTE}))`,
   );
-  const [lieux, artistes, evenements, sponsors] = await Promise.all([
+  const [lieux, artistes, evenements, sponsors, ajouts, engagement] = await Promise.all([
     lire<Record<string, unknown>[]>(`venues?select=${COLONNES_LIEU}&order=nom.asc`),
     lire<Record<string, unknown>[]>(`artists?select=${COLONNES_ARTISTE}&order=nom.asc`),
     lire<EvenementBrut[]>(`events?select=${selectEvents}&order=date_debut.asc`),
     lireSponsors(),
+    lireAjouts(),
+    lireEngagement(),
   ]);
   return {
     lieux: lieux.map((l) => lieuDe(l)).filter((l): l is LieuPublic => Boolean(l)),
     artistes: artistes.filter((a) => typeof a.id === "string").map(artisteDe),
     evenements: evenements.map((brut) => {
       const evenement = evenementDe(brut);
+      evenement.ajoute_le = ajouts.get(evenement.id) ?? null;
+      const eng = engagement.get(evenement.id);
+      if (eng) {
+        evenement.vues = eng.vues;
+        evenement.interets = eng.interets;
+      }
       const sponsor = sponsors.get(evenement.id);
       if (sponsor) {
         evenement.sponsored_from = sponsor.sponsored_from;
@@ -199,6 +207,40 @@ async function lireSponsors(): Promise<Map<string, { sponsored_from: string | nu
     if (!res.ok) return new Map();
     const rows = (await res.json()) as { id: string; sponsored_from: string | null; sponsored_to: string | null }[];
     return new Map(rows.map((row) => [row.id, { sponsored_from: row.sponsored_from, sponsored_to: row.sponsored_to }]));
+  } catch {
+    return new Map();
+  }
+}
+
+/** Lecture séparée : si la colonne manque, on perd seulement le badge « Nouveau ». */
+async function lireAjouts(): Promise<Map<string, string>> {
+  const { url, cle } = configuration();
+  try {
+    const res = await fetch(`${url}/rest/v1/events?select=id,created_at`, {
+      headers: { apikey: cle, Authorization: `Bearer ${cle}`, Accept: "application/json" },
+      next: { revalidate: 300, tags: [TAG] },
+    });
+    if (!res.ok) return new Map();
+    const rows = (await res.json()) as { id: string; created_at: string | null }[];
+    return new Map(rows.filter((r) => r.created_at).map((r) => [r.id, r.created_at as string]));
+  } catch {
+    return new Map();
+  }
+}
+
+/** Lecture séparée : tant que la migration d'engagement n'est pas appliquée, rien n'est affiché. */
+async function lireEngagement(): Promise<Map<string, { interets: number; vues: number }>> {
+  const { url, cle } = configuration();
+  try {
+    const res = await fetch(`${url}/rest/v1/rpc/evenements_engagement`, {
+      method: "POST",
+      headers: { apikey: cle, Authorization: `Bearer ${cle}`, "Content-Type": "application/json" },
+      body: "{}",
+      next: { revalidate: 300, tags: [TAG] },
+    });
+    if (!res.ok) return new Map();
+    const rows = (await res.json()) as { event_id: string; interets: number; vues: number }[];
+    return new Map(rows.map((r) => [r.event_id, { interets: Number(r.interets), vues: Number(r.vues) }]));
   } catch {
     return new Map();
   }
