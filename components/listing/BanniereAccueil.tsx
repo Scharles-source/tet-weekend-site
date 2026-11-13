@@ -71,7 +71,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
           // eslint-disable-next-line @next/next/no-img-element
           <img src={e.flyer.publicUrl} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-125 object-cover brightness-[.55] blur-[26px]" />
         ) : (
-          <div className="absolute inset-0" style={{ background: "linear-gradient(150deg, #F97316, #E02B20 55%, #5B2EE5)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(150deg, #F97316, #A63446 55%, #5B2EE5)" }} />
         )}
 
         <div className="relative flex h-[460px] flex-col lg:h-auto lg:min-h-[380px] lg:flex-row lg:items-center">
@@ -91,7 +91,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
           <div className="flex flex-1 flex-col px-5 pt-1 pb-6 lg:py-[30px] lg:pr-[34px] lg:pl-7">
             <div className="mb-3 flex items-center gap-3">
               <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-[2.5px] text-white">
-                <span className="h-[9px] w-[9px] rounded-full bg-[#E02B20]" />
+                <span className="h-[9px] w-[9px] rounded-full bg-[#A63446]" />
                 À LA UNE
               </p>
               {badge}
@@ -113,7 +113,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
                   <p className="line-clamp-2 font-[family-name:var(--font-display)] text-[20px] font-black text-white lg:text-[26px]">{e.prix}</p>
                 </div>
               ) : null}
-              <Link href={`/evenements/${e.slug}`} className="absolute right-5 bottom-5 inline-flex min-h-11 items-center rounded-[14px] bg-[#E02B20] px-[30px] text-[15px] font-bold text-white shadow-[0_10px_24px_rgba(224,43,32,.45)] no-underline lg:static lg:ml-auto lg:min-h-[52px] lg:text-base">
+              <Link href={`/evenements/${e.slug}`} className="absolute right-5 bottom-5 inline-flex min-h-11 items-center rounded-[14px] bg-[#A63446] px-[30px] text-[15px] font-bold text-white shadow-[0_10px_24px_rgba(166,52,70,.45)] no-underline lg:static lg:ml-auto lg:min-h-[52px] lg:text-base">
                 Voir l&apos;événement
               </Link>
             </div>
@@ -122,13 +122,13 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
 
         {/* Points du carrousel (desktop : dans la carte, en bas à droite) */}
         {points("absolute right-[30px] bottom-6 hidden items-center gap-1.5 lg:flex", (actif) =>
-          `h-2 rounded-full ${actif ? "w-[26px] bg-[#E02B20]" : "w-2 bg-white/45"}`,
+          `h-2 rounded-full ${actif ? "w-[26px] bg-[#A63446]" : "w-2 bg-white/45"}`,
         )}
       </article>
 
       {/* Points du carrousel (mobile : sous la carte) */}
       {points("mt-3 flex items-center justify-center gap-1.5 lg:hidden", (actif) =>
-        `h-2 rounded-full ${actif ? "w-[26px] bg-[#E02B20]" : "w-2 bg-[#D8C6A4]"}`,
+        `h-2 rounded-full ${actif ? "w-[26px] bg-[#A63446]" : "w-2 bg-[#D8C6A4]"}`,
       )}
     </section>
   );

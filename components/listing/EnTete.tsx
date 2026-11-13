@@ -27,7 +27,7 @@ export function EnTete({ large = false, email }: { large?: boolean; email?: stri
         <Link
           href="/recherche"
           aria-label="Rechercher un événement"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-[0_4px_12px_rgba(224,43,32,.35)] no-underline md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-[0_4px_12px_rgba(166,52,70,.35)] no-underline md:hidden"
         >
           <Search size={18} aria-hidden />
         </Link>
@@ -49,7 +49,7 @@ export function EnTete({ large = false, email }: { large?: boolean; email?: stri
           {email ? (
             <a
               href={`mailto:${email}?subject=Devenir%20partenaire`}
-              className="rounded-full bg-[var(--accent)] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_rgba(224,43,32,.3)] no-underline"
+              className="rounded-full bg-[var(--accent)] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_rgba(166,52,70,.3)] no-underline"
             >
               Devenir partenaire
             </a>

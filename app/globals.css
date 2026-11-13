@@ -138,8 +138,8 @@ body {
   --creme: #FBF7EF;
   --encre: #191410;
   --encre2: #4A4136;
-  --accent: #E02B20;
-  --accent-texte: #FF6A5C;
+  --accent: #A63446;
+  --accent-texte: #E58B9A;
   --or: #FFC247;
   --text-sec: #B9AB9A;
   --surface: #1B1613;
@@ -157,10 +157,76 @@ body {
 .theme-nuit .bg-\[\#FFFDF8\] { background-color: var(--nuit-carte); }
 .theme-nuit .bg-\[\#F3E6D8\] { background-color: var(--nuit-carte2); }
 .theme-nuit .bg-\[\#191410\] { background-color: var(--nuit-carte2); }
-.theme-nuit .bg-\[\#FDECEA\] { background-color: rgba(255, 77, 63, 0.16); }
+.theme-nuit .bg-\[\#FDECEA\] { background-color: rgba(229, 139, 154, 0.14); }
 .theme-nuit .bg-\[\#D8C6A4\] { background-color: var(--nuit-ligne); }
 .theme-nuit .text-\[\#191410\] { color: var(--nuit-texte); }
 .theme-nuit .text-\[\#4A4136\] { color: var(--nuit-texte2); }
 .theme-nuit .text-\[\#8A7B66\], .theme-nuit .text-\[\#6E6252\], .theme-nuit .text-\[\#9A8B74\] { color: var(--nuit-muet); }
 .theme-nuit .text-\[\#B91C1C\], .theme-nuit .text-\[\#E02B20\] { color: var(--accent-texte); }
 .theme-nuit .border-\[\#EFE5D2\], .theme-nuit .border-\[\#EFE5D2\]\/70, .theme-nuit .border-\[\#D8C6A4\], .theme-nuit .border-\[\#E5D9BE\] { border-color: var(--nuit-ligne); }
+
+/* ===== EFFET VERRE (thème nuit) =====
+   Lueur colorée derrière la page + cartes et barres en verre translucide.
+   Le reflet passe une fois quand une carte apparaît, au toucher, et en boucle lente sur la barre du bas.
+   Tout est coupé si le téléphone demande moins d'animations. */
+.theme-nuit { isolation: isolate; }
+.theme-nuit::before {
+  content: "";
+  position: fixed;
+  inset: -15%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 85% 8%, rgba(249, 115, 22, 0.42), transparent 40%),
+    radial-gradient(circle at 10% 45%, rgba(91, 46, 229, 0.38), transparent 45%),
+    radial-gradient(circle at 80% 85%, rgba(166, 52, 70, 0.42), transparent 45%);
+  animation: verre-derive 28s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.theme-nuit [class*="bg-[var(--nuit-carte)]"] {
+  background-color: rgba(27, 22, 19, 0.45);
+  border-color: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  background-image: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.13) 50%, transparent 62%);
+  background-size: 300% 100%;
+  background-position: 120% 0;
+  background-repeat: no-repeat;
+  animation: verre-reflet 1.6s ease-out 0.3s 1 both;
+}
+.theme-nuit [class*="bg-[var(--nuit-carte)]"]:active {
+  animation: verre-reflet 0.9s ease-out 1;
+}
+
+.theme-nuit nav ul[class*="rounded-full"] {
+  background-color: rgba(27, 22, 19, 0.5);
+  border-color: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  background-image: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.12) 50%, transparent 62%);
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  animation: verre-reflet 1.8s ease-out 0.5s 1 both, verre-reflet 2.2s ease-in-out 9s infinite;
+}
+
+.theme-nuit header[class*="sticky"] {
+  background-color: rgba(15, 12, 11, 0.55);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+@keyframes verre-reflet {
+  from { background-position: 120% 0; }
+  to { background-position: -20% 0; }
+}
+@keyframes verre-derive {
+  from { transform: translate3d(-2%, -1%, 0) scale(1); }
+  to { transform: translate3d(2%, 2%, 0) scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-nuit::before,
+  .theme-nuit [class*="bg-[var(--nuit-carte)]"],
+  .theme-nuit nav ul[class*="rounded-full"] { animation: none; }
+}
