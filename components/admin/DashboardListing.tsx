@@ -5,14 +5,16 @@ import { useRouter } from "next/navigation";
 import { AccueilAdmin } from "@/components/admin/AccueilAdmin";
 import { Coquille, titreSection, type SectionAdmin } from "@/components/admin/Coquille";
 import { SectionEvenements } from "@/components/admin/SectionEvenements";
+import { SectionStatistiques } from "@/components/admin/SectionStatistiques";
 import { AIDE, BTN_PRIMAIRE, BTN_SECONDAIRE, CARTE, CHAMP, LABEL, TITRE_BLOC } from "@/components/admin/styles";
 import { changerStatut, enregistrerArtiste, enregistrerCompte, enregistrerLieu } from "@/app/admin/actions";
 import type { ExtrasAccueil } from "@/lib/admin/accueil";
 import type { ArtisteAdmin, CompteAdmin, EvenementAdmin, LieuAdmin } from "@/lib/admin/charger";
+import type { Periode, Statistiques } from "@/lib/admin/statistiques-pures";
 import { CATEGORIES, LIBELLES_STATUT, PLATEFORMES, TYPES_ARTISTE, TYPES_COMPTE, TYPES_LIEU } from "@/lib/listing/schema";
 import { slugifier } from "@/lib/listing/slug";
 
-const SECTIONS: SectionAdmin[] = ["accueil", "evenements", "lieux", "artistes", "categories", "comptes"];
+const SECTIONS: SectionAdmin[] = ["accueil", "evenements", "statistiques", "lieux", "artistes", "categories", "comptes"];
 
 export function DashboardListing({
   lieux,
@@ -22,6 +24,8 @@ export function DashboardListing({
   email,
   extras,
   maintenantIso,
+  stats = null,
+  periode = "aujourdhui",
   section = "accueil",
 }: {
   lieux: LieuAdmin[];
@@ -31,6 +35,8 @@ export function DashboardListing({
   email: string | null;
   extras: ExtrasAccueil;
   maintenantIso: string;
+  stats?: Statistiques | null;
+  periode?: Periode;
   section?: string;
 }) {
   const router = useRouter();
@@ -51,6 +57,7 @@ export function DashboardListing({
     });
   }
 
+  const avecRecherche = onglet === "evenements" || onglet === "lieux" || onglet === "artistes" || onglet === "comptes";
   const q = recherche.trim().toLowerCase();
   const lieuxFiltres = lieux.filter((l) => !q || [l.nom, l.ville, l.adresse].join(" ").toLowerCase().includes(q));
   const artistesFiltres = artistes.filter((a) => !q || [a.nom, a.ville_base].join(" ").toLowerCase().includes(q));
@@ -61,14 +68,15 @@ export function DashboardListing({
       actif={onglet}
       email={email}
       titre={titreSection(onglet)}
-      recherche={recherche}
-      onRecherche={setRecherche}
+      recherche={avecRecherche ? recherche : undefined}
+      onRecherche={avecRecherche ? setRecherche : undefined}
       onNouveau={onglet === "evenements" ? () => setNouveau((n) => n + 1) : undefined}
       sale={sale}
     >
       {erreur && <p className="mb-4 text-[13px] text-[#D92D20]">{erreur}</p>}
       {pending && <p className="mb-4 text-[13px] text-[#5B6472]">Enregistrement…</p>}
-      {onglet === "accueil" && <AccueilAdmin evenements={evenements} extras={extras} maintenantIso={maintenantIso} />}
+      {onglet === "accueil" && <AccueilAdmin evenements={evenements} extras={extras} maintenantIso={maintenantIso} stats={stats} />}
+      {onglet === "statistiques" && <SectionStatistiques stats={stats} periode={periode} />}
       {onglet === "evenements" && (
         <SectionEvenements
           lieux={lieux}
