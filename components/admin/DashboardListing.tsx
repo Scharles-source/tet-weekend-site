@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AccueilAdmin } from "@/components/admin/AccueilAdmin";
 import { Coquille, titreSection, type SectionAdmin } from "@/components/admin/Coquille";
 import { SectionEvenements } from "@/components/admin/SectionEvenements";
 import { AIDE, BTN_PRIMAIRE, BTN_SECONDAIRE, CARTE, CHAMP, LABEL, TITRE_BLOC } from "@/components/admin/styles";
 import { changerStatut, enregistrerArtiste, enregistrerCompte, enregistrerLieu } from "@/app/admin/actions";
+import type { ExtrasAccueil } from "@/lib/admin/accueil";
 import type { ArtisteAdmin, CompteAdmin, EvenementAdmin, LieuAdmin } from "@/lib/admin/charger";
 import { CATEGORIES, LIBELLES_STATUT, PLATEFORMES, TYPES_ARTISTE, TYPES_COMPTE, TYPES_LIEU } from "@/lib/listing/schema";
 import { slugifier } from "@/lib/listing/slug";
 
-const SECTIONS: SectionAdmin[] = ["evenements", "lieux", "artistes", "categories", "comptes"];
+const SECTIONS: SectionAdmin[] = ["accueil", "evenements", "lieux", "artistes", "categories", "comptes"];
 
 export function DashboardListing({
   lieux,
@@ -18,17 +20,21 @@ export function DashboardListing({
   evenements,
   comptes,
   email,
-  section = "evenements",
+  extras,
+  maintenantIso,
+  section = "accueil",
 }: {
   lieux: LieuAdmin[];
   artistes: ArtisteAdmin[];
   evenements: EvenementAdmin[];
   comptes: CompteAdmin[];
   email: string | null;
+  extras: ExtrasAccueil;
+  maintenantIso: string;
   section?: string;
 }) {
   const router = useRouter();
-  const onglet: SectionAdmin = SECTIONS.includes(section as SectionAdmin) ? (section as SectionAdmin) : "evenements";
+  const onglet: SectionAdmin = SECTIONS.includes(section as SectionAdmin) ? (section as SectionAdmin) : "accueil";
   const [erreur, setErreur] = useState<string | null>(null);
   const [recherche, setRecherche] = useState("");
   const [sale, setSale] = useState(false);
@@ -60,8 +66,9 @@ export function DashboardListing({
       onNouveau={onglet === "evenements" ? () => setNouveau((n) => n + 1) : undefined}
       sale={sale}
     >
-      {erreur && <p className="mb-4 text-[13px] text-[#E02B20]">{erreur}</p>}
-      {pending && <p className="mb-4 text-[13px] text-[#8A7B66]">Enregistrement…</p>}
+      {erreur && <p className="mb-4 text-[13px] text-[#D92D20]">{erreur}</p>}
+      {pending && <p className="mb-4 text-[13px] text-[#5B6472]">Enregistrement…</p>}
+      {onglet === "accueil" && <AccueilAdmin evenements={evenements} extras={extras} maintenantIso={maintenantIso} />}
       {onglet === "evenements" && (
         <SectionEvenements
           lieux={lieux}
@@ -92,13 +99,13 @@ function BoutonsStatut({
   statut: string;
   onAction: (action: () => Promise<{ ok: boolean; erreur?: string }>) => void;
 }) {
-  const style = statut === "publie" ? "bg-[#E4F3EA] text-[#177E54]" : statut === "retire" ? "bg-[#EFE9DC] text-[#8A7B66]" : "bg-[#FEF3C7] text-[#92400E]";
+  const style = statut === "publie" ? "bg-[#E4F3EA] text-[#177E54]" : statut === "retire" ? "bg-[#EEF0F4] text-[#5B6472]" : "bg-[#FEF3C7] text-[#92400E]";
   return (
     <div className="mt-3 flex flex-wrap items-center gap-2">
       <span className={`inline-flex min-h-7 items-center rounded-full px-2.5 text-[11.5px] font-semibold capitalize ${style}`}>{LIBELLES_STATUT[statut as "brouillon"] ?? statut}</span>
       {statut !== "publie" && <button type="button" className={BTN_PRIMAIRE} onClick={() => onAction(() => changerStatut({ table, id, statut: "publie" }))}>Publier</button>}
       {statut === "publie" && <button type="button" className={BTN_SECONDAIRE} onClick={() => onAction(() => changerStatut({ table, id, statut: "brouillon" }))}>Dépublier</button>}
-      {statut !== "retire" && <button type="button" className="inline-flex min-h-11 items-center rounded-[14px] border-[1.5px] border-[#E02B20] bg-white px-4 text-[14px] font-semibold text-[#E02B20] hover:bg-[#FDECEA]" onClick={() => onAction(() => changerStatut({ table, id, statut: "retire" }))}>Retirer</button>}
+      {statut !== "retire" && <button type="button" className="inline-flex min-h-11 items-center rounded-[14px] border-[1.5px] border-[#D92D20] bg-white px-4 text-[14px] font-semibold text-[#D92D20] hover:bg-[#FDECEA]" onClick={() => onAction(() => changerStatut({ table, id, statut: "retire" }))}>Retirer</button>}
     </div>
   );
 }
@@ -133,7 +140,7 @@ function FormulaireLieu({ lieux, onAction }: { lieux: LieuAdmin[]; onAction: (ac
         {lieux.map((l) => (
           <li key={l.id} className={`${CARTE} p-4`}>
             <p className="font-[family-name:var(--font-display)] text-[16px] font-extrabold">{l.nom}</p>
-            <p className="text-[13px] text-[#4A4136]">{[l.ville, l.adresse].filter(Boolean).join(" · ")}</p>
+            <p className="text-[13px] text-[#3C4452]">{[l.ville, l.adresse].filter(Boolean).join(" · ")}</p>
             <button type="button" className={`${BTN_SECONDAIRE} mt-3`} onClick={() => setF({ id: l.id, nom: l.nom, slug: l.slug, ville: l.ville ?? "", pays: l.pays ?? "", adresse: l.adresse ?? "", type: l.type ?? "", description: l.description ?? "", instagram: l.instagram ?? "", facebook: l.facebook ?? "", site_web: l.site_web ?? "" })}>Modifier</button>
             <BoutonsStatut table="venues" id={l.id} statut={l.statut} onAction={onAction} />
           </li>
@@ -170,7 +177,7 @@ function FormulaireArtiste({ artistes, onAction }: { artistes: ArtisteAdmin[]; o
         {artistes.map((a) => (
           <li key={a.id} className={`${CARTE} p-4`}>
             <p className="font-[family-name:var(--font-display)] text-[16px] font-extrabold">{a.nom}</p>
-            <p className="text-[13px] text-[#8A7B66]">{[a.type, a.ville_base].filter(Boolean).join(" · ")}</p>
+            <p className="text-[13px] text-[#5B6472]">{[a.type, a.ville_base].filter(Boolean).join(" · ")}</p>
             <button type="button" className={`${BTN_SECONDAIRE} mt-3`} onClick={() => setF({ id: a.id, nom: a.nom, slug: a.slug, type: a.type ?? "", ville_base: a.ville_base ?? "", bio: a.bio ?? "", instagram: a.instagram ?? "", facebook: a.facebook ?? "", site_web: a.site_web ?? "" })}>Modifier</button>
             <BoutonsStatut table="artists" id={a.id} statut={a.statut} onAction={onAction} />
           </li>
@@ -190,7 +197,7 @@ function ListeCategories({ evenements }: { evenements: EvenementAdmin[] }) {
           return (
             <li key={c.slug} className={`${CARTE} p-4`}>
               <p className="font-[family-name:var(--font-display)] text-[16px] font-extrabold">{c.nom}</p>
-              <p className="text-[13px] text-[#8A7B66]">{nombre} événement{nombre > 1 ? "s" : ""}</p>
+              <p className="text-[13px] text-[#5B6472]">{nombre} événement{nombre > 1 ? "s" : ""}</p>
             </li>
           );
         })}
@@ -227,7 +234,7 @@ function FormulaireCompte({ comptes, onAction }: { comptes: CompteAdmin[]; onAct
         {comptes.map((c) => (
           <li key={c.id} className={`${CARTE} p-4`}>
             <p className="font-semibold">{c.handle || c.url || "Compte"}</p>
-            <p className="text-[13px] text-[#8A7B66]">{c.plateforme} · {c.type} · {c.actif ? "actif" : "inactif"}</p>
+            <p className="text-[13px] text-[#5B6472]">{c.plateforme} · {c.type} · {c.actif ? "actif" : "inactif"}</p>
             <button type="button" className={`${BTN_SECONDAIRE} mt-3`} onClick={() => setF({ id: c.id, plateforme: c.plateforme, handle: c.handle ?? "", url: c.url ?? "", type: c.type, actif: c.actif })}>Modifier</button>
           </li>
         ))}
@@ -246,7 +253,7 @@ function Etiquette({ id, label, children }: { id: string; label: string; childre
 }
 
 function Vide({ texte }: { texte: string }) {
-  return <p className="rounded-[20px] border-2 border-dashed border-[#D8C6A4] px-5 py-8 text-center text-[14px] text-[#4A4136]">{texte}</p>;
+  return <p className="rounded-[20px] border-2 border-dashed border-[#AEB4C0] px-5 py-8 text-center text-[14px] text-[#3C4452]">{texte}</p>;
 }
 
 function slugOuVide(nom: string): string {
