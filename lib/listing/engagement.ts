@@ -1,10 +1,14 @@
-/** Seuils sous lesquels on n'affiche aucun chiffre : de petits nombres font paraître le site vide. */
-export const SEUIL_INTERET = 10;
+/** Une vue par visiteur et par jour : le chiffre « vu aujourd'hui » n'apparaît qu'à partir de ce seuil. */
+export const SEUIL_VUES_JOUR = 20;
+/** Vues cumulées : seuil du badge « Hot right now » et de la ligne « views ». */
 export const SEUIL_VUES = 50;
+/** Villes comptant au moins ce nombre d'événements à venir pour mériter un classement « n°1 ». */
+export const MIN_EVENEMENTS_CLASSEMENT = 3;
 
+/** Le nombre de « I'm in » est montré dès le premier (décision de Smith, 13 nov. 2026). */
 export function libelleInteret(total: number | null | undefined): string | null {
-  if (!total || total < SEUIL_INTERET) return null;
-  return `${total} people going`;
+  if (!total || total < 1) return null;
+  return `${total} in`;
 }
 
 export function estTresConsulte(vues: number | null | undefined): boolean {

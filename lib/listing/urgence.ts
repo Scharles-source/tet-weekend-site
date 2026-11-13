@@ -25,7 +25,11 @@ export function urgenceDe(
   }
   const minutes = Math.round((debut - t) / 60_000);
   if (minutes < 60) return { texte: `In ${Math.max(1, minutes)} min`, urgent: true };
-  if (minutes < 6 * 60) return { texte: `In ${Math.floor(minutes / 60)} h`, urgent: true };
+  if (minutes < 6 * 60) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return { texte: m === 0 ? `In ${h} h` : `In ${h} h ${m} min`, urgent: true };
+  }
   const aujourdhui = intervalleJour(0, maintenant, e.fuseau);
   if (debut <= aujourdhui.fin.getTime()) {
     const soir = Number(saisieDepuisInstant(e.date_debut, e.fuseau).slice(11, 13)) >= 18;

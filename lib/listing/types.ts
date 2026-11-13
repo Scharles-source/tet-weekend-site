@@ -62,6 +62,10 @@ export interface EvenementPublic {
   ajoute_le?: string | null;
   /** Dernière modification en base (sert au lastmod du sitemap). */
   modifie_le?: string | null;
-  /** Nombre de « J'y vais » (null tant que la base ne le fournit pas). */
+  /** Nombre de « I'm in » (null tant que la base ne le fournit pas). */
   interets?: number | null;
+  /** Vues d'aujourd'hui (une par visiteur) ; absent tant que la migration « engagement social » n'est pas appliquée. */
+  vues_jour?: number | null;
+  /** 1 quand l'événement est le plus vu de sa ville (calculé, jamais saisi). */
+  rang_ville?: number | null;
 }

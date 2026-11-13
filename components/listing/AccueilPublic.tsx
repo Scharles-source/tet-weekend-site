@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Affiche } from "@/components/listing/Affiche";
 import { BanniereAccueil, type Panneau } from "@/components/listing/BanniereAccueil";
 import { LigneEvenement } from "@/components/listing/CarteEvenement";
@@ -46,7 +46,16 @@ export function AccueilPublic({
     () => evenements.filter((e) => dansLaPeriode(e.date_debut, periode) && (ville === null || e.ville === ville)),
     [evenements, periode, ville],
   );
-  const ceSoir = useMemo(() => evenements.filter((e) => dansLaPeriode(e.date_debut, "ce-soir")), [evenements]);
+  // « Tonight or never » : seulement les soirées pas encore commencées. Dès que l'heure passe, elles quittent cette rangée.
+  const [maintenant, setMaintenant] = useState<number | null>(null);
+  useEffect(() => {
+    const t = setInterval(() => setMaintenant(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, []);
+  const ceSoir = useMemo(
+    () => evenements.filter((e) => dansLaPeriode(e.date_debut, "ce-soir") && (maintenant === null || Date.parse(e.date_debut) > maintenant)),
+    [evenements, maintenant],
+  );
   const weekend = evenements.filter((e) => dansLeWeekend(e.date_debut));
 
   return (
@@ -100,7 +109,7 @@ export function AccueilPublic({
       ) : (
         <>
           {ceSoir.length > 0 && (
-            <Rangee titre="Tonight" href="/evenements">
+            <Rangee titre="Tonight or never" sousTitre="The countdown is real. Once it starts, it leaves this row." href="/evenements">
               {ceSoir.map((e) => (
                 <Affiche key={e.id} evenement={e} className="w-[236px] shrink-0 snap-start lg:w-[260px]" />
               ))}
@@ -160,10 +169,11 @@ export function AccueilPublic({
   );
 }
 
-function Rangee({ titre, href, children }: { titre: string; href: string; children: React.ReactNode }) {
+function Rangee({ titre, sousTitre, href, children }: { titre: string; sousTitre?: string; href: string; children: React.ReactNode }) {
   return (
     <section className="mt-8 lg:mt-12">
       <EnteteSection titre={titre} href={href} />
+      {sousTitre && <p className="-mt-2 mb-3.5 text-[13.5px] text-[var(--nuit-muet)] lg:mb-5">{sousTitre}</p>}
       <div className="no-scrollbar -mx-[var(--page-px)] flex snap-x gap-3 overflow-x-auto px-[var(--page-px)] lg:gap-5">{children}</div>
     </section>
   );
