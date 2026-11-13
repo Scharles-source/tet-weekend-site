@@ -15,7 +15,7 @@ const LIENS = [
   { href: "/categories", label: "Categories", exact: false },
 ] as const;
 
-export function EnTete({ large = false, email }: { large?: boolean; email?: string }) {
+export function EnTete({ large = false }: { large?: boolean; email?: string }) {
   const pathname = usePathname();
   const largeur = large ? "max-w-[1240px]" : "max-w-3xl";
 
@@ -23,13 +23,12 @@ export function EnTete({ large = false, email }: { large?: boolean; email?: stri
     <header className="sticky top-0 z-40 border-b border-[var(--nuit-ligne)] bg-[var(--nuit-fond)]">
       <div className={`mx-auto flex h-16 w-full ${largeur} items-center justify-between gap-4 px-[var(--page-px)]`}>
         <Logo />
-        {/* Mobile : accès direct à la recherche (la navigation vit dans la barre du bas) */}
+        {/* Mobile : devenir partenaire / proposer un événement (la recherche vit dans la barre du bas) */}
         <Link
-          href="/recherche"
-          aria-label="Search for an event"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-[0_4px_12px_rgba(166,52,70,.35)] no-underline md:hidden"
+          href="/ajouter-evenement"
+          className="flex h-10 items-center rounded-full bg-[var(--accent)] px-4 text-[14px] font-extrabold text-white shadow-[0_4px_12px_rgba(166,52,70,.35)] no-underline md:hidden"
         >
-          <Search size={18} aria-hidden />
+          Become a partner
         </Link>
         {/* Desktop : navigation horizontale */}
         <nav className="hidden items-center gap-7 md:flex" aria-label="Main navigation">
@@ -46,14 +45,12 @@ export function EnTete({ large = false, email }: { large?: boolean; email?: stri
               </Link>
             );
           })}
-          {email ? (
-            <a
-              href={`mailto:${email}?subject=Become%20a%20partner`}
-              className="rounded-full bg-[var(--accent)] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_rgba(166,52,70,.3)] no-underline"
-            >
-              Become a partner
-            </a>
-          ) : null}
+          <Link
+            href="/ajouter-evenement"
+            className="rounded-full bg-[var(--accent)] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_rgba(166,52,70,.3)] no-underline"
+          >
+            Become a partner
+          </Link>
         </nav>
       </div>
     </header>
