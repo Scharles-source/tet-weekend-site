@@ -1,5 +1,6 @@
 import { altFlyer } from "./flyer.ts";
-import { formaterQuand } from "./dates.ts";
+import { estTermine, formaterQuand } from "./dates.ts";
+import { rangsParVille } from "./preuve.ts";
 import type { ArtistePublic, EvenementPublic, FlyerPublic, LieuPublic } from "./types.ts";
 
 export class ConfigurationSupabaseManquante extends Error {
@@ -178,16 +179,14 @@ export async function lireAnnuaire(): Promise<Annuaire> {
     lireAjouts(),
     lireEngagement(),
   ]);
-  return {
-    lieux: lieux.map((l) => lieuDe(l)).filter((l): l is LieuPublic => Boolean(l)),
-    artistes: artistes.filter((a) => typeof a.id === "string").map(artisteDe),
-    evenements: evenements.map((brut) => {
+  const liste = evenements.map((brut) => {
       const evenement = evenementDe(brut);
       evenement.ajoute_le = ajouts.get(evenement.id) ?? null;
       const eng = engagement.get(evenement.id);
       if (eng) {
         evenement.vues = eng.vues;
         evenement.interets = eng.interets;
+        evenement.vues_jour = eng.vues_jour;
       }
       const sponsor = sponsors.get(evenement.id);
       if (sponsor) {
@@ -195,7 +194,13 @@ export async function lireAnnuaire(): Promise<Annuaire> {
         evenement.sponsored_to = sponsor.sponsored_to;
       }
       return evenement;
-    }),
+  });
+  const rangs = rangsParVille(liste.filter((e) => !estTermine(e)));
+  for (const e of liste) e.rang_ville = rangs.get(e.id) ?? null;
+  return {
+    lieux: lieux.map((l) => lieuDe(l)).filter((l): l is LieuPublic => Boolean(l)),
+    artistes: artistes.filter((a) => typeof a.id === "string").map(artisteDe),
+    evenements: liste,
   };
 }
 
@@ -231,19 +236,25 @@ async function lireAjouts(): Promise<Map<string, string>> {
   }
 }
 
-/** Lecture séparée : tant que la migration d'engagement n'est pas appliquée, rien n'est affiché. */
-async function lireEngagement(): Promise<Map<string, { interets: number; vues: number }>> {
+/** Lecture séparée : tant que les migrations d'engagement ne sont pas appliquées, rien n'est affiché. */
+async function lireEngagement(): Promise<Map<string, { interets: number; vues: number; vues_jour: number | null }>> {
   const { url, cle } = configuration();
-  try {
-    const res = await fetch(`${url}/rest/v1/rpc/evenements_engagement`, {
+  const appeler = (fonction: string) =>
+    fetch(`${url}/rest/v1/rpc/${fonction}`, {
       method: "POST",
       headers: { apikey: cle, Authorization: `Bearer ${cle}`, "Content-Type": "application/json" },
       body: "{}",
       next: { revalidate: 300, tags: [TAG] },
     });
+  try {
+    // Version avec les vues du jour ; sinon, la version d'origine.
+    let res = await appeler("evenements_engagement_jour");
+    if (!res.ok) res = await appeler("evenements_engagement");
     if (!res.ok) return new Map();
-    const rows = (await res.json()) as { event_id: string; interets: number; vues: number }[];
-    return new Map(rows.map((r) => [r.event_id, { interets: Number(r.interets), vues: Number(r.vues) }]));
+    const rows = (await res.json()) as { event_id: string; interets: number; vues: number; vues_jour?: number }[];
+    return new Map(
+      rows.map((r) => [r.event_id, { interets: Number(r.interets), vues: Number(r.vues), vues_jour: r.vues_jour === undefined ? null : Number(r.vues_jour) }]),
+    );
   } catch {
     return new Map();
   }
