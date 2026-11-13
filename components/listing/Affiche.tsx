@@ -44,7 +44,9 @@ export function Affiche({ evenement, className = "" }: { evenement: EvenementPub
         <span className="line-clamp-2 text-[15px] leading-snug font-bold text-[var(--nuit-texte)]">{evenement.titre}</span>
         <span className="truncate text-[13.5px] text-[var(--nuit-muet)]">{ou}</span>
         {evenement.prix && <span className="truncate text-[13px] font-semibold text-[var(--or)]">{evenement.prix}</span>}
-        {estTresConsulte(evenement.vues) && <span className="text-xs font-bold text-[var(--accent-texte)]">Très consulté</span>}
+        {estTresConsulte(evenement.vues) && (
+          <span className="mt-1 w-fit rounded-full bg-[var(--or)] px-2.5 py-0.5 text-xs font-extrabold text-[var(--encre)]">Très consulté</span>
+        )}
       </div>
     </Link>
   );

@@ -138,8 +138,8 @@ body {
   --creme: #FBF7EF;
   --encre: #191410;
   --encre2: #4A4136;
-  --accent: #E02B20;
-  --accent-texte: #FF6A5C;
+  --accent: #A63446;
+  --accent-texte: #E58B9A;
   --or: #FFC247;
   --text-sec: #B9AB9A;
   --surface: #1B1613;
@@ -157,7 +157,7 @@ body {
 .theme-nuit .bg-\[\#FFFDF8\] { background-color: var(--nuit-carte); }
 .theme-nuit .bg-\[\#F3E6D8\] { background-color: var(--nuit-carte2); }
 .theme-nuit .bg-\[\#191410\] { background-color: var(--nuit-carte2); }
-.theme-nuit .bg-\[\#FDECEA\] { background-color: rgba(255, 77, 63, 0.16); }
+.theme-nuit .bg-\[\#FDECEA\] { background-color: rgba(229, 139, 154, 0.14); }
 .theme-nuit .bg-\[\#D8C6A4\] { background-color: var(--nuit-ligne); }
 .theme-nuit .text-\[\#191410\] { color: var(--nuit-texte); }
 .theme-nuit .text-\[\#4A4136\] { color: var(--nuit-texte2); }

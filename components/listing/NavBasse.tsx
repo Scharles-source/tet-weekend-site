@@ -54,7 +54,7 @@ export function NavBasse({ email }: { email?: string }) {
       <ul className="pointer-events-auto grid grid-cols-5 rounded-full border border-[var(--nuit-ligne)] bg-[rgba(27,22,19,0.96)] shadow-[0_12px_30px_rgba(0,0,0,.5)] backdrop-blur-xl">
         {GAUCHE.map(lien)}
         <li className="flex items-center justify-center">
-          <Link href="/recherche" aria-label="Rechercher" className="-mt-7 flex h-[60px] w-[60px] items-center justify-center rounded-full border-4 border-[var(--nuit-fond)] bg-[var(--accent)] text-white shadow-[0_8px_20px_rgba(224,43,32,.45)] no-underline">
+          <Link href="/recherche" aria-label="Rechercher" className="-mt-7 flex h-[60px] w-[60px] items-center justify-center rounded-full border-4 border-[var(--nuit-fond)] bg-[var(--accent)] text-white shadow-[0_8px_20px_rgba(166,52,70,.45)] no-underline">
             <Search size={24} strokeWidth={2.4} aria-hidden />
           </Link>
         </li>
