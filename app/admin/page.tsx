@@ -4,6 +4,8 @@ import { Deconnexion } from "@/components/admin/Deconnexion";
 import { chargerListing, type ArtisteAdmin, type CompteAdmin, type EvenementAdmin, type LieuAdmin } from "@/lib/admin/charger";
 import { chargerExtrasAccueil, type ExtrasAccueil } from "@/lib/admin/accueil";
 import { lireSession } from "@/lib/admin/session";
+import { chargerStatistiques } from "@/lib/admin/statistiques";
+import { periodeValide, type Periode, type Statistiques } from "@/lib/admin/statistiques-pures";
 import { supabaseConfigure } from "@/lib/admin/supabase";
 
 export const dynamic = "force-dynamic";
@@ -17,24 +19,31 @@ type Acces =
       email: string | null;
       donnees: { lieux: LieuAdmin[]; artistes: ArtisteAdmin[]; evenements: EvenementAdmin[]; comptes: CompteAdmin[] };
       extras: ExtrasAccueil;
+      stats: Statistiques | null;
     };
 
-async function preparerAdmin(): Promise<Acces> {
+async function preparerAdmin(section: string | undefined, periode: Periode): Promise<Acces> {
   if (!supabaseConfigure()) return { type: "login" };
   try {
     const session = await lireSession();
     if (!session) return { type: "login" };
     if (!session.isAdmin) return { type: "interdit", email: session.email };
-    const [donnees, extras] = await Promise.all([chargerListing(), chargerExtrasAccueil()]);
-    return { type: "ok", email: session.email, donnees, extras };
+    const voirStats = section === undefined || section === "accueil" || section === "statistiques";
+    const [donnees, extras, stats] = await Promise.all([
+      chargerListing(),
+      chargerExtrasAccueil(),
+      voirStats ? chargerStatistiques(section === "statistiques" ? periode : "aujourdhui") : Promise.resolve(null),
+    ]);
+    return { type: "ok", email: session.email, donnees, extras, stats };
   } catch (e) {
     return { type: "erreur", message: (e as Error).message };
   }
 }
 
-export default async function PageAdmin({ searchParams }: { searchParams: Promise<{ section?: string }> }) {
-  const { section } = await searchParams;
-  const acces = await preparerAdmin();
+export default async function PageAdmin({ searchParams }: { searchParams: Promise<{ section?: string; periode?: string }> }) {
+  const { section, periode: periodeBrute } = await searchParams;
+  const periode = periodeValide(periodeBrute);
+  const acces = await preparerAdmin(section, periode);
   if (acces.type === "login") redirect("/admin/login");
   if (acces.type === "erreur") {
     return (
@@ -55,5 +64,5 @@ export default async function PageAdmin({ searchParams }: { searchParams: Promis
       </main>
     );
   }
-  return <DashboardListing {...acces.donnees} extras={acces.extras} maintenantIso={new Date().toISOString()} email={acces.email} section={section} />;
+  return <DashboardListing {...acces.donnees} extras={acces.extras} maintenantIso={new Date().toISOString()} stats={acces.stats} periode={periode} email={acces.email} section={section} />;
 }

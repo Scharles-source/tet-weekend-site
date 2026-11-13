@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   BookUser,
+  ChartColumn,
   CalendarDays,
   ExternalLink,
   House,
@@ -19,13 +20,14 @@ import {
 import { Deconnexion } from "@/components/admin/Deconnexion";
 import { BTN_DANGER_PLEIN, BTN_SECONDAIRE } from "@/components/admin/styles";
 
-export type SectionAdmin = "accueil" | "evenements" | "collecte" | "lieux" | "artistes" | "categories" | "comptes";
+export type SectionAdmin = "accueil" | "evenements" | "statistiques" | "collecte" | "lieux" | "artistes" | "categories" | "comptes";
 
 type Entree = { id: SectionAdmin; label: string; icon: LucideIcon; href: string };
 
 const ENTREES: Entree[] = [
   { id: "accueil", label: "Accueil", icon: House, href: "/admin" },
   { id: "evenements", label: "Événements", icon: CalendarDays, href: "/admin?section=evenements" },
+  { id: "statistiques", label: "Statistiques", icon: ChartColumn, href: "/admin?section=statistiques" },
   { id: "collecte", label: "Collecte", icon: Radar, href: "/admin/collecte-evenements" },
   { id: "lieux", label: "Lieux", icon: MapPin, href: "/admin?section=lieux" },
   { id: "artistes", label: "Artistes & DJ", icon: Users, href: "/admin?section=artistes" },
@@ -38,6 +40,7 @@ const ANNUAIRE: SectionAdmin[] = ["lieux", "artistes", "categories", "comptes"];
 const ONGLETS: { id: string; label: string; icon: LucideIcon; href: string; groupe: SectionAdmin[] }[] = [
   { id: "accueil", label: "Accueil", icon: House, href: "/admin", groupe: ["accueil"] },
   { id: "evenements", label: "Événements", icon: CalendarDays, href: "/admin?section=evenements", groupe: ["evenements"] },
+  { id: "statistiques", label: "Stats", icon: ChartColumn, href: "/admin?section=statistiques", groupe: ["statistiques"] },
   { id: "collecte", label: "Collecte", icon: Radar, href: "/admin/collecte-evenements", groupe: ["collecte"] },
   { id: "annuaire", label: "Annuaire", icon: BookUser, href: "/admin?section=lieux", groupe: ANNUAIRE },
 ];
