@@ -18,8 +18,20 @@ export interface StatsEvenement {
   interets: number;
 }
 
+/** Réponse de la fonction SQL installations_admin (voir la migration 20261113200000). */
+export interface InstallationsApp {
+  installations: number;
+  nouvelles_aujourdhui: number;
+  nouvelles_7j: number;
+  ouvertures_aujourdhui: number;
+  android: number;
+  ios: number;
+}
+
 /** Réponse de la fonction SQL statistiques_admin (voir la migration 20261113000000). */
 export interface Statistiques {
+  /** Installations de la web app (absent tant que la migration « installations_app » n'est pas appliquée). */
+  app?: InstallationsApp | null;
   periode: Periode;
   heure_actuelle: number;
   en_ligne: { total: number; mobile: number; ordinateur: number };

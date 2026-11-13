@@ -74,6 +74,17 @@ function slugDuClic(cible: Element): string | null {
   return lien ? slugEvenement(lien.getAttribute("href") ?? "") : null;
 }
 
+function plateforme(): "android" | "ios" | "autre" {
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/.test(ua)) return "ios";
+  if (/Android/.test(ua)) return "android";
+  return "autre";
+}
+
+function appInstallee(): boolean {
+  return window.matchMedia("(display-mode: standalone)").matches || (navigator as unknown as { standalone?: boolean }).standalone === true;
+}
+
 /** Mesure d'audience anonyme du site public : pages vues, présence en ligne, clics flyer et agenda. */
 export function Mesure() {
   const chemin = usePathname();
@@ -84,6 +95,22 @@ export function Mesure() {
     if (!autorise.current) return;
     envoyer({ type: "vue", chemin, slug: slugEvenement(chemin), source: source() });
   }, [chemin]);
+
+  // Web app : ouverture depuis l'écran d'accueil (une fois par jour) et installation signalée par le navigateur.
+  useEffect(() => {
+    if (autorise.current === null) autorise.current = mesureAutorisee();
+    if (!autorise.current) return;
+    if (appInstallee()) {
+      const jour = new Date().toISOString().slice(0, 10);
+      if (lire("local", "tw_app_ouverte") !== jour) {
+        ecrire("local", "tw_app_ouverte", jour);
+        envoyer({ type: "app", evenement: "ouverture", plateforme: plateforme() });
+      }
+    }
+    const installee = () => envoyer({ type: "app", evenement: "installation", plateforme: plateforme() });
+    window.addEventListener("appinstalled", installee);
+    return () => window.removeEventListener("appinstalled", installee);
+  }, []);
 
   useEffect(() => {
     if (autorise.current === null) autorise.current = mesureAutorisee();
