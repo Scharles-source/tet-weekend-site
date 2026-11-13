@@ -102,7 +102,6 @@ export default async function PageApercuAdmin({ searchParams }: { searchParams: 
       section={section}
       periode={periode}
       stats={stats}
-      extras={{ aValider: 3, engagement: {} }}
       maintenantIso={new Date().toISOString()}
       lieux={[lieu]}
       artistes={[artiste]}

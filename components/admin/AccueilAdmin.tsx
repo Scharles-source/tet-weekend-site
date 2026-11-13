@@ -1,11 +1,9 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import { RapportSeoBloc } from "@/components/admin/RapportSeo";
 import { StatsAujourdhui } from "@/components/admin/StatsAujourdhui";
 import { CARTE } from "@/components/admin/styles";
 import type { RapportSeo } from "@/lib/admin/search-console-pures";
 import type { Statistiques } from "@/lib/admin/statistiques-pures";
-import type { ExtrasAccueil } from "@/lib/admin/accueil";
 import type { EvenementAdmin } from "@/lib/admin/charger";
 
 function dateCourte(iso: string, fuseau: string): { jour: string; mois: string } {
@@ -14,7 +12,7 @@ function dateCourte(iso: string, fuseau: string): { jour: string; mois: string }
   return { jour: f({ day: "numeric" }), mois: f({ month: "short" }).replace(".", "") };
 }
 
-export function AccueilAdmin({ evenements, extras, maintenantIso, stats, rapportSeo = null }: { evenements: EvenementAdmin[]; extras: ExtrasAccueil; maintenantIso: string; stats: Statistiques | null; rapportSeo?: RapportSeo | null }) {
+export function AccueilAdmin({ evenements, maintenantIso, stats, rapportSeo = null }: { evenements: EvenementAdmin[]; maintenantIso: string; stats: Statistiques | null; rapportSeo?: RapportSeo | null }) {
   const maintenant = new Date(maintenantIso).getTime();
   const aVenir = evenements.filter((e) => new Date(e.date_fin ?? e.date_debut).getTime() >= maintenant);
   const publies = aVenir.filter((e) => e.statut === "publie").length;
@@ -27,22 +25,6 @@ export function AccueilAdmin({ evenements, extras, maintenantIso, stats, rapport
 
   return (
     <div className="mx-auto max-w-3xl space-y-3 lg:mx-0">
-      <Link
-        href="/admin/collecte-evenements"
-        className="flex items-center gap-3.5 rounded-[16px] bg-[#1D3FD8] p-4 text-white no-underline"
-      >
-        <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[14px] bg-white/20 font-[family-name:var(--font-display)] text-[24px] font-extrabold">
-          {extras.aValider ?? "–"}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[16px] font-bold">Événements à valider</span>
-          <span className="block text-[13px] opacity-90">
-            {extras.aValider === null ? "Compteur indisponible pour le moment" : "Trouvés par la collecte, en attente"}
-          </span>
-        </span>
-        <ChevronRight size={20} aria-hidden />
-      </Link>
-
       <StatsAujourdhui stats={stats} />
 
       <RapportSeoBloc rapport={rapportSeo} />

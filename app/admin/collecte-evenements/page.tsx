@@ -1,36 +1,16 @@
 import { redirect } from "next/navigation";
-import { CollecteEvenements } from "@/components/admin/CollecteEvenements";
-import { Coquille } from "@/components/admin/Coquille";
-import { Deconnexion } from "@/components/admin/Deconnexion";
-import { chargerCollecte } from "@/lib/crawlers/charger";
-import { erreurPublique } from "@/lib/crawlers/serveur";
 import { lireSession } from "@/lib/admin/session";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * La section Collecte n'existe plus (décision de Smith, 13 nov. 2026) :
+ * la veille dépose les événements repérés directement en brouillon dans
+ * l'écran Événements. L'ancienne adresse y redirige, pour les signets.
+ */
 export default async function PageCollecteEvenements() {
   const session = await lireSession();
   if (!session) redirect("/admin/login");
   if (!session.isAdmin) redirect("/admin");
-  let donnees = null;
-  let erreur: string | null = null;
-  try {
-    donnees = await chargerCollecte(session.email);
-  } catch (e) {
-    erreur = erreurPublique(e);
-  }
-  if (!donnees) {
-    return (
-      <main className="mx-auto max-w-lg pt-10">
-        <h1 className="mb-3 text-2xl font-extrabold">Collecte — Événements</h1>
-        <p className="text-sm text-[#92400E]">{erreur}</p>
-        <div className="mt-6"><Deconnexion /></div>
-      </main>
-    );
-  }
-  return (
-    <Coquille actif="collecte" email={donnees.email} titre="Collecte">
-      <CollecteEvenements donnees={donnees} />
-    </Coquille>
-  );
+  redirect("/admin?section=evenements");
 }

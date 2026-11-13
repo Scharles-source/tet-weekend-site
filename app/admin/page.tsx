@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { DashboardListing } from "@/components/admin/DashboardListing";
 import { Deconnexion } from "@/components/admin/Deconnexion";
 import { chargerListing, type ArtisteAdmin, type CompteAdmin, type EvenementAdmin, type LieuAdmin } from "@/lib/admin/charger";
-import { chargerExtrasAccueil, type ExtrasAccueil } from "@/lib/admin/accueil";
 import { lireSession } from "@/lib/admin/session";
 import { chargerRapportSeo } from "@/lib/admin/search-console";
 import { periodeSeoValide, type PeriodeSeo, type RapportSeo } from "@/lib/admin/search-console-pures";
@@ -20,7 +19,6 @@ type Acces =
       type: "ok";
       email: string | null;
       donnees: { lieux: LieuAdmin[]; artistes: ArtisteAdmin[]; evenements: EvenementAdmin[]; comptes: CompteAdmin[] };
-      extras: ExtrasAccueil;
       stats: Statistiques | null;
       rapportSeo: RapportSeo | null;
     };
@@ -33,13 +31,12 @@ async function preparerAdmin(section: string | undefined, periode: Periode, seoP
     if (!session.isAdmin) return { type: "interdit", email: session.email };
     const voirStats = section === undefined || section === "accueil" || section === "statistiques";
     const voirSeo = section === undefined || section === "accueil";
-    const [donnees, extras, stats, rapportSeo] = await Promise.all([
+    const [donnees, stats, rapportSeo] = await Promise.all([
       chargerListing(),
-      chargerExtrasAccueil(),
       voirStats ? chargerStatistiques(section === "statistiques" ? periode : "aujourdhui") : Promise.resolve(null),
       voirSeo ? chargerRapportSeo(seoPeriode) : Promise.resolve(null),
     ]);
-    return { type: "ok", email: session.email, donnees, extras, stats, rapportSeo };
+    return { type: "ok", email: session.email, donnees, stats, rapportSeo };
   } catch (e) {
     return { type: "erreur", message: (e as Error).message };
   }
@@ -69,5 +66,5 @@ export default async function PageAdmin({ searchParams }: { searchParams: Promis
       </main>
     );
   }
-  return <DashboardListing {...acces.donnees} extras={acces.extras} maintenantIso={new Date().toISOString()} stats={acces.stats} rapportSeo={acces.rapportSeo} periode={periode} email={acces.email} section={section} />;
+  return <DashboardListing {...acces.donnees} maintenantIso={new Date().toISOString()} stats={acces.stats} rapportSeo={acces.rapportSeo} periode={periode} email={acces.email} section={section} />;
 }

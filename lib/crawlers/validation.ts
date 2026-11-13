@@ -1,5 +1,16 @@
 import { SaisieInvalide } from "../listing/erreurs.ts";
-import { FREQUENCES, PLATEFORMES_SOURCE, TYPES_SOURCE } from "./vue.ts";
+
+/** Constantes des sources surveillées (anciennement dans ./vue.ts, retiré avec l'écran Collecte). */
+export const FREQUENCES = [
+  { minutes: 0, libelle: "Manuel" },
+  { minutes: 360, libelle: "Toutes les 6 h" },
+  { minutes: 720, libelle: "Toutes les 12 h" },
+  { minutes: 1440, libelle: "Tous les jours" },
+  { minutes: 2880, libelle: "Tous les 2 jours" },
+] as const;
+
+export const PLATEFORMES_SOURCE = ["instagram", "facebook", "eventbrite", "website", "rss", "manual"] as const;
+export const TYPES_SOURCE = ["lieu", "artiste", "promoteur", "media", "organisateur", "autre"] as const;
 
 function texte(v: unknown): string | null {
   if (v === null || v === undefined) return null;

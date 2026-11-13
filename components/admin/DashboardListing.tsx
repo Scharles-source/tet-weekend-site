@@ -8,7 +8,6 @@ import { SectionEvenements } from "@/components/admin/SectionEvenements";
 import { SectionStatistiques } from "@/components/admin/SectionStatistiques";
 import { AIDE, BTN_PRIMAIRE, BTN_SECONDAIRE, CARTE, CHAMP, LABEL, TITRE_BLOC } from "@/components/admin/styles";
 import { changerStatut, enregistrerArtiste, enregistrerCompte, enregistrerLieu } from "@/app/admin/actions";
-import type { ExtrasAccueil } from "@/lib/admin/accueil";
 import type { ArtisteAdmin, CompteAdmin, EvenementAdmin, LieuAdmin } from "@/lib/admin/charger";
 import type { RapportSeo } from "@/lib/admin/search-console-pures";
 import type { Periode, Statistiques } from "@/lib/admin/statistiques-pures";
@@ -23,7 +22,6 @@ export function DashboardListing({
   evenements,
   comptes,
   email,
-  extras,
   maintenantIso,
   stats = null,
   rapportSeo = null,
@@ -35,7 +33,6 @@ export function DashboardListing({
   evenements: EvenementAdmin[];
   comptes: CompteAdmin[];
   email: string | null;
-  extras: ExtrasAccueil;
   maintenantIso: string;
   stats?: Statistiques | null;
   rapportSeo?: RapportSeo | null;
@@ -78,7 +75,7 @@ export function DashboardListing({
     >
       {erreur && <p className="mb-4 text-[13px] text-[#D92D20]">{erreur}</p>}
       {pending && <p className="mb-4 text-[13px] text-[#5B6472]">Enregistrement…</p>}
-      {onglet === "accueil" && <AccueilAdmin evenements={evenements} extras={extras} maintenantIso={maintenantIso} stats={stats} rapportSeo={rapportSeo} />}
+      {onglet === "accueil" && <AccueilAdmin evenements={evenements} maintenantIso={maintenantIso} stats={stats} rapportSeo={rapportSeo} />}
       {onglet === "statistiques" && <SectionStatistiques stats={stats} periode={periode} />}
       {onglet === "evenements" && (
         <SectionEvenements
@@ -224,7 +221,7 @@ function FormulaireCompte({ comptes, onAction }: { comptes: CompteAdmin[]; onAct
     <div className="grid items-start gap-4 lg:grid-cols-2">
       <form className={`${CARTE} space-y-3 p-5`} onSubmit={(ev) => { ev.preventDefault(); onAction(() => enregistrerCompte({ id: f.id || null, champs: f })); }}>
         <h2 className={TITRE_BLOC}>{f.id ? "Modifier le compte" : "Nouveau compte"}</h2>
-        <p className={AIDE}>Liste des comptes à surveiller. Aucun scan ne part d&apos;ici : la collecte se lance dans son écran.</p>
+        <p className={AIDE}>Liste des comptes surveillés par Jarvis : les événements repérés sur ces comptes sont déposés directement dans les brouillons, écran Événements.</p>
         <Etiquette id="cpt-plateforme" label="Plateforme">
           <select id="cpt-plateforme" className={CHAMP} value={f.plateforme} onChange={(e) => setF({ ...f, plateforme: e.target.value })}>
             {PLATEFORMES.map((p) => <option key={p} value={p}>{p}</option>)}
