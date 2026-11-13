@@ -6,7 +6,7 @@ test("aucun chiffre sous le seuil", () => {
   assert.equal(libelleInteret(0), null);
   assert.equal(libelleInteret(9), null);
   assert.equal(libelleInteret(null), null);
-  assert.equal(libelleInteret(23), "23 personnes y vont");
+  assert.equal(libelleInteret(23), "23 people going");
 });
 
 test("« très consulté » seulement à partir du seuil", () => {

@@ -17,7 +17,7 @@ export function Urgence({ evenement, className = "" }: { evenement: { date_debut
   const u = urgenceDe(evenement, maintenant);
   if (!u) {
     if (!estNouveau(evenement, maintenant)) return null;
-    return <span className={`rounded-full bg-[var(--or)] px-2.5 py-1 text-xs font-extrabold text-[var(--encre)] ${className}`}>Nouveau</span>;
+    return <span className={`rounded-full bg-[var(--or)] px-2.5 py-1 text-xs font-extrabold text-[var(--encre)] ${className}`}>New</span>;
   }
   return (
     <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${u.urgent ? "bg-[var(--accent)] text-white" : "bg-[rgba(15,12,11,0.82)] text-[var(--nuit-texte)]"} ${className}`}>

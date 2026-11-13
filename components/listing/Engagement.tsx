@@ -88,7 +88,7 @@ export function Engagement({ evenementId, interetsInitiaux, termine }: { eveneme
         onClick={basculer}
         className={`inline-flex min-h-12 items-center rounded-[14px] px-5 text-[15px] font-extrabold ${actif ? "bg-[var(--creme)] text-[var(--encre)]" : "border-2 border-[var(--accent)] text-[var(--nuit-texte)]"}`}
       >
-        {actif ? "J'y vais ✓" : "J'y vais"}
+        {actif ? "I'm going ✓" : "I'm going"}
       </button>
       {label && <span className="text-sm font-semibold text-[var(--or)]">{label}</span>}
     </div>

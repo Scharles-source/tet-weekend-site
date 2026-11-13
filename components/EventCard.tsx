@@ -114,7 +114,7 @@ export default function EventCard({
                   gap: 4,
                 }}
               >
-                <RefreshCw size={10} /> {event.recurringLabel ?? "Récurrent"}
+                <RefreshCw size={10} /> {event.recurringLabel ?? "Recurring"}
               </span>
             )}
           </div>
@@ -208,7 +208,7 @@ export default function EventCard({
           {/* Fallback quand pas de statMode */}
           {!statMode && (event.interestedCount ?? 0) > 0 && (
             <span style={{ fontSize: 11, color: "var(--text-sec)" }}>
-              {event.interestedCount} intéressés
+              {event.interestedCount} interested
             </span>
           )}
         </div>

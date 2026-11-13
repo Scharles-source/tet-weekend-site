@@ -24,12 +24,12 @@ export default function Footer() {
           />
         </div>
         <div style={{ fontSize: 12, color: "var(--text-sec)" }}>
-          La référence des événements haïtiens &amp; diaspora.
+          The reference for Haitian events &amp; the diaspora.
         </div>
       </div>
 
       <div style={{ fontSize: 12, color: "var(--text-sec)" }}>
-        © {new Date().getFullYear()} Tèt Weekend. Tous droits réservés.
+        © {new Date().getFullYear()} Tèt Weekend. All rights reserved.
       </div>
     </footer>
   );

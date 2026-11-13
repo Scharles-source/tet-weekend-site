@@ -6,8 +6,8 @@ import { chargerAnnuaire } from "@/lib/listing/data";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Lieux — Tèt Weekend",
-  description: "Bars, clubs, salles et restaurants où ont lieu les événements haïtiens.",
+  title: "Venues — Tèt Weekend",
+  description: "Bars, clubs, halls and restaurants hosting Haitian events.",
 };
 
 export default async function PageLieux() {
@@ -24,7 +24,7 @@ export default async function PageLieux() {
       <Gabarit>
         <h1 className="mb-4 font-[family-name:var(--font-display)] text-3xl font-extrabold">Lieux</h1>
         {lieux.length === 0 ? (
-          <p className="text-sm text-[var(--text-sec)]">Aucun lieu publié pour le moment.</p>
+          <p className="text-sm text-[var(--text-sec)]">No venues published yet.</p>
         ) : (
           <ul className="space-y-3">
             {lieux.map((lieu) => (

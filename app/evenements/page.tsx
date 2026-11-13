@@ -9,9 +9,9 @@ import { villesDe } from "@/lib/listing/villes";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Événements haïtiens — ce week-end et à venir — Tèt Weekend",
+  title: "Haitian Events — This Weekend & Coming Up — Tèt Weekend",
   description:
-    "Les événements haïtiens à venir, en Haïti et dans la diaspora : bals, concerts kompa, soirées et festivals. Haitian events this weekend and tonight — parties, concerts and kompa nights.",
+    "Upcoming Haitian events in Haiti and across the diaspora: bals, concerts, kompa parties and festivals — this weekend, tonight and coming up.",
 };
 
 export default async function PageEvenements() {
@@ -28,15 +28,15 @@ export default async function PageEvenements() {
   const termines = evenements.filter((e) => estTermine(e)).reverse();
     return (
       <Gabarit>
-        <h1 className="mb-4 font-[family-name:var(--font-display)] text-3xl font-black">Agenda</h1>
+        <h1 className="mb-4 font-[family-name:var(--font-display)] text-3xl font-black">Events</h1>
         {aVenir.length === 0 ? (
-          <p className="text-[15px] text-[var(--nuit-texte2)]">Aucun événement à venir pour le moment.</p>
+          <p className="text-[15px] text-[var(--nuit-texte2)]">No upcoming events for the moment.</p>
         ) : (
           <Agenda evenements={aVenir} maintenantIso={new Date().toISOString()} villes={villesDe({ lieux: charge.annuaire.lieux, evenements: aVenir }).map((v) => v.nom)} />
         )}
         {termines.length > 0 && (
           <section className="mt-10">
-            <h2 className="mb-4 text-lg font-bold">Déjà passés</h2>
+            <h2 className="mb-4 text-lg font-bold">Past events</h2>
             <ListeEvenements evenements={termines} vide="" />
           </section>
         )}

@@ -7,12 +7,12 @@ import EventCard from "@/components/EventCard";
 import { apiGetEvents as getEvents } from "@/lib/api";
 import { Event } from "@/lib/types";
 
-const CATEGORIES = ["Tout", "Konpa", "Rasin", "Rara", "Festival", "Rap Kreyòl", "Gospel", "Dance"];
+const CATEGORIES = ["All", "Konpa", "Rasin", "Rara", "Festival", "Rap Kreyòl", "Gospel", "Dance"];
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState("Tout");
+  const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function EventsPage() {
 
   const filtered = events.filter((e) => {
     const matchCat =
-      activeCategory === "Tout" ||
+      activeCategory === "All" ||
       (e.category ?? "").toLowerCase().includes(activeCategory.toLowerCase());
     const matchSearch =
       search === "" ||
@@ -42,13 +42,13 @@ export default function EventsPage() {
           {/* Header */}
           <div style={{ marginBottom: 40 }}>
             <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--blue)", fontWeight: 500, marginBottom: 12 }}>
-              Découverte
+              Discover
             </p>
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(36px, 5vw, 60px)", fontWeight: 800, letterSpacing: "-2px", marginBottom: 8 }}>
-              Tous les événements
+              All events
             </h1>
             <p style={{ color: "var(--text-sec)", fontSize: 16 }}>
-              {loading ? "Chargement..." : `${events.length} événements disponibles`}
+              {loading ? "Loading..." : `${events.length} events available`}
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export default function EventsPage() {
             <span style={{ color: "var(--text-sec)" }}><Search size={16} /></span>
             <input
               type="text"
-              placeholder="Chercher un événement, une ville..."
+              placeholder="Search an event, a city..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -105,7 +105,7 @@ export default function EventsPage() {
           ) : filtered.length === 0 ? (
             <div style={{ textAlign: "center", padding: "80px 0" }}>
               <div style={{ marginBottom: 16, color: "var(--text-sec)", opacity: 0.4 }}><Music size={48} /></div>
-              <p style={{ color: "var(--text-sec)", fontSize: 16 }}>Aucun événement trouvé.</p>
+              <p style={{ color: "var(--text-sec)", fontSize: 16 }}>No events found.</p>
             </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>

@@ -48,10 +48,10 @@ export default function Navbar() {
         {/* Desktop links */}
         {!isMobile && (
           <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
-            <NavLink href="/" active={pathname === "/"}>Accueil</NavLink>
-            <NavLink href="/evenements" active={pathname.startsWith("/evenements")}>Événements</NavLink>
-            <NavLink href="/lieux" active={pathname.startsWith("/lieux")}>Lieux</NavLink>
-            <NavLink href="/artistes" active={pathname.startsWith("/artistes")}>Artistes</NavLink>
+            <NavLink href="/" active={pathname === "/"}>Home</NavLink>
+            <NavLink href="/evenements" active={pathname.startsWith("/evenements")}>Events</NavLink>
+            <NavLink href="/lieux" active={pathname.startsWith("/lieux")}>Venues</NavLink>
+            <NavLink href="/artistes" active={pathname.startsWith("/artistes")}>Artists</NavLink>
             <Link href="/evenements" style={{
               background: "var(--blue)", color: "var(--black)",
               padding: "8px 20px", borderRadius: 100,
@@ -91,10 +91,10 @@ export default function Navbar() {
           borderBottom: "1px solid rgba(107,138,255,0.15)",
           paddingBottom: 16,
         }}>
-          <MobileLink href="/" active={pathname === "/"} onClick={() => setCheminOuvert(null)}>Accueil</MobileLink>
-          <MobileLink href="/evenements" active={pathname.startsWith("/evenements")} onClick={() => setCheminOuvert(null)}>Événements</MobileLink>
-          <MobileLink href="/lieux" active={pathname.startsWith("/lieux")} onClick={() => setCheminOuvert(null)}>Lieux</MobileLink>
-          <MobileLink href="/artistes" active={pathname.startsWith("/artistes")} onClick={() => setCheminOuvert(null)}>Artistes</MobileLink>
+          <MobileLink href="/" active={pathname === "/"} onClick={() => setCheminOuvert(null)}>Home</MobileLink>
+          <MobileLink href="/evenements" active={pathname.startsWith("/evenements")} onClick={() => setCheminOuvert(null)}>Events</MobileLink>
+          <MobileLink href="/lieux" active={pathname.startsWith("/lieux")} onClick={() => setCheminOuvert(null)}>Venues</MobileLink>
+          <MobileLink href="/artistes" active={pathname.startsWith("/artistes")} onClick={() => setCheminOuvert(null)}>Artists</MobileLink>
           <Link
             href="/evenements"
             onClick={() => setCheminOuvert(null)}

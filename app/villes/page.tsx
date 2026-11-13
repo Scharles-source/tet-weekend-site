@@ -10,8 +10,8 @@ import { nomVilleCanonique, slugVille } from "@/lib/listing/villes";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Villes — Tèt Weekend",
-  description: "Événements haïtiens par ville, en Haïti et dans la diaspora.",
+  title: "Cities — Tèt Weekend",
+  description: "Haitian events by city, in Haiti and across the diaspora.",
 };
 
 const VILLES_HAITI = ["port-au-prince", "petion-ville", "delmas", "carrefour", "tabarre", "cap-haitien", "jacmel", "les cayes", "gonaives", "jeremie", "saint-marc", "hinche", "port-de-paix", "fort-liberte", "leogane", "kenscoff", "croix-des-bouquets"];
@@ -62,15 +62,15 @@ export default async function PageVilles() {
 
   return (
     <Gabarit>
-      <h1 className="mb-1 font-[family-name:var(--font-display)] text-3xl font-black">Villes</h1>
-      <p className="mb-6 text-[15px] text-[var(--nuit-texte2)]">Où est-ce que ça bouge ? Choisis ta ville.</p>
+      <h1 className="mb-1 font-[family-name:var(--font-display)] text-3xl font-black">Cities</h1>
+      <p className="mb-6 text-[15px] text-[var(--nuit-texte2)]">Where&apos;s the party? Pick your city.</p>
       {toutes.length === 0 ? (
-        <p className="text-sm text-[var(--nuit-texte2)]">Aucune ville publiée pour le moment.</p>
+        <p className="text-sm text-[var(--nuit-texte2)]">No cities published yet.</p>
       ) : (
         <div className="space-y-8">
           {une && (
             <section aria-labelledby="v-haiti">
-              <h2 id="v-haiti" className="mb-3 text-xs font-bold tracking-[0.14em] text-[var(--nuit-muet)] uppercase">En Haïti</h2>
+              <h2 id="v-haiti" className="mb-3 text-xs font-bold tracking-[0.14em] text-[var(--nuit-muet)] uppercase">In Haiti</h2>
               <Link href={`/villes/${une.slug}`} className="block rounded-[24px] bg-[linear-gradient(160deg,#C21810,#5B1209)] p-5 text-white no-underline">
                 <span className="block font-[family-name:var(--font-display)] text-2xl font-black">{une.nom}</span>
                 <span className="mt-1 block text-sm text-white/85">{compte(une)}</span>
@@ -111,7 +111,7 @@ export default async function PageVilles() {
 }
 
 function compte(v: Ville): string {
-  if (v.total === 0) return "Rien d'annoncé";
-  const base = `${v.total} événement${v.total > 1 ? "s" : ""}`;
-  return v.weekend > 0 ? `${base} · ${v.weekend} ce week-end` : base;
+  if (v.total === 0) return "Nothing announced";
+  const base = `${v.total} event${v.total > 1 ? "s" : ""}`;
+  return v.weekend > 0 ? `${base} · ${v.weekend} this weekend` : base;
 }

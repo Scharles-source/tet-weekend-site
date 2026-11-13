@@ -29,10 +29,10 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
   if (!courant) return <BanniereVide email={email} />;
 
   const e = courant.evenement;
-  const lieu = [e.lieu?.nom, e.ville].filter(Boolean).join(" · ") || "Lieu non indiqué";
+  const lieu = [e.lieu?.nom, e.ville].filter(Boolean).join(" · ") || "Venue not listed";
   const badge = (
     <span className="rounded-full bg-[#14100B] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
-      {courant.sponsorise ? "SPONSORISÉ" : "TENDANCE"}
+      {courant.sponsorise ? "SPONSORED" : "TRENDING"}
     </span>
   );
 
@@ -51,7 +51,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
           <button
             key={panneau.evenement.id}
             type="button"
-            aria-label={`Panneau ${i + 1}`}
+            aria-label={`Panel ${i + 1}`}
             className={pointClasses(i === index)}
             onClick={() => setIndex(i)}
           />
@@ -60,7 +60,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
     ) : null;
 
   return (
-    <section aria-roledescription="carrousel" aria-label="À la une" className="relative">
+    <section aria-roledescription="carousel" aria-label="Featured" className="relative">
       <article
         className="relative overflow-hidden rounded-[26px] shadow-[0_24px_48px_rgba(28,23,16,.20),0_8px_18px_rgba(28,23,16,.10)]"
         onTouchStart={(ev) => setDepart(ev.changedTouches[0]?.clientX ?? null)}
@@ -92,7 +92,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
             <div className="mb-3 flex items-center gap-3">
               <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-[2.5px] text-white">
                 <span className="h-[9px] w-[9px] rounded-full bg-[#A63446]" />
-                À LA UNE
+                FEATURED
               </p>
               {badge}
             </div>
@@ -109,12 +109,12 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
             <div className="mt-auto flex items-center gap-5 pt-5 pr-[172px] lg:pt-0 lg:pr-0">
               {e.prix ? (
                 <div className="h-[64px] overflow-hidden lg:h-auto">
-                  <p className="text-[11px] font-bold tracking-[1.5px] text-[#CFC6B0]">ENTRÉE</p>
+                  <p className="text-[11px] font-bold tracking-[1.5px] text-[#CFC6B0]">ADMISSION</p>
                   <p className="line-clamp-2 font-[family-name:var(--font-display)] text-[20px] font-black text-white lg:text-[26px]">{e.prix}</p>
                 </div>
               ) : null}
               <Link href={`/evenements/${e.slug}`} className="absolute right-5 bottom-5 inline-flex min-h-11 items-center rounded-[14px] bg-[#A63446] px-[30px] text-[15px] font-bold text-white shadow-[0_10px_24px_rgba(166,52,70,.45)] no-underline lg:static lg:ml-auto lg:min-h-[52px] lg:text-base">
-                Voir l&apos;événement
+                View event
               </Link>
             </div>
           </div>
@@ -137,10 +137,10 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
 export function BanniereVide({ email }: { email: string }) {
   return (
     <section className="rounded-[20px] border-2 border-dashed border-[#D8C6A4] bg-[#FFFDF8] px-5 py-8 text-center">
-      <h2 className="font-[family-name:var(--font-display)] text-[23px] font-black text-[#191410]">Votre événement ici</h2>
-      <p className="mx-auto mt-2 max-w-sm text-sm text-[#4A4136]">La bannière d&apos;accueil, vue par tous les visiteurs. Emplacement sponsorisé</p>
-      <a href={`mailto:${email}?subject=Devenir%20sponsor`} className="mt-4 inline-flex min-h-11 items-center rounded-full bg-[#191410] px-4 text-sm font-semibold text-white no-underline">
-        Devenir sponsor
+      <h2 className="font-[family-name:var(--font-display)] text-[23px] font-black text-[#191410]">Your event here</h2>
+      <p className="mx-auto mt-2 max-w-sm text-sm text-[#4A4136]">The homepage banner, seen by every visitor. Sponsored placement</p>
+      <a href={`mailto:${email}?subject=Become%20a%20sponsor`} className="mt-4 inline-flex min-h-11 items-center rounded-full bg-[#191410] px-4 text-sm font-semibold text-white no-underline">
+        Become a sponsor
       </a>
     </section>
   );

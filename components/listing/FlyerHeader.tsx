@@ -59,12 +59,12 @@ export function FlyerHeader({
             ref={boutonRef}
             type="button"
             className="absolute inset-0 z-10 cursor-pointer"
-            aria-label={`Voir le flyer entier de ${title}`}
+            aria-label={`View the full flyer for ${title}`}
             onClick={onOpen}
           >
             <span className="absolute right-3 bottom-3 flex items-center gap-1 rounded-full bg-[rgba(0,0,0,0.68)] px-[9px] py-[6px] text-xs text-white">
               <Expand size={16} aria-hidden />
-              Voir le flyer
+              View flyer
             </span>
           </button>
         </>

@@ -6,8 +6,8 @@ import { chargerAnnuaire } from "@/lib/listing/data";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Artistes — Tèt Weekend",
-  description: "DJ, groupes et chanteurs haïtiens, et leurs prochaines dates.",
+  title: "Artists — Tèt Weekend",
+  description: "Haitian DJs, bands and singers, and their upcoming dates.",
 };
 
 export default async function PageArtistes() {
@@ -24,7 +24,7 @@ export default async function PageArtistes() {
       <Gabarit>
         <h1 className="mb-4 font-[family-name:var(--font-display)] text-3xl font-extrabold">Artistes</h1>
         {artistes.length === 0 ? (
-          <p className="text-sm text-[var(--text-sec)]">Aucun artiste publié pour le moment.</p>
+          <p className="text-sm text-[var(--text-sec)]">No artists published yet.</p>
         ) : (
           <ul className="space-y-3">
             {artistes.map((artiste) => (

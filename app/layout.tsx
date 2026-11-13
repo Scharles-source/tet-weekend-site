@@ -11,32 +11,32 @@ export const metadata: Metadata = {
   verification: {
     google: "z0RYQLMp3mSHvtPSquY51QKux-vOoNwak_phgEBB5Uk",
   },
-  title: "Tèt Weekend — Kote fèt la?",
-  description: "Découvre les meilleurs événements haïtiens près de toi. Concerts, soirées, festivals — ne rate plus rien.",
+  title: "Tèt Weekend — Haitian Events",
+  description: "Find the best Haitian events near you. Concerts, parties, festivals — never miss a night.",
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: "Tèt Weekend",
-    description: "La référence des événements haïtiens & diaspora.",
+    description: "The reference for Haitian events, in Haiti and across the diaspora.",
     type: "website",
     url: "https://www.tetweekend.com",
     siteName: "Tèt Weekend",
-    locale: "fr_FR",
+    locale: "en_US",
     images: [{ url: "/logotetweekend.png", width: 2000, height: 2000, alt: "Tèt Weekend" }],
   },
   twitter: {
     card: "summary",
     title: "Tèt Weekend",
-    description: "La référence des événements haïtiens & diaspora.",
+    description: "The reference for Haitian events, in Haiti and across the diaspora.",
     images: ["/logotetweekend.png"],
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${archivo.variable} ${archivoBlack.variable} ${inter.variable}`}>
+    <html lang="en" className={`${archivo.variable} ${archivoBlack.variable} ${inter.variable}`}>
       <head>
         <style dangerouslySetInnerHTML={{ __html: `
           :root { --page-px: 32px; }

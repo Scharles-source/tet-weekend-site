@@ -13,7 +13,12 @@ const ON = "bg-[var(--accent)] font-bold text-white";
 const OFF = "border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] font-semibold text-[var(--nuit-texte2)]";
 
 const ymd = (iso: string, fuseau: string) => saisieDepuisInstant(iso, fuseau).slice(0, 10);
-const heure = (iso: string, fuseau: string) => saisieDepuisInstant(iso, fuseau).slice(11, 16).replace(":", "h");
+const heure = (iso: string, fuseau: string) => {
+  const [h, m] = saisieDepuisInstant(iso, fuseau).slice(11, 16).split(":").map(Number);
+  const suffixe = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return m === 0 ? `${h12} ${suffixe}` : `${h12}:${String(m).padStart(2, "0")} ${suffixe}`;
+};
 
 export function Agenda({ evenements, maintenantIso, villes }: { evenements: EvenementPublic[]; maintenantIso: string; villes: string[] }) {
   const [jour, setJour] = useState<string | null>(null);
@@ -46,7 +51,7 @@ export function Agenda({ evenements, maintenantIso, villes }: { evenements: Even
         const iso = d.toISOString();
         return {
           cle: ymd(iso, FUSEAU_DEFAUT),
-          sem: new Intl.DateTimeFormat("fr-FR", { weekday: "short", timeZone: FUSEAU_DEFAUT }).format(d).replace(".", ""),
+          sem: new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: FUSEAU_DEFAUT }).format(d).replace(".", ""),
           num: new Intl.DateTimeFormat("fr-FR", { day: "numeric", timeZone: FUSEAU_DEFAUT }).format(d),
         };
       }),
@@ -58,15 +63,15 @@ export function Agenda({ evenements, maintenantIso, villes }: { evenements: Even
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([k, items]) => ({
       cle: k,
-      titre: new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${k}T12:00:00Z`)),
+      titre: new Intl.DateTimeFormat("en-US", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${k}T12:00:00Z`)),
       items: [...items].sort((a, b) => a.date_debut.localeCompare(b.date_debut)),
     }));
 
   return (
     <div>
-      <div className="no-scrollbar -mx-[var(--page-px)] flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Choisir un jour">
+      <div className="no-scrollbar -mx-[var(--page-px)] flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Pick a day">
         <button type="button" aria-pressed={jour === null} onClick={() => setJour(null)} className={`flex min-h-20 w-14 shrink-0 flex-col items-center justify-center gap-1 rounded-2xl text-xs font-bold ${jour === null ? "bg-[var(--creme)] text-[var(--encre)]" : "border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] text-[var(--nuit-texte2)]"}`}>
-          <span className="uppercase tracking-wider">Tout</span>
+          <span className="uppercase tracking-wider">All</span>
         </button>
         {bande.map((j) => {
           const actif = jour === j.cle;
@@ -76,31 +81,31 @@ export function Agenda({ evenements, maintenantIso, villes }: { evenements: Even
               <span className="text-xs font-bold uppercase tracking-wider">{j.sem}</span>
               <span className="font-[family-name:var(--font-display)] text-[22px] leading-none font-black">{j.num}</span>
               <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${a ? "bg-[var(--accent)]" : "bg-transparent"}`} />
-              <span className="sr-only">{a ? "des événements" : "aucun événement"}</span>
+              <span className="sr-only">{a ? "has events" : "no events"}</span>
             </button>
           );
         })}
       </div>
 
-      <div className="no-scrollbar -mx-[var(--page-px)] mt-3.5 flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Filtres">
-        <select aria-label="Ville" value={ville ?? ""} onChange={(e) => setVille(e.target.value || null)} className={`${PUCE} ${ville ? ON : OFF}`}>
-          <option value="">Toutes les villes</option>
+      <div className="no-scrollbar -mx-[var(--page-px)] mt-3.5 flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Filters">
+        <select aria-label="City" value={ville ?? ""} onChange={(e) => setVille(e.target.value || null)} className={`${PUCE} ${ville ? ON : OFF}`}>
+          <option value="">All cities</option>
           {villes.map((v) => (
             <option key={v} value={v}>{v}</option>
           ))}
         </select>
-        <select aria-label="Catégorie" value={categorie ?? ""} onChange={(e) => setCategorie(e.target.value || null)} className={`${PUCE} ${categorie ? ON : OFF}`}>
-          <option value="">Toutes catégories</option>
+        <select aria-label="Category" value={categorie ?? ""} onChange={(e) => setCategorie(e.target.value || null)} className={`${PUCE} ${categorie ? ON : OFF}`}>
+          <option value="">All categories</option>
           {CATEGORIES.map((k) => (
             <option key={k.slug} value={k.slug}>{k.nom}</option>
           ))}
         </select>
-        <button type="button" aria-pressed={gratuit} onClick={() => setGratuit((v) => !v)} className={`${PUCE} ${gratuit ? ON : OFF}`}>Gratuit</button>
+        <button type="button" aria-pressed={gratuit} onClick={() => setGratuit((v) => !v)} className={`${PUCE} ${gratuit ? ON : OFF}`}>Free</button>
       </div>
 
       {groupes.length === 0 ? (
         <p role="status" className="mt-6 rounded-[20px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-5 text-[15px] text-[var(--nuit-texte2)]">
-          Aucun événement pour ces critères. Essaie un autre jour ou enlève un filtre.
+          No events match these filters. Try another day or remove a filter.
         </p>
       ) : (
         <div className="mt-6 space-y-6">
@@ -108,12 +113,12 @@ export function Agenda({ evenements, maintenantIso, villes }: { evenements: Even
             <section key={g.cle}>
               <div className="mb-2.5 flex items-baseline justify-between">
                 <h2 className="font-[family-name:var(--font-display)] text-xl font-black capitalize text-[var(--nuit-texte)]">{g.titre}</h2>
-                <span className="text-[13px] text-[var(--nuit-muet)]">{g.items.length} événement{g.items.length > 1 ? "s" : ""}</span>
+                <span className="text-[13px] text-[var(--nuit-muet)]">{g.items.length} event{g.items.length > 1 ? "s" : ""}</span>
               </div>
               <ul className="space-y-2.5">
                 {g.items.map((e) => (
                   <li key={e.id} className="flex items-stretch gap-3">
-                    <span className="w-12 shrink-0 pt-3 text-right font-[family-name:var(--font-display)] text-[17px] leading-none font-black text-[var(--nuit-texte)]">{heure(e.date_debut, e.fuseau)}</span>
+                    <span className="w-16 shrink-0 pt-3 text-right font-[family-name:var(--font-display)] text-[17px] leading-none font-black text-[var(--nuit-texte)]">{heure(e.date_debut, e.fuseau)}</span>
                     <Link href={`/evenements/${e.slug}`} className="flex min-w-0 flex-1 gap-3 rounded-[18px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-2.5 text-inherit no-underline">
                       {e.flyer ? (
                         // eslint-disable-next-line @next/next/no-img-element

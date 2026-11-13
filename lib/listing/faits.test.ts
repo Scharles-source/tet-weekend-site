@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { artistesDepuisDescription, lieuDepuisDescription } from "./faits.ts";
+import { artistesDepuisDescription, langueEvenement, lieuDepuisDescription } from "./faits.ts";
 import { jsonLdEvenement } from "./jsonld.ts";
 import type { EvenementPublic } from "./types.ts";
 
@@ -81,4 +81,17 @@ test("jsonLdEvenement : sans fait énoncé, repli sur la ville seule", () => {
     address: { "@type": "PostalAddress", addressLocality: "Pétion-Ville" },
   });
   assert.equal(ld.performer, undefined);
+});
+
+test("lieu et artistes se lisent aussi en anglais (Venue / Artists / Lineup)", () => {
+  assert.equal(lieuDepuisDescription("Party night.\nVenue: Punch Line Irving, Dallas"), "Punch Line Irving, Dallas");
+  assert.equal(lieuDepuisDescription("Location: TBA"), null);
+  assert.deepEqual(artistesDepuisDescription("Artists: Success Jr, DJ Stakz"), ["Success Jr", "DJ Stakz"]);
+  assert.deepEqual(artistesDepuisDescription("Lineup: Live Music"), []);
+});
+
+test("langueEvenement suit la langue réelle des textes de la fiche", () => {
+  assert.equal(langueEvenement("Bal de Nu-Look", "Soirée avec les meilleurs artistes. Entrée : 500 HTG."), "fr");
+  assert.equal(langueEvenement("Konpa on Tap", "The biggest Haitian party in Brooklyn, with live music and free entry. Doors open at 9 PM."), "en");
+  assert.equal(langueEvenement("Konpa on Tap", null), "fr");
 });

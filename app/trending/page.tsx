@@ -47,13 +47,13 @@ export default function TrendingPage() {
           {/* Header */}
           <div style={{ marginBottom: 40 }}>
             <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--blue)", fontWeight: 500, marginBottom: 12 }}>
-              Score viral
+              Viral score
             </p>
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(36px, 5vw, 60px)", fontWeight: 800, letterSpacing: "-2px", marginBottom: 8, display: "flex", alignItems: "center", gap: 16 }}>
               <TrendingUp size={40} color="var(--blue)" /> Trending
             </h1>
             <p style={{ color: "var(--text-sec)", fontSize: 16 }}>
-              Les événements qui buzzent le plus en ce moment.
+              The events buzzing the most right now.
             </p>
           </div>
 
@@ -75,7 +75,7 @@ export default function TrendingPage() {
               {/* Most viewed */}
               {mostViewed.length > 0 && (
                 <section style={{ marginBottom: 48 }}>
-                  <SectionHeader icon={<Eye size={18} />} title="Plus vus" subtitle="Les événements les plus consultés" />
+                  <SectionHeader icon={<Eye size={18} />} title="Most viewed" subtitle="The most viewed events" />
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
                     {mostViewed.map((e) => <EventCard key={e.id} event={e} statMode="views" />)}
                   </div>
@@ -85,7 +85,7 @@ export default function TrendingPage() {
               {/* Most liked */}
               {mostLiked.length > 0 && (
                 <section style={{ marginBottom: 48 }}>
-                  <SectionHeader icon={<Heart size={18} />} title="Plus aimés" subtitle="Les événements avec le plus de j'aime" />
+                  <SectionHeader icon={<Heart size={18} />} title="Most liked" subtitle="The events with the most likes" />
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
                     {mostLiked.map((e) => <EventCard key={e.id} event={e} statMode="likes" />)}
                   </div>
@@ -97,12 +97,12 @@ export default function TrendingPage() {
                 <SectionHeader
                   icon={<CalendarDays size={18} />}
                   title={`Ce weekend · ${getUpcomingWeekendLabel()}`}
-                  subtitle="Événements prévus ce samedi et dimanche"
+                  subtitle="Events this Saturday and Sunday"
                 />
                 {weekend.length === 0 ? (
                   <div style={{ textAlign: "center", padding: "40px 0", color: "var(--text-sec)", fontSize: 14 }}>
                     <Music size={32} style={{ opacity: 0.3, marginBottom: 12 }} />
-                    <p>Aucun événement ce weekend pour le moment.</p>
+                    <p>No events this weekend yet.</p>
                   </div>
                 ) : (
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
@@ -114,7 +114,7 @@ export default function TrendingPage() {
               {/* Overall trending */}
               {overall.length > 0 && (
                 <section>
-                  <SectionHeader icon={<TrendingUp size={18} />} title="Top global" subtitle="Score combiné: vues + j'aime + participation" />
+                  <SectionHeader icon={<TrendingUp size={18} />} title="Top overall" subtitle="Combined score: views + likes + going" />
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
                     {overall.map((e) => <EventCard key={e.id} event={e} statMode="all" />)}
                   </div>

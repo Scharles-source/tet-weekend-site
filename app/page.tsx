@@ -8,12 +8,11 @@ import { estTermine } from "@/lib/listing/dates";
 export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Tèt Weekend — Événements haïtiens";
-  // Une seule langue et une longueur que Google ne tronque pas (correctif
-  // SEO, 13 nov. 2026) : l'ancienne description bilingue dépassait
-  // 270 caractères et était réécrite par le moteur.
+  const title = "Tèt Weekend — Haitian Events";
+  // Site basculé en anglais le 13 nov. 2026 (décision de Smith) : meta en
+  // anglais, longueur que Google ne tronque pas.
   const description =
-    "Bals, concerts et soirées haïtiens en Haïti et dans la diaspora : où et quand, ce week-end et à venir. Tèt Weekend ne vend pas de billets.";
+    "Haitian events this weekend and coming up: bals, concerts and kompa parties in Haiti and across the diaspora. Tèt Weekend does not sell tickets.";
   // Image de partage : le flyer d'un événement à venir plutôt que le logo.
   let image: string | null = null;
   let imageAlt = "Tèt Weekend";
@@ -43,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       url: "https://www.tetweekend.com",
       siteName: "Tèt Weekend",
-      locale: "fr_FR",
+      locale: "en_US",
       type: "website",
       images,
     },

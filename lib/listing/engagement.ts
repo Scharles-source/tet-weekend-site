@@ -4,7 +4,7 @@ export const SEUIL_VUES = 50;
 
 export function libelleInteret(total: number | null | undefined): string | null {
   if (!total || total < SEUIL_INTERET) return null;
-  return `${total} personnes y vont`;
+  return `${total} people going`;
 }
 
 export function estTresConsulte(vues: number | null | undefined): boolean {

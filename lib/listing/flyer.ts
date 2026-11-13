@@ -23,7 +23,7 @@ export function flyerFrameStyle(flyer: Pick<EventFlyer, "publicUrl" | "cardUrl">
 }
 
 export function altFlyer(titre: string, lieu: string | null, quand: string): string {
-  return `Flyer — ${titre}, ${lieu?.trim() || "lieu non indiqué"}, ${quand}`;
+  return `Flyer — ${titre}, ${lieu?.trim() || "venue not listed"}, ${quand}`;
 }
 
 export function creditPublic(credit: string | null, compte: string | null, source: string | null): string | null {

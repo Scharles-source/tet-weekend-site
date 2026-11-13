@@ -22,9 +22,9 @@ export default function BetaModal({ onClose }: { onClose: () => void }) {
       });
       const data = await res.json();
       if (data.success) setDone(true);
-      else setError(data.error ?? "Une erreur s'est produite.");
+      else setError(data.error ?? "Something went wrong.");
     } catch {
-      setError("Erreur de connexion. Réessaie.");
+      setError("Connection error. Try again.");
     }
     setLoading(false);
   };
@@ -54,17 +54,17 @@ export default function BetaModal({ onClose }: { onClose: () => void }) {
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 800, marginBottom: 12 }}>
-              Tu es sur la liste !
+              You&apos;re on the list!
             </h3>
             <p style={{ color: "var(--text-sec)", fontSize: 14, lineHeight: 1.7 }}>
-              On t&apos;envoie l&apos;accès beta dès que l&apos;app est prête. Reste à l&apos;écoute 🔥
+              We&apos;ll send you beta access as soon as the app is ready. Stay tuned 🔥
             </p>
             <button onClick={onClose} style={{
               marginTop: 24, background: "var(--blue)", color: "var(--black)",
               padding: "12px 32px", borderRadius: 100, fontWeight: 600,
               fontSize: 14, border: "none", cursor: "pointer",
             }}>
-              Fermer
+              Close
             </button>
           </div>
         ) : (
@@ -78,16 +78,16 @@ export default function BetaModal({ onClose }: { onClose: () => void }) {
               <Smartphone size={24} />
             </div>
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 800, marginBottom: 8 }}>
-              Deviens testeur beta 🚀
+              Become a beta tester 🚀
             </h3>
             <p style={{ color: "var(--text-sec)", fontSize: 13, lineHeight: 1.7, marginBottom: 24 }}>
-              Accès exclusif à l&apos;app avant tout le monde + billets VIP offerts aux premiers testeurs.
+              Exclusive early access to the app + free VIP tickets for the first testers.
             </p>
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <input
                 type="text"
-                placeholder="Ton prénom / nom"
+                placeholder="Your first / last name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -99,7 +99,7 @@ export default function BetaModal({ onClose }: { onClose: () => void }) {
               />
               <input
                 type="email"
-                placeholder="Ton adresse email"
+                placeholder="Your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -111,7 +111,7 @@ export default function BetaModal({ onClose }: { onClose: () => void }) {
               />
               <input
                 type="tel"
-                placeholder="Numéro de téléphone (optionnel)"
+                placeholder="Phone number (optional)"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 style={{
@@ -131,7 +131,7 @@ export default function BetaModal({ onClose }: { onClose: () => void }) {
                   opacity: loading ? 0.7 : 1, marginTop: 4,
                 }}
               >
-                {loading ? "Envoi..." : "Je veux l'accès beta →"}
+                {loading ? "Sending..." : "I want beta access →"}
               </button>
             </form>
           </>

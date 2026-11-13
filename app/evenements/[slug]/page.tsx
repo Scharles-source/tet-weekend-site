@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   try {
     const { evenements } = await lireAnnuaire();
     const evenement = evenements.find((e) => e.slug === slug);
-    if (!evenement) return { title: "Événement — Tèt Weekend" };
+    if (!evenement) return { title: "Event — Tèt Weekend" };
     // Description rédigée (correctif SEO, 13 nov. 2026) : titre, date, lieu,
     // ville et artistes dans une vraie phrase — l'ancien texte brut de la
     // description (« Artistes : … Lieu : … ») était tronqué et réécrit par
@@ -37,8 +37,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const segments = [
       `${evenement.titre} — ${formaterQuand(evenement.date_debut, evenement.fuseau)}${ou ? `, ${ou}` : ""}.`,
     ];
-    if (artistes.length > 0) segments.push(`Avec ${artistes.slice(0, 3).join(", ")}.`);
-    segments.push("Flyer, lieu et infos sur Tèt Weekend.");
+    if (artistes.length > 0) segments.push(`With ${artistes.slice(0, 3).join(", ")}.`);
+    segments.push("Flyer, venue and details on Tèt Weekend.");
     const descriptionBrute = segments.join(" ");
     const description = descriptionBrute.length > 160 ? `${descriptionBrute.slice(0, 157).trimEnd()}…` : descriptionBrute;
     const url = `${SITE}/evenements/${evenement.slug}`;
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           },
     };
   } catch {
-    return { title: "Événement — Tèt Weekend" };
+    return { title: "Event — Tèt Weekend" };
   }
 }
 
@@ -115,7 +115,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
       <article>
         {termine && (
           <p className="mb-3 rounded-xl bg-[rgba(255,77,63,0.16)] px-3 py-2 text-sm font-semibold text-[var(--accent-texte)]">
-            Événement terminé
+            Event ended
           </p>
         )}
         <ZoneFlyer evenement={evenement} />
@@ -132,7 +132,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           <div className="rounded-2xl border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-3.5">
             <p className="text-[15px] font-bold text-[var(--nuit-texte)]">{formaterQuand(evenement.date_debut, evenement.fuseau)}</p>
             <p className="text-[13px] text-[var(--nuit-muet)]">
-              {evenement.date_fin ? `Fin : ${formaterQuand(evenement.date_fin, evenement.fuseau)} · ` : ""}Heure d&apos;Haïti
+              {evenement.date_fin ? `Ends: ${formaterQuand(evenement.date_fin, evenement.fuseau)} · ` : ""}Local time
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-3.5">
@@ -142,7 +142,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
                   {evenement.lieu.nom}
                 </Link>
               ) : (
-                "Lieu non indiqué"
+                "Venue not listed"
               )}
               {evenement.ville && (
                 <>
@@ -157,15 +157,15 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           </div>
           {evenement.prix && (
             <div className="rounded-2xl border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-3.5">
-              <p className="text-[15px] font-bold text-[var(--or)]">Entrée : {evenement.prix}</p>
-              <p className="text-[13px] text-[var(--nuit-muet)]">Tarif donné par l&apos;organisateur. Tèt Weekend ne vend pas de billets.</p>
+              <p className="text-[15px] font-bold text-[var(--or)]">Admission: {evenement.prix}</p>
+              <p className="text-[13px] text-[var(--nuit-muet)]">Price given by the organizer. Tèt Weekend does not sell tickets.</p>
             </div>
           )}
         </div>
 
         {evenement.artistes.length > 0 && (
           <div className="mt-6">
-            <h2 className="mb-2.5 font-[family-name:var(--font-display)] text-xl font-black text-[var(--nuit-texte)]">À l&apos;affiche</h2>
+            <h2 className="mb-2.5 font-[family-name:var(--font-display)] text-xl font-black text-[var(--nuit-texte)]">Lineup</h2>
             <ul className="flex flex-wrap gap-2 text-sm">
               {evenement.artistes.map((a) => (
                 <li key={a.id}>
@@ -179,22 +179,22 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
         )}
         {evenement.description && (
           <div className="mt-6">
-            <h2 className="mb-2 font-[family-name:var(--font-display)] text-xl font-black text-[var(--nuit-texte)]">Infos</h2>
+            <h2 className="mb-2 font-[family-name:var(--font-display)] text-xl font-black text-[var(--nuit-texte)]">Details</h2>
             <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-[var(--nuit-texte2)]">{evenement.description}</p>
           </div>
         )}
         <Engagement evenementId={evenement.id} interetsInitiaux={evenement.interets ?? null} termine={termine} />
         <div className="mt-6 flex flex-wrap gap-2">
           <a href={lienGoogleAgenda(evenement, url)} className="inline-flex min-h-12 items-center rounded-[14px] bg-[var(--accent)] px-5 text-[15px] font-extrabold text-white no-underline">
-            Ajouter à Google Agenda
+            Add to Google Calendar
           </a>
           <a href={`/evenements/${evenement.slug}/calendrier`} className="inline-flex min-h-12 items-center rounded-[14px] border border-[#6B5B4D] px-5 text-[15px] font-bold text-[var(--nuit-texte)] no-underline">
-            Télécharger .ics
+            Download .ics
           </a>
         </div>
         {questionCarte && (evenement.lieu?.adresse || evenement.ville) && (
           <iframe
-            title={`Carte : ${evenement.titre}`}
+            title={`Map: ${evenement.titre}`}
             src={`https://maps.google.com/maps?q=${encodeURIComponent(questionCarte)}&z=15&output=embed`}
             className="mt-6 h-56 w-full rounded-[20px] border border-[var(--nuit-ligne)]"
             loading="lazy"
@@ -203,7 +203,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
       </article>
       {termine && suivantsArtistes.length > 0 && (
         <section className="mt-10 space-y-3">
-          <h2 className="text-lg font-bold">Prochains événements des mêmes artistes</h2>
+          <h2 className="text-lg font-bold">Upcoming events by the same artists</h2>
           {suivantsArtistes.map((e) => (
             <CarteEvenement key={e.id} evenement={e} />
           ))}
@@ -211,7 +211,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
       )}
       {termine && suivantsLieu.length > 0 && (
         <section className="mt-10 space-y-3">
-          <h2 className="text-lg font-bold">Prochains événements du même lieu</h2>
+          <h2 className="text-lg font-bold">Upcoming events at the same venue</h2>
           {suivantsLieu.map((e) => (
             <CarteEvenement key={e.id} evenement={e} />
           ))}

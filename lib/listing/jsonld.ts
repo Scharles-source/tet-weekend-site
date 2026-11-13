@@ -1,4 +1,4 @@
-import { artistesDepuisDescription, lieuDepuisDescription } from "./faits.ts";
+import { artistesDepuisDescription, langueEvenement, lieuDepuisDescription } from "./faits.ts";
 import { slugifier } from "./slug.ts";
 import { nomVilleCanonique } from "./villes.ts";
 import type { EvenementPublic } from "./types.ts";
@@ -37,7 +37,7 @@ export function jsonLdEvenement(e: EvenementPublic, url: string): Record<string,
     startDate: e.date_debut,
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     eventStatus: "https://schema.org/EventScheduled",
-    inLanguage: "fr",
+    inLanguage: langueEvenement(e.titre, e.description),
     url,
   };
   if (e.date_fin) data.endDate = e.date_fin;

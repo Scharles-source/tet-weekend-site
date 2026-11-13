@@ -8,8 +8,8 @@ import { villesDe } from "@/lib/listing/villes";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Rechercher une soirée — Tèt Weekend",
-  description: "Cherche un événement, un DJ, un lieu ou une ville, avec des filtres par moment, catégorie et prix.",
+  title: "Search Events — Tèt Weekend",
+  description: "Search for an event, a DJ, a venue or a city, with filters by moment, category and price.",
   robots: { index: false },
 };
 

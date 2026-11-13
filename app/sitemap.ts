@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { lireAnnuaire } from "@/lib/listing/data";
 import { estTermine } from "@/lib/listing/dates";
+import { MARCHES } from "@/lib/listing/marches";
 import { CATEGORIES } from "@/lib/listing/schema";
 import { slugVille, villesDe } from "@/lib/listing/villes";
 
@@ -24,6 +25,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE}/villes`, changeFrequency: "weekly", priority: 0.6 },
     { url: `${SITE}/categories`, changeFrequency: "weekly", priority: 0.5 },
     ...CATEGORIES.map((c) => ({ url: `${SITE}/categories/${c.slug}`, changeFrequency: "daily" as const, priority: 0.6 })),
+    // Pages marchés en anglais (13 nov. 2026) : New York, Floride,
+    // Massachusetts, Haïti — les requêtes de la diaspora.
+    ...MARCHES.map((m) => ({ url: `${SITE}/haitian-events/${m.slug}`, changeFrequency: "daily" as const, priority: 0.9 })),
   ];
   try {
     const annuaire = await lireAnnuaire();

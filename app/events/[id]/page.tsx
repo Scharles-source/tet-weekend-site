@@ -101,7 +101,7 @@ export default function EventDetailPage() {
         <main style={{ paddingTop: 72 }}>
           <div style={{ maxWidth: 800, margin: "0 auto", padding: "80px 32px", textAlign: "center" }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
-            <p style={{ color: "var(--text-sec)" }}>Chargement...</p>
+            <p style={{ color: "var(--text-sec)" }}>Loading...</p>
           </div>
         </main>
       </>
@@ -115,9 +115,9 @@ export default function EventDetailPage() {
         <main style={{ paddingTop: 72 }}>
           <div style={{ maxWidth: 800, margin: "0 auto", padding: "80px 32px", textAlign: "center" }}>
             <div style={{ marginBottom: 16, color: "var(--text-sec)", opacity: 0.4 }}><Music size={48} /></div>
-            <p style={{ color: "var(--text-sec)", marginBottom: 24 }}>Événement introuvable.</p>
+            <p style={{ color: "var(--text-sec)", marginBottom: 24 }}>Event not found.</p>
             <Link href="/events" style={{ color: "var(--blue)", textDecoration: "none", fontSize: 14 }}>
-              ← Retour aux événements
+              ← Back to events
             </Link>
           </div>
         </main>
@@ -142,7 +142,7 @@ export default function EventDetailPage() {
             color: "var(--text-sec)", textDecoration: "none", fontSize: 13,
             display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 32,
           }}>
-            ← Tous les événements
+            ← All events
           </Link>
 
           <div className="two-col-detail">
@@ -236,7 +236,7 @@ export default function EventDetailPage() {
                     fontSize: 11, padding: "3px 12px", borderRadius: 100,
                     border: "1px solid rgba(255,255,255,0.1)",
                   }}>
-                    ↻ {event.recurringLabel ?? "Récurrent"}
+                    ↻ {event.recurringLabel ?? "Recurring"}
                   </span>
                 )}
               </div>
@@ -267,10 +267,10 @@ export default function EventDetailPage() {
               }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
-                    🎟️ Obtiens ton billet sur l&apos;app
+                    🎟️ Get your ticket on the app
                   </div>
                   <div style={{ fontSize: 13, color: "var(--text-sec)" }}>
-                    Télécharge TètWeekend pour acheter, gérer et partager tes billets.
+                    Download TètWeekend to buy, manage and share your tickets.
                   </div>
                 </div>
                 <button
@@ -305,13 +305,13 @@ export default function EventDetailPage() {
                   <DetailRow icon={<CalendarDays size={18} />} label="Date" value={formatEventDate(event.date)} />
                 )}
                 {event.city && (
-                  <DetailRow icon={<MapPin size={18} />} label="Ville" value={event.city} />
+                  <DetailRow icon={<MapPin size={18} />} label="City" value={event.city} />
                 )}
                 {event.venue && (
-                  <DetailRow icon={<Building2 size={18} />} label="Lieu" value={event.venue} />
+                  <DetailRow icon={<Building2 size={18} />} label="Venue" value={event.venue} />
                 )}
                 {(event.interestedCount ?? 0) > 0 && (
-                  <DetailRow icon={<Users size={18} />} label="Intéressés" value={`${event.interestedCount} personnes`} />
+                  <DetailRow icon={<Users size={18} />} label="Interested" value={`${event.interestedCount} people`} />
                 )}
               </div>
 
@@ -319,7 +319,7 @@ export default function EventDetailPage() {
                 display: "block", textAlign: "center",
                 color: "var(--text-sec)", fontSize: 13, textDecoration: "none",
               }}>
-                ← Retour aux événements
+                ← Back to events
               </Link>
             </div>
           </div>

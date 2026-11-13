@@ -6,7 +6,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   const charge = await chargerAnnuaire();
   if (!charge.ok) return new Response("Service indisponible", { status: 503 });
   const evenement = charge.annuaire.evenements.find((e) => e.slug === slug);
-  if (!evenement) return new Response("Événement introuvable", { status: 404 });
+  if (!evenement) return new Response("Event not found", { status: 404 });
   const page = `https://www.tetweekend.com/evenements/${evenement.slug}`;
   return new Response(fichierIcs(evenement, page), {
     headers: {

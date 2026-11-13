@@ -14,16 +14,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const lieu = charge.ok ? charge.annuaire.lieux.find((l) => l.slug === slug) : undefined;
   if (!lieu) {
     return {
-      title: "Lieu — Tèt Weekend",
+      title: "Venue — Tèt Weekend",
       alternates: { canonical: `https://www.tetweekend.com/lieux/${slug}` },
     };
   }
-  const ou = lieu.ville ? ` à ${lieu.ville}` : "";
+  const ou = lieu.ville ? ` in ${lieu.ville}` : "";
   const description = lieu.description?.trim()
     ? lieu.description.trim().slice(0, 155)
-    : `${lieu.nom}${ou} : concerts, bals et soirées haïtiens à venir dans ce lieu, sur Tèt Weekend.`;
+    : `${lieu.nom}${ou}: upcoming Haitian concerts, bals and parties at this venue, on Tèt Weekend.`;
   return {
-    title: `${lieu.nom} — Événements haïtiens${ou} — Tèt Weekend`,
+    title: `${lieu.nom} — Haitian Events${ou} — Tèt Weekend`,
     description,
     alternates: { canonical: `https://www.tetweekend.com/lieux/${slug}` },
   };
@@ -74,26 +74,26 @@ export default async function PageLieu({ params }: { params: Promise<{ slug: str
           {lieu.ville && (
             <li>
               <Link className="underline" href={`/villes/${slugVille(lieu.ville)}`}>
-                Événements à {lieu.ville}
+                Events in {lieu.ville}
               </Link>
             </li>
           )}
         </ul>
         {(lieu.adresse || lieu.ville) && (
           <iframe
-            title={`Carte : ${lieu.nom}`}
+            title={`Map: ${lieu.nom}`}
             src={`https://maps.google.com/maps?q=${encodeURIComponent(question)}&z=15&output=embed`}
             className="mt-6 h-56 w-full rounded-[20px] border border-[#EFE5D2]"
             loading="lazy"
           />
         )}
         <section className="mt-8 space-y-3">
-          <h2 className="text-lg font-bold">À venir</h2>
-          {aVenir.length === 0 ? <p className="text-sm text-[var(--text-sec)]">Aucun événement à venir.</p> : aVenir.map((e) => <CarteEvenement key={e.id} evenement={e} />)}
+          <h2 className="text-lg font-bold">Coming up</h2>
+          {aVenir.length === 0 ? <p className="text-sm text-[var(--text-sec)]">No upcoming events.</p> : aVenir.map((e) => <CarteEvenement key={e.id} evenement={e} />)}
         </section>
         {passes.length > 0 && (
           <section className="mt-8 space-y-3">
-            <h2 className="text-lg font-bold">Déjà passés</h2>
+            <h2 className="text-lg font-bold">Past events</h2>
             {passes.map((e) => (
               <CarteEvenement key={e.id} evenement={e} />
             ))}

@@ -59,7 +59,7 @@ export function saisieDepuisInstant(iso: string, fuseau: string = FUSEAU_DEFAUT)
 }
 
 export function formaterQuand(iso: string, fuseau: string = FUSEAU_DEFAUT): string {
-  return new Intl.DateTimeFormat("fr-FR", {
+  return new Intl.DateTimeFormat("en-US", {
     timeZone: fuseau,
     weekday: "long",
     day: "numeric",
@@ -108,32 +108,35 @@ export function dansLeWeekend(
 }
 
 const JOUR_COURT: Record<string, string> = {
-  Sun: "dim.",
-  Mon: "lun.",
-  Tue: "mar.",
-  Wed: "mer.",
-  Thu: "jeu.",
-  Fri: "ven.",
-  Sat: "sam.",
+  Sun: "Sun",
+  Mon: "Mon",
+  Tue: "Tue",
+  Wed: "Wed",
+  Thu: "Thu",
+  Fri: "Fri",
+  Sat: "Sat",
 };
-const MOIS_COURT = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+const MOIS_COURT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-/** Badge de carte : « ven. 23 oct. · 23h00 ». */
-export function formaterBadge(iso: string, fuseau: string = FUSEAU_DEFAUT): string {
-  const p = parties(new Date(iso), fuseau);
-  const heure = String(p.hour).padStart(2, "0");
-  const minute = String(p.minute).padStart(2, "0");
-  return `${JOUR_COURT[p.weekday] ?? ""} ${p.day} ${MOIS_COURT[p.month - 1]} · ${heure}h${minute}`;
+/** Heure au format américain : « 11:00 PM », « 9 PM » si l'heure est ronde. */
+function heureAmPm(hour: number, minute: number): string {
+  const suffixe = hour >= 12 ? "PM" : "AM";
+  const h12 = hour % 12 === 0 ? 12 : hour % 12;
+  return minute === 0 ? `${h12} ${suffixe}` : `${h12}:${String(minute).padStart(2, "0")} ${suffixe}`;
 }
 
-/** Kicker de bannière : « SAM. 14 NOV. 2026 · 22H00 ». */
+/** Badge de carte : « Fri Oct 23 · 11:00 PM ». */
+export function formaterBadge(iso: string, fuseau: string = FUSEAU_DEFAUT): string {
+  const p = parties(new Date(iso), fuseau);
+  return `${JOUR_COURT[p.weekday] ?? ""} ${MOIS_COURT[p.month - 1]} ${p.day} · ${heureAmPm(p.hour, p.minute)}`;
+}
+
+/** Kicker de bannière : « SAT NOV 14 2026 · 10:00 PM ». */
 export function formaterKicker(iso: string, fuseau: string = FUSEAU_DEFAUT): string {
   const p = parties(new Date(iso), fuseau);
-  const jour = (JOUR_COURT[p.weekday] ?? "").replace(".", "").toUpperCase();
+  const jour = (JOUR_COURT[p.weekday] ?? "").toUpperCase();
   const mois = (MOIS_COURT[p.month - 1] ?? "").toUpperCase();
-  const heure = String(p.hour).padStart(2, "0");
-  const minute = String(p.minute).padStart(2, "0");
-  return `${jour}. ${p.day} ${mois} ${p.year} · ${heure}H${minute}`;
+  return `${jour} ${mois} ${p.day} ${p.year} · ${heureAmPm(p.hour, p.minute)}`;
 }
 
 export function formaterPastille(iso: string, fuseau: string = FUSEAU_DEFAUT): { jour: string; mois: string } {

@@ -14,15 +14,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const artiste = charge.ok ? charge.annuaire.artistes.find((a) => a.slug === slug) : undefined;
   if (!artiste) {
     return {
-      title: "Artiste — Tèt Weekend",
+      title: "Artist — Tèt Weekend",
       alternates: { canonical: `https://www.tetweekend.com/artistes/${slug}` },
     };
   }
-  const typeLabel = artiste.type === "groupe" ? "Groupe haïtien" : artiste.type === "chanteur" ? "Chanteur haïtien" : artiste.type === "DJ" ? "DJ haïtien" : "Artiste haïtien";
-  const base = artiste.ville_base ? ` basé à ${artiste.ville_base}` : "";
+  const typeLabel = artiste.type === "groupe" ? "Haitian group" : artiste.type === "chanteur" ? "Haitian singer" : artiste.type === "DJ" ? "Haitian DJ" : "Haitian artist";
+  const base = artiste.ville_base ? ` based in ${artiste.ville_base}` : "";
   const description = artiste.bio?.trim()
     ? artiste.bio.trim().slice(0, 155)
-    : `${artiste.nom} (${typeLabel.toLowerCase()})${base} : ses prochains concerts, bals et soirées haïtiens, sur Tèt Weekend.`;
+    : `${artiste.nom} (${typeLabel.toLowerCase()})${base}: upcoming Haitian concerts, bals and parties, on Tèt Weekend.`;
   return {
     title: `${artiste.nom} — ${typeLabel} — Tèt Weekend`,
     description,
@@ -79,12 +79,12 @@ export default async function PageArtiste({ params }: { params: Promise<{ slug: 
           </section>
         )}
         <section className="mt-8 space-y-3">
-          <h2 className="text-lg font-bold">Dates à venir</h2>
-          {aVenir.length === 0 ? <p className="text-sm text-[var(--text-sec)]">Aucune date à venir.</p> : aVenir.map((e) => <CarteEvenement key={e.id} evenement={e} />)}
+          <h2 className="text-lg font-bold">Upcoming dates</h2>
+          {aVenir.length === 0 ? <p className="text-sm text-[var(--text-sec)]">No upcoming dates.</p> : aVenir.map((e) => <CarteEvenement key={e.id} evenement={e} />)}
         </section>
         {passes.length > 0 && (
           <section className="mt-8 space-y-3">
-            <h2 className="text-lg font-bold">Dates passées</h2>
+            <h2 className="text-lg font-bold">Past dates</h2>
             {passes.map((e) => <CarteEvenement key={e.id} evenement={e} />)}
           </section>
         )}

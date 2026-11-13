@@ -10,9 +10,9 @@ export const LIBELLES_STATUT: Record<Statut, string> = {
 export const CATEGORIES = [
   { slug: "bals", nom: "Bals" },
   { slug: "concerts", nom: "Concerts" },
-  { slug: "soirees-kompa", nom: "Soirées kompa" },
+  { slug: "soirees-kompa", nom: "Kompa Parties" },
   { slug: "festivals", nom: "Festivals" },
-  { slug: "autre", nom: "Autre" },
+  { slug: "autre", nom: "Other" },
 ] as const;
 
 export type SlugCategorie = (typeof CATEGORIES)[number]["slug"];

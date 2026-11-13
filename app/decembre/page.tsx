@@ -12,12 +12,12 @@ const ANNEE = new Date().getFullYear();
 const SITE = "https://www.tetweekend.com";
 
 export const metadata: Metadata = {
-  title: `Événements haïtiens en décembre ${ANNEE} — Bals, concerts & réveillon — Tèt Weekend`,
-  description: `Tous les événements haïtiens de décembre ${ANNEE} : bals, concerts kompa, soirées et le réveillon du 31 décembre, en Haïti et dans la diaspora. Haitian events in December — parties, concerts and the New Year's Eve bals.`,
+  title: `Haitian Events in December ${ANNEE} — Bals, Concerts & New Year's Eve — Tèt Weekend`,
+  description: `All the Haitian events of December ${ANNEE}: bals, kompa concerts, parties and New Year's Eve on December 31, in Haiti and across the diaspora.`,
   alternates: { canonical: `${SITE}/decembre` },
   openGraph: {
-    title: `Décembre ${ANNEE} — Événements haïtiens`,
-    description: `Bals, concerts et soirées haïtiens de décembre ${ANNEE}, jusqu'au réveillon du 31.`,
+    title: `December ${ANNEE} — Haitian Events`,
+    description: `Haitian bals, concerts and parties of December ${ANNEE}, up to New Year's Eve on the 31st.`,
   },
 };
 
@@ -41,7 +41,7 @@ export default async function PageDecembre() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: `Événements haïtiens en décembre ${ANNEE}`,
+    name: `Haitian Events in December ${ANNEE}`,
     itemListElement: tous.map((e, i) => ({
       "@type": "ListItem",
       position: i + 1,
@@ -52,20 +52,20 @@ export default async function PageDecembre() {
   return (
     <Gabarit>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold">Événements haïtiens en décembre {ANNEE}</h1>
+      <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold">Haitian Events in December {ANNEE}</h1>
       <p className="mt-3 mb-8 max-w-2xl text-[15px] leading-relaxed text-[#4A4136]">
-        Décembre, c&apos;est le mois des grandes retrouvailles : bals, concerts kompa, soirées et fêtes de fin d&apos;année, en Haïti comme dans la diaspora —
-        jusqu&apos;au <strong>réveillon du 31 décembre</strong> et aux fêtes du <strong>1er janvier</strong>. Cette page rassemble tous les événements haïtiens de
-        décembre {ANNEE}, ville par ville, dès que les organisateurs les annoncent.
+        December is the month of the big homecomings: bals, kompa concerts, parties and year-end celebrations, in Haiti and across the diaspora —
+        all the way to <strong>New Year&apos;s Eve on December 31</strong> and the <strong>January 1</strong> celebrations. This page gathers every Haitian event of
+        December {ANNEE}, city by city, as soon as organizers announce them.
       </p>
 
       <section className="space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">Réveillon &amp; Jour de l&apos;An</h2>
+        <h2 className="font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">New Year&apos;s Eve &amp; New Year&apos;s Day</h2>
         {reveillon.length === 0 ? (
           <p className="text-sm text-[var(--text-sec)]">
-            Les bals du 31 décembre et les fêtes du 1er janvier seront annoncés ici dès leur parution.{" "}
+            The December 31 bals and January 1 celebrations will be announced here as soon as they are published.{" "}
             <Link href="/reveillon" className="font-semibold text-[#E02B20] no-underline">
-              Voir la page Réveillon
+              See the New Year&apos;s Eve page
             </Link>
           </p>
         ) : (
@@ -75,7 +75,7 @@ export default async function PageDecembre() {
             ))}
             <p>
               <Link href="/reveillon" className="text-sm font-semibold text-[#E02B20] no-underline">
-                Tous les événements du réveillon →
+                All New Year&apos;s Eve events →
               </Link>
             </p>
           </>
@@ -83,12 +83,12 @@ export default async function PageDecembre() {
       </section>
 
       <section className="mt-10 space-y-3">
-        <h2 className="font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">Tout le mois de décembre</h2>
+        <h2 className="font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">All of December</h2>
         {decembre.length === 0 ? (
           <p className="text-sm text-[var(--text-sec)]">
-            Aucun autre événement de décembre publié pour le moment — les annonces arrivent dès novembre. En attendant,{" "}
+            No other December events published yet — announcements start in November. In the meantime,{" "}
             <Link href="/evenements" className="font-semibold text-[#E02B20] no-underline">
-              voir tous les événements à venir
+              see all upcoming events
             </Link>
             .
           </p>
@@ -99,7 +99,7 @@ export default async function PageDecembre() {
 
       {villes.length > 0 && (
         <section className="mt-10">
-          <h2 className="mb-3 font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">Décembre par ville</h2>
+          <h2 className="mb-3 font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">December by city</h2>
           <ul className="flex flex-wrap gap-2">
             {villes.map(([slug, nom]) => (
               <li key={slug}>

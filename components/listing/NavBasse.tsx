@@ -6,16 +6,16 @@ import { CalendarDays, Home, MapPin, MoreHorizontal, Search } from "lucide-react
 import { useState } from "react";
 
 const GAUCHE = [
-  { href: "/", label: "Accueil", icone: Home, exact: true },
-  { href: "/villes", label: "Villes", icone: MapPin, exact: false },
+  { href: "/", label: "Home", icone: Home, exact: true },
+  { href: "/villes", label: "Cities", icone: MapPin, exact: false },
 ] as const;
-const DROITE = [{ href: "/evenements", label: "Agenda", icone: CalendarDays, exact: false }] as const;
+const DROITE = [{ href: "/evenements", label: "Events", icone: CalendarDays, exact: false }] as const;
 
 const PLUS = [
-  { href: "/lieux", label: "Lieux" },
-  { href: "/artistes", label: "Artistes" },
-  { href: "/categories", label: "Catégories" },
-  { href: "/decembre", label: "Décembre" },
+  { href: "/lieux", label: "Venues" },
+  { href: "/artistes", label: "Artists" },
+  { href: "/categories", label: "Categories" },
+  { href: "/decembre", label: "December" },
 ];
 
 export function NavBasse({ email }: { email?: string }) {
@@ -45,8 +45,8 @@ export function NavBasse({ email }: { email?: string }) {
             </Link>
           ))}
           {email && (
-            <a href={`mailto:${email}?subject=Proposer%20mon%20%C3%A9v%C3%A9nement`} className="block border-t border-[var(--nuit-ligne)] py-3 text-sm font-bold text-[var(--accent-texte)] no-underline">
-              Proposer mon événement
+            <a href={`mailto:${email}?subject=Submit%20my%20event`} className="block border-t border-[var(--nuit-ligne)] py-3 text-sm font-bold text-[var(--accent-texte)] no-underline">
+              Submit my event
             </a>
           )}
         </div>
@@ -54,7 +54,7 @@ export function NavBasse({ email }: { email?: string }) {
       <ul className="pointer-events-auto grid grid-cols-5 rounded-full border border-[var(--nuit-ligne)] bg-[rgba(27,22,19,0.96)] shadow-[0_12px_30px_rgba(0,0,0,.5)] backdrop-blur-xl">
         {GAUCHE.map(lien)}
         <li className="flex items-center justify-center">
-          <Link href="/recherche" aria-label="Rechercher" className="-mt-7 flex h-[60px] w-[60px] items-center justify-center rounded-full border-4 border-[var(--nuit-fond)] bg-[var(--accent)] text-white shadow-[0_8px_20px_rgba(166,52,70,.45)] no-underline">
+          <Link href="/recherche" aria-label="Search" className="-mt-7 flex h-[60px] w-[60px] items-center justify-center rounded-full border-4 border-[var(--nuit-fond)] bg-[var(--accent)] text-white shadow-[0_8px_20px_rgba(166,52,70,.45)] no-underline">
             <Search size={24} strokeWidth={2.4} aria-hidden />
           </Link>
         </li>
@@ -62,7 +62,7 @@ export function NavBasse({ email }: { email?: string }) {
         <li>
           <button type="button" aria-expanded={plus} onClick={() => setPlus((v) => !v)} className={`flex min-h-16 w-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold ${plus || plusActif ? "text-[var(--accent-texte)]" : "text-[var(--nuit-muet)]"}`}>
             <MoreHorizontal size={22} aria-hidden />
-            Plus
+            More
           </button>
         </li>
       </ul>

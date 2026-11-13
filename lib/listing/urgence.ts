@@ -9,7 +9,7 @@ export interface Urgence {
 
 function heureLocale(iso: string, fuseau: string): string {
   const [h, m] = saisieDepuisInstant(iso, fuseau).slice(11, 16).split(":");
-  return m === "00" ? `${Number(h)}h` : `${Number(h)}h${m}`;
+  const H = Number(h); const suffixe = H >= 12 ? "PM" : "AM"; const h12 = H % 12 === 0 ? 12 : H % 12; return m === "00" ? `${h12} ${suffixe}` : `${h12}:${m} ${suffixe}`;
 }
 
 /** Libellé d'urgence honnête, calculé uniquement à partir de la date de l'événement. */
@@ -21,18 +21,18 @@ export function urgenceDe(
   const t = maintenant.getTime();
   if (t >= debut) {
     const fin = e.date_fin ? Date.parse(e.date_fin) : null;
-    return fin !== null && t < fin ? { texte: "En cours", urgent: true } : null;
+    return fin !== null && t < fin ? { texte: "Happening now", urgent: true } : null;
   }
   const minutes = Math.round((debut - t) / 60_000);
-  if (minutes < 60) return { texte: `Dans ${Math.max(1, minutes)} min`, urgent: true };
-  if (minutes < 6 * 60) return { texte: `Dans ${Math.floor(minutes / 60)} h`, urgent: true };
+  if (minutes < 60) return { texte: `In ${Math.max(1, minutes)} min`, urgent: true };
+  if (minutes < 6 * 60) return { texte: `In ${Math.floor(minutes / 60)} h`, urgent: true };
   const aujourdhui = intervalleJour(0, maintenant, e.fuseau);
   if (debut <= aujourdhui.fin.getTime()) {
     const soir = Number(saisieDepuisInstant(e.date_debut, e.fuseau).slice(11, 13)) >= 18;
-    return { texte: `${soir ? "Ce soir" : "Aujourd'hui"} · ${heureLocale(e.date_debut, e.fuseau)}`, urgent: true };
+    return { texte: `${soir ? "Tonight" : "Today"} · ${heureLocale(e.date_debut, e.fuseau)}`, urgent: true };
   }
   const demain = intervalleJour(1, maintenant, e.fuseau);
-  if (debut <= demain.fin.getTime()) return { texte: `Demain · ${heureLocale(e.date_debut, e.fuseau)}`, urgent: false };
+  if (debut <= demain.fin.getTime()) return { texte: `Tomorrow · ${heureLocale(e.date_debut, e.fuseau)}`, urgent: false };
   return null;
 }
 

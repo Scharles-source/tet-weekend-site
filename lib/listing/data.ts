@@ -5,8 +5,8 @@ import type { ArtistePublic, EvenementPublic, FlyerPublic, LieuPublic } from "./
 export class ConfigurationSupabaseManquante extends Error {
   constructor(manquantes: string[]) {
     super(
-      `Configuration Supabase manquante : ${manquantes.join(", ")}. ` +
-        "Ajoutez ces variables d'environnement (Vercel ou .env.local) puis redéployez.",
+      `Missing Supabase configuration: ${manquantes.join(", ")}. ` +
+        "Add these environment variables (Vercel or .env.local), then redeploy.",
     );
     this.name = "ConfigurationSupabaseManquante";
   }
@@ -44,9 +44,9 @@ async function lire<T>(chemin: string): Promise<T> {
       next: { revalidate: 300, tags: [TAG] },
     });
   } catch {
-    throw new ErreurDonnees("Impossible de joindre la base de données. Réessayez dans un instant.");
+    throw new ErreurDonnees("The database could not be reached. Please try again in a moment.");
   }
-  if (!res.ok) throw new ErreurDonnees(`La base de données a répondu ${res.status}. Réessayez dans un instant.`);
+  if (!res.ok) throw new ErreurDonnees(`The database answered ${res.status}. Please try again in a moment.`);
   return (await res.json()) as T;
 }
 

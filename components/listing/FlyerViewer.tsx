@@ -63,13 +63,13 @@ function FlyerOuvert({ evenement, onClose }: { evenement: EvenementPublic; onClo
     >
       <div className="absolute top-3 right-3 z-10 flex gap-2">
         <button type="button" className="min-h-11 rounded-full bg-white/10 px-3 text-sm text-white" onClick={(e) => { e.stopPropagation(); setZoom((z) => Math.max(1, Math.round((z - 0.5) * 10) / 10)); }}>
-          Réduire
+          Zoom out
         </button>
         <button type="button" className="min-h-11 rounded-full bg-white/10 px-3 text-sm text-white" onClick={(e) => { e.stopPropagation(); setZoom((z) => Math.min(3, Math.round((z + 0.5) * 10) / 10)); }}>
-          Agrandir
+          Zoom in
         </button>
         <button ref={fermerRef} type="button" className="min-h-11 rounded-full bg-white px-4 text-sm font-medium text-black" onClick={onClose}>
-          Fermer
+          Close
         </button>
       </div>
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-4 pb-24" style={{ touchAction: "pinch-zoom" }}>
@@ -85,7 +85,7 @@ function FlyerOuvert({ evenement, onClose }: { evenement: EvenementPublic; onClo
       <footer className="absolute right-0 bottom-0 left-0 flex h-24 flex-col justify-center gap-1 px-4 text-sm text-white" onClick={(e) => e.stopPropagation()}>
         <p className="font-medium">{evenement.titre}</p>
         <p className="text-white/80">{[quand, lieu].filter(Boolean).join(" · ")}</p>
-        {credit && <p className="text-white/80">Flyer : {credit}</p>}
+        {credit && <p className="text-white/80">Flyer: {credit}</p>}
       </footer>
     </div>
   );

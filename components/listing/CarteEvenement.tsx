@@ -33,18 +33,18 @@ export function CarteEvenement({ evenement }: { evenement: EvenementPublic }) {
         <p className="text-[10.5px] font-bold uppercase tracking-wide text-[#B91C1C]">
           {quand}
           {categorie ? ` · ${categorie}` : ""}
-          {termine ? " · Événement terminé" : ""}
+          {termine ? " · Event ended" : ""}
         </p>
         <h2 className="mt-1 font-[family-name:var(--font-display)] text-[19.5px] font-black leading-tight text-[#191410]">
           <Link href={`/evenements/${evenement.slug}`} className="text-[#191410] no-underline">
             {evenement.titre}
           </Link>
         </h2>
-        <p className="mt-1 text-[13.5px] font-semibold text-[#4A4136]">{ou || "Lieu non indiqué"}</p>
+        <p className="mt-1 text-[13.5px] font-semibold text-[#4A4136]">{ou || "Venue not listed"}</p>
         {evenement.artistes.length > 0 && (
           <p className="mt-1 text-[12.5px] text-[#8A7B66]">{evenement.artistes.map((a) => a.nom).join(", ")}</p>
         )}
-        {evenement.prix && <p className="mt-2 text-[13.5px] text-[#4A4136]">Entrée : {evenement.prix}</p>}
+        {evenement.prix && <p className="mt-2 text-[13.5px] text-[#4A4136]">Admission: {evenement.prix}</p>}
       </div>
       <FlyerViewer evenement={evenement} open={ouvert} onClose={() => setOuvert(false)} />
     </article>
@@ -53,7 +53,7 @@ export function CarteEvenement({ evenement }: { evenement: EvenementPublic }) {
 
 export function LigneEvenement({ evenement }: { evenement: EvenementPublic }) {
   const pastille = formaterPastille(evenement.date_debut, evenement.fuseau);
-  const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(" · ") || "Lieu non indiqué";
+  const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(" · ") || "Venue not listed";
   return (
     <Link href={`/evenements/${evenement.slug}`} className="flex items-center gap-3 rounded-[16px] border-[1.5px] border-[#EFE5D2] bg-white p-3 text-inherit no-underline shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
       <span className="flex h-[56px] w-[56px] shrink-0 flex-col items-center justify-center rounded-xl bg-[#FDECEA]">
@@ -100,7 +100,7 @@ export function CarteEvenementCompacte({ evenement }: { evenement: EvenementPubl
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={urlCouverture} alt={evenement.titre} className="absolute inset-0 h-full w-full object-cover object-top" />
-            <button type="button" className="absolute inset-0 z-10 cursor-pointer" aria-label={`Voir le flyer entier de ${evenement.titre}`} onClick={() => setOuvert(true)} />
+            <button type="button" className="absolute inset-0 z-10 cursor-pointer" aria-label={`View the full flyer for ${evenement.titre}`} onClick={() => setOuvert(true)} />
           </>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center px-6 text-center" style={{ background: "linear-gradient(150deg, #F97316, #E02B20 55%, #5B2EE5)" }}>
@@ -118,11 +118,11 @@ export function CarteEvenementCompacte({ evenement }: { evenement: EvenementPubl
             {evenement.titre}
           </Link>
         </h3>
-        <p className="mt-1 truncate text-[13px] font-semibold text-[#4A4136]">{ou || "Lieu non indiqué"}</p>
+        <p className="mt-1 truncate text-[13px] font-semibold text-[#4A4136]">{ou || "Venue not listed"}</p>
         {evenement.artistes.length > 0 && (
           <p className="mt-1 truncate text-[12px] text-[#8A7B66]">{evenement.artistes.map((a) => a.nom).join(", ")}</p>
         )}
-        {evenement.prix && <p className="mt-1.5 text-[13px] text-[#4A4136]">Entrée : {evenement.prix}</p>}
+        {evenement.prix && <p className="mt-1.5 text-[13px] text-[#4A4136]">Admission: {evenement.prix}</p>}
       </div>
       <FlyerViewer evenement={evenement} open={ouvert} onClose={() => setOuvert(false)} />
     </article>
@@ -146,9 +146,9 @@ export function ZoneFlyer({ evenement }: { evenement: EvenementPublic }) {
       {evenement.flyer && (
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
           <button type="button" className="min-h-11 rounded-full border border-[#EFE5D2] bg-white px-4 text-[#191410]" onClick={() => setOuvert(true)}>
-            Voir le flyer en entier
+            View the full flyer
           </button>
-          {credit && <span className="text-[#8A7B66]">Flyer : {credit}</span>}
+          {credit && <span className="text-[#8A7B66]">Flyer: {credit}</span>}
         </div>
       )}
       <FlyerViewer evenement={evenement} open={ouvert} onClose={() => setOuvert(false)} />

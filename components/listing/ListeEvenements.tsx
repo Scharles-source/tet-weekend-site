@@ -31,7 +31,7 @@ export function ListeEvenements({ evenements, vide }: { evenements: EvenementPub
         type="search"
         value={recherche}
         onChange={(e) => setRecherche(e.target.value)}
-        placeholder="Nom de l'événement, du DJ, de la ville…"
+        placeholder="Event name, DJ, city…"
         className="min-h-11 w-full rounded-[14px] border border-[#EFE5D2] bg-white px-3 text-[#191410] outline-none placeholder:text-[#8A7B66]"
       />
       {filtres.length === 0 ? (

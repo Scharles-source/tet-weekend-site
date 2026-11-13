@@ -12,7 +12,7 @@ export function sanitizeFirestoreVideoUrl(url?: string | null): string | null {
 
 /** Format a price value: free if falsy or 0, else "$XX" or raw string */
 export function formatPrice(price?: number | string | null): string {
-  if (!price || price === 0 || price === "0" || price === "free") return "Gratuit";
+  if (!price || price === 0 || price === "0" || price === "free") return "Free";
   if (typeof price === "number") return `$${price}`;
   return String(price);
 }
@@ -22,7 +22,7 @@ export function formatEventDate(dateStr?: string | null): string {
   if (!dateStr) return "";
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString("fr-FR", {
+    return d.toLocaleDateString("en-US", {
       weekday: "short",
       day: "numeric",
       month: "short",
