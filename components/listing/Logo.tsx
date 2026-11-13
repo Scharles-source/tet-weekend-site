@@ -1,5 +1,6 @@
 import "./boutons-sombres.css";
 import "./theme-clair.css";
+import "./anti-debordement.css";
 import Link from "next/link";
 
 /** Logo officiel, détouré, pour le fond clair du site (« logo-tw.png » reste disponible pour un fond sombre). */

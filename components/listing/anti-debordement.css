@@ -1,0 +1,19 @@
+/* La page ne doit jamais bouger de gauche à droite sur téléphone :
+   rien ne dépasse horizontalement, et un geste latéral ne rebondit pas. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+}
+.theme-clair main {
+  overflow-x: clip;
+}
+.theme-clair article h1,
+.theme-clair article p,
+.theme-clair article a {
+  overflow-wrap: anywhere;
+}
+.theme-clair article iframe {
+  max-width: 100%;
+}
