@@ -363,7 +363,7 @@ export function SectionEvenements({
     return (
       <div className="space-y-4">
         {(compteurs.brouillons > 0 || sansFlyer > 0 || cetteSemaine > 0) && (
-          <section className={`${CARTE} border-l-4 border-l-[#E02B20] p-4`}>
+          <section className={`${CARTE} border-l-4 border-l-[#1D3FD8] p-4`}>
             {compteurs.brouillons > 0 && (
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="font-[family-name:var(--font-display)] text-[16px] font-extrabold">{compteurs.brouillons} brouillon{compteurs.brouillons > 1 ? "s" : ""} à vérifier</p>
@@ -394,7 +394,7 @@ export function SectionEvenements({
           <Compteur libelle="Terminés" valeur={compteurs.termines} actif={filtreQuand === "passes" && !filtreStatut && !filtreFlyer} onClick={() => choisirCompteur("", "passes")} />
         </div>
 
-        <div className="sticky top-[132px] z-10 space-y-3 rounded-[20px] bg-[#FBF7EF]/95 py-2 lg:top-[76px]">
+        <div className="sticky top-[74px] z-10 space-y-3 rounded-[20px] bg-[#F3F4F7]/95 py-2 lg:top-[76px]">
           <label className="block">
             <span className="sr-only">Recherche dans la liste</span>
             <input className={CHAMP} value={recherche} onChange={(e) => majRecherche(e.target.value)} placeholder="Titre, lieu ou ville" />
@@ -427,14 +427,14 @@ export function SectionEvenements({
               </select>
             </label>
           </div>
-          <p className="text-[12.5px] text-[#8A7B66]">{filtres.length} événement{filtres.length > 1 ? "s" : ""}</p>
+          <p className="text-[12.5px] text-[#5B6472]">{filtres.length} événement{filtres.length > 1 ? "s" : ""}</p>
         </div>
 
-        {erreur && <p className="text-[13px] text-[#E02B20]">{erreur}</p>}
+        {erreur && <p className="text-[13px] text-[#D92D20]">{erreur}</p>}
 
         {filtres.length === 0 ? (
-          <div className="rounded-[20px] border-2 border-dashed border-[#D8C6A4] bg-[#FBF7EF] px-5 py-10 text-center">
-            <p className="text-[15px] text-[#4A4136]">{filtreStatut === "brouillon" && !recherche && !filtreVille && !filtreCategorie ? "Aucun brouillon — tout est publié." : "Aucun événement ne correspond à ces filtres."}</p>
+          <div className="rounded-[20px] border-2 border-dashed border-[#AEB4C0] bg-[#F3F4F7] px-5 py-10 text-center">
+            <p className="text-[15px] text-[#3C4452]">{filtreStatut === "brouillon" && !recherche && !filtreVille && !filtreCategorie ? "Aucun brouillon — tout est publié." : "Aucun événement ne correspond à ces filtres."}</p>
             {filtreStatut === "brouillon" && <button type="button" className={`${BTN_PRIMAIRE} mt-4`} onClick={() => ouvrirFormulaire(vide)}><Plus size={16} aria-hidden /> Nouvel événement</button>}
           </div>
         ) : (
@@ -462,7 +462,7 @@ export function SectionEvenements({
         {menuId && <button type="button" aria-label="Fermer le menu" className="fixed inset-0 z-20 cursor-default" onClick={() => setMenuId(null)} />}
         {dialogue?.type === "supprimer" && (
           <Modal titre={`Supprimer « ${dialogue.evenement.titre} » ?`} onFermer={() => setDialogue(null)}>
-            <p className="text-[14px] text-[#4A4136]">L&apos;événement sera retiré. Il disparaît du site et reste dans l&apos;admin avec le statut retiré.</p>
+            <p className="text-[14px] text-[#3C4452]">L&apos;événement sera retiré. Il disparaît du site et reste dans l&apos;admin avec le statut retiré.</p>
             <div className="mt-5 flex justify-end gap-2">
               <button type="button" className={BTN_SECONDAIRE} onClick={() => setDialogue(null)}>Annuler</button>
               <button type="button" className={BTN_DANGER_PLEIN} onClick={() => { const id = dialogue.evenement.id; setDialogue(null); executer(() => changerStatut({ table: "events", id, statut: "retire" })); }}>Supprimer</button>
@@ -496,15 +496,15 @@ export function SectionEvenements({
 
   return (
     <form
-      className="pb-24"
+      className="pb-44 lg:pb-24"
       onSubmit={(ev) => {
         ev.preventDefault();
         soumettre(f.statutEnregistre === "publie" ? "publie" : "brouillon");
       }}
     >
-      <button type="button" className="mb-4 text-[14px] font-semibold text-[#E02B20]" onClick={() => demander(() => setEdition(false))}>Retour à la liste</button>
+      <button type="button" className="mb-4 text-[14px] font-semibold text-[#1D3FD8]" onClick={() => demander(() => setEdition(false))}>Retour à la liste</button>
       {(plusieursErreurs || erreur) && (
-        <div className="mb-4 rounded-[14px] bg-[#FDECEA] px-4 py-3 text-[13px] text-[#E02B20]">
+        <div className="mb-4 rounded-[14px] bg-[#FDECEA] px-4 py-3 text-[13px] text-[#D92D20]">
           {erreur && <p>{erreur}</p>}
           {Object.values(erreurs).map((message) => <p key={message}>{message}</p>)}
         </div>
@@ -535,10 +535,10 @@ export function SectionEvenements({
                 />
               </Champ>
               {suggestionsLieu && lieuTexte.trim() && (
-                <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#EFE5D2] bg-white shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
+                <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#E3E6EC] bg-white shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
                   {propositionsLieu.map((l) => (
                     <li key={l.id}>
-                      <button type="button" className="min-h-11 w-full px-3 text-left text-[14px] hover:bg-[#FBF7EF]" onClick={() => {
+                      <button type="button" className="min-h-11 w-full px-3 text-left text-[14px] hover:bg-[#F3F4F7]" onClick={() => {
                         set("venue_id", l.id);
                         set("nouveauLieu", false);
                         setLieuTexte(l.nom);
@@ -548,7 +548,7 @@ export function SectionEvenements({
                     </li>
                   ))}
                   <li>
-                    <button type="button" className="min-h-11 w-full px-3 text-left text-[14px] font-semibold text-[#E02B20]" onClick={() => {
+                    <button type="button" className="min-h-11 w-full px-3 text-left text-[14px] font-semibold text-[#1D3FD8]" onClick={() => {
                       set("nouveauLieu", true);
                       set("lieuNom", lieuTexte.trim());
                       set("venue_id", "");
@@ -631,14 +631,14 @@ export function SectionEvenements({
                 </select>
               </Champ>
               {suggestionsArtiste && f.artisteNom.trim() && (
-                <ul className="absolute top-full z-20 mt-1 w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#EFE5D2] bg-white sm:w-[calc(100%-168px)]">
+                <ul className="absolute top-full z-20 mt-1 w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#E3E6EC] bg-white sm:w-[calc(100%-168px)]">
                   {propositionsArtiste.map((a) => (
                     <li key={a.id}>
-                      <button type="button" className="min-h-11 w-full px-3 text-left hover:bg-[#FBF7EF]" onClick={() => { set("artist_ids", [...f.artist_ids, a.id]); set("artisteNom", ""); setSuggestionsArtiste(false); }}>{a.nom}</button>
+                      <button type="button" className="min-h-11 w-full px-3 text-left hover:bg-[#F3F4F7]" onClick={() => { set("artist_ids", [...f.artist_ids, a.id]); set("artisteNom", ""); setSuggestionsArtiste(false); }}>{a.nom}</button>
                     </li>
                   ))}
                   <li>
-                    <button type="button" className="min-h-11 w-full px-3 text-left font-semibold text-[#E02B20]" onClick={() => {
+                    <button type="button" className="min-h-11 w-full px-3 text-left font-semibold text-[#1D3FD8]" onClick={() => {
                       const nom = f.artisteNom.trim();
                       if (!nom) return;
                       set("artistesNouveaux", [...f.artistesNouveaux, { nom, type: f.artisteType, slug: slugOuVide(nom) }]);
@@ -671,14 +671,14 @@ export function SectionEvenements({
           <section className={`${CARTE} space-y-3 p-4`}>
             <h2 className={TITRE_BLOC}>Flyer</h2>
             {(f.flyer_url || f.apercuLocal) && !f.flyer_hidden_at ? (
-              <div className="relative max-h-[260px] overflow-hidden rounded-[12px] bg-[#F3E6D8]">
+              <div className="relative max-h-[260px] overflow-hidden rounded-[12px] bg-[#E3E6EC]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={f.apercuLocal || f.flyer_url} alt="" className="absolute inset-0 h-full max-h-[260px] w-full scale-110 object-cover blur-[16px]" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={f.apercuLocal || f.flyer_url} alt={f.flyer_alt || f.titre || "Flyer"} className="relative max-h-[260px] w-full object-contain" />
               </div>
             ) : (
-              <div className="flex min-h-28 items-center justify-center rounded-[12px] border-2 border-dashed border-[#D8C6A4] px-3 text-center text-[14px] text-[#8A7B66]">
+              <div className="flex min-h-28 items-center justify-center rounded-[12px] border-2 border-dashed border-[#AEB4C0] px-3 text-center text-[14px] text-[#5B6472]">
                 {f.flyer_hidden_at ? "Flyer masqué — le site affiche le dégradé." : "Ajouter un flyer"}
               </div>
             )}
@@ -771,9 +771,9 @@ export function SectionEvenements({
         </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t-[1.5px] border-[#EFE5D2] bg-white px-4 py-3 lg:left-[248px]">
+      <div className="fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] z-30 border-t-[1.5px] border-[#E3E6EC] bg-white px-4 py-3 lg:bottom-0 lg:left-[248px]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
-          <p className="flex items-center gap-2 text-[12.5px] text-[#8A7B66]">
+          <p className="flex items-center gap-2 text-[12.5px] text-[#5B6472]">
             {sale ? <><span className="h-2 w-2 rounded-full bg-[#F97316]" aria-hidden /> Modifications non enregistrées</> : enregistreA ? `Enregistré à ${enregistreA}` : "Aucune modification"}
           </p>
           <button type="submit" className={BTN_PRIMAIRE} disabled={pending}>
@@ -784,7 +784,7 @@ export function SectionEvenements({
 
       {dialogue?.type === "quitter" && (
         <Modal titre="Quitter sans enregistrer ?" onFermer={() => setDialogue(null)}>
-          <p className="text-[14px] text-[#4A4136]">Les modifications de cet événement ne sont pas enregistrées.</p>
+          <p className="text-[14px] text-[#3C4452]">Les modifications de cet événement ne sont pas enregistrées.</p>
           <div className="mt-5 flex justify-end gap-2">
             <button type="button" className={BTN_SECONDAIRE} onClick={() => setDialogue(null)}>Annuler</button>
             <button type="button" className={BTN_DANGER_PLEIN} onClick={() => { const suite = dialogue.suite; setDialogue(null); suite(); }}>Quitter</button>
@@ -816,7 +816,7 @@ export function SectionEvenements({
         </Modal>
       )}
       {toast && (
-        <p className="fixed bottom-20 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#E4F3EA] px-4 py-3 text-[14px] font-semibold text-[#177E54] shadow">
+        <p className="fixed bottom-36 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#E4F3EA] px-4 py-3 text-[14px] font-semibold text-[#177E54] shadow lg:bottom-20">
           <Check size={16} aria-hidden /> {toast}
         </p>
       )}
@@ -862,20 +862,20 @@ function Ligne({
   return (
     <li className={`${CARTE} relative flex flex-wrap items-center gap-3 p-3.5 ${menuOuvert ? "z-40" : ""}`}>
       <Vignette titre={evenement.titre} url={flyerVisible ? evenement.flyer_url : null} masque={Boolean(evenement.flyer_hidden_at)} />
-      <span className="flex h-[52px] w-[52px] shrink-0 flex-col items-center justify-center rounded-xl bg-[#FDECEA]">
-        <span className="font-[family-name:var(--font-display)] text-[17px] leading-none font-black text-[#191410]">{pastille.jour}</span>
-        <span className="mt-0.5 text-[10px] font-semibold text-[#B91C1C]">{pastille.mois}</span>
+      <span className="flex h-[52px] w-[52px] shrink-0 flex-col items-center justify-center rounded-xl bg-[#E7ECFF]">
+        <span className="font-[family-name:var(--font-display)] text-[17px] leading-none font-black text-[#12161F]">{pastille.jour}</span>
+        <span className="mt-0.5 text-[10px] font-semibold text-[#1D3FD8]">{pastille.mois}</span>
       </span>
       <div className="min-w-[180px] flex-1">
-        <p className="font-[family-name:var(--font-display)] text-[16px] font-extrabold text-[#191410]">{evenement.titre}</p>
-        <p className="text-[13px] text-[#4A4136]">{[lieu, evenement.ville].filter(Boolean).join(" · ") || "Lieu non indiqué"}</p>
-        <p className="truncate text-[12.5px] text-[#8A7B66]">{[horaire, categorie, artistes.join(", ")].filter(Boolean).join(" · ")}</p>
+        <p className="font-[family-name:var(--font-display)] text-[16px] font-extrabold text-[#12161F]">{evenement.titre}</p>
+        <p className="text-[13px] text-[#3C4452]">{[lieu, evenement.ville].filter(Boolean).join(" · ") || "Lieu non indiqué"}</p>
+        <p className="truncate text-[12.5px] text-[#5B6472]">{[horaire, categorie, artistes.join(", ")].filter(Boolean).join(" · ")}</p>
       </div>
       <div className="flex items-center gap-2">
         <PastilleStatut evenement={evenement} />
-        {estSponsorise(evenement) && <span className="rounded-full bg-[#191410] px-2 py-1 text-[11px] font-semibold text-white">SPONSORISÉ</span>}
-        {flyerVisible && <span title="Flyer présent"><ImageIcon size={16} aria-label="Flyer présent" className="text-[#8A7B66]" /></span>}
-        {evenement.source_url && <span title="Lien source"><Link2 size={16} aria-label="Lien source, admin uniquement" className="text-[#8A7B66]" /></span>}
+        {estSponsorise(evenement) && <span className="rounded-full bg-[#12161F] px-2 py-1 text-[11px] font-semibold text-white">SPONSORISÉ</span>}
+        {flyerVisible && <span title="Flyer présent"><ImageIcon size={16} aria-label="Flyer présent" className="text-[#5B6472]" /></span>}
+        {evenement.source_url && <span title="Lien source"><Link2 size={16} aria-label="Lien source, admin uniquement" className="text-[#5B6472]" /></span>}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {evenement.statut === "publie" ? (
@@ -884,19 +884,19 @@ function Ligne({
           <button type="button" className={BTN_PRIMAIRE} onClick={onPublier}>Publier</button>
         )}
         <button type="button" className={BTN_SECONDAIRE} onClick={onModifier}>Modifier</button>
-        <button type="button" aria-label="Plus d'actions" className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] border-[1.5px] border-[#EFE5D2] bg-white" onClick={onMenu}>
+        <button type="button" aria-label="Plus d'actions" className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] border-[1.5px] border-[#E3E6EC] bg-white" onClick={onMenu}>
           <MoreHorizontal size={18} aria-hidden />
         </button>
       </div>
       {menuOuvert && (
-        <div className="absolute top-14 right-3 z-30 w-56 rounded-[14px] border-[1.5px] border-[#EFE5D2] bg-white p-1 shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
+        <div className="absolute top-14 right-3 z-30 w-56 rounded-[14px] border-[1.5px] border-[#E3E6EC] bg-white p-1 shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
           <ItemMenu onClick={onApercu}>Aperçu de la carte</ItemMenu>
           {(evenement.flyer_storage_path || evenement.flyer_url) && !evenement.flyer_hidden_at && <ItemMenu onClick={onMasquer}>Masquer le flyer</ItemMenu>}
           {evenement.flyer_hidden_at && <ItemMenu onClick={onReafficher}>Réafficher le flyer</ItemMenu>}
           <ItemMenu onClick={onDupliquer}>Dupliquer</ItemMenu>
           {evenement.statut !== "retire" && (
             <>
-              <hr className="my-1 border-[#EFE5D2]" />
+              <hr className="my-1 border-[#E3E6EC]" />
               <ItemMenu danger onClick={onSupprimer}>Supprimer</ItemMenu>
             </>
           )}
@@ -908,7 +908,7 @@ function Ligne({
 
 function ItemMenu({ children, onClick, danger = false }: { children: ReactNode; onClick: () => void; danger?: boolean }) {
   return (
-    <button type="button" onClick={onClick} className={`flex min-h-11 w-full items-center rounded-[10px] px-3 text-left text-[14px] font-semibold ${danger ? "text-[#E02B20] hover:bg-[#FDECEA]" : "text-[#191410] hover:bg-[#FBF7EF]"}`}>
+    <button type="button" onClick={onClick} className={`flex min-h-11 w-full items-center rounded-[10px] px-3 text-left text-[14px] font-semibold ${danger ? "text-[#D92D20] hover:bg-[#FDECEA]" : "text-[#12161F] hover:bg-[#F3F4F7]"}`}>
       {children}
     </button>
   );
@@ -917,7 +917,7 @@ function ItemMenu({ children, onClick, danger = false }: { children: ReactNode; 
 function Vignette({ titre, url, masque }: { titre: string; url: string | null; masque: boolean }) {
   const lettres = titre.trim().split(/\s+/).slice(0, 2).map((mot) => mot[0]?.toUpperCase() ?? "").join("");
   return (
-    <span className="relative h-20 w-16 shrink-0 overflow-hidden rounded-[12px] bg-[#F3E6D8]">
+    <span className="relative h-20 w-16 shrink-0 overflow-hidden rounded-[12px] bg-[#E3E6EC]">
       {url ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -928,16 +928,16 @@ function Vignette({ titre, url, masque }: { titre: string; url: string | null; m
       ) : (
         <span className="flex h-full w-full items-center justify-center font-[family-name:var(--font-display)] text-[14px] font-black text-white" style={{ background: DEGRADE }}>{lettres}</span>
       )}
-      {masque && <span className="absolute bottom-1 left-1 rounded-full bg-[#191410] px-1.5 py-0.5 text-[9px] font-semibold text-white">Masqué</span>}
+      {masque && <span className="absolute bottom-1 left-1 rounded-full bg-[#12161F] px-1.5 py-0.5 text-[9px] font-semibold text-white">Masqué</span>}
     </span>
   );
 }
 
 function Compteur({ libelle, valeur, actif, onClick }: { libelle: string; valeur: number; actif: boolean; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className={`${CARTE} px-4 py-3 text-left ${actif ? "border-2 border-[#E02B20]" : ""}`}>
-      <span className="block font-[family-name:var(--font-display)] text-[30px] leading-none font-black text-[#191410]">{valeur}</span>
-      <span className="mt-2 block text-[12.5px] font-semibold tracking-[0.08em] text-[#8A7B66] uppercase">{libelle}</span>
+    <button type="button" onClick={onClick} className={`${CARTE} px-4 py-3 text-left ${actif ? "border-2 border-[#1D3FD8]" : ""}`}>
+      <span className="block font-[family-name:var(--font-display)] text-[30px] leading-none font-black text-[#12161F]">{valeur}</span>
+      <span className="mt-2 block text-[12.5px] font-semibold tracking-[0.08em] text-[#5B6472] uppercase">{libelle}</span>
     </button>
   );
 }
@@ -951,14 +951,14 @@ function Champ({ id, label, erreur, children }: { id: string; label: string; err
     <div>
       <label className={LABEL} htmlFor={id}>{label}</label>
       {children}
-      {erreur && <p className="mt-1 text-[12px] text-[#E02B20]">{erreur}</p>}
+      {erreur && <p className="mt-1 text-[12px] text-[#D92D20]">{erreur}</p>}
     </div>
   );
 }
 
 function PastilleCle({ nom, onRetirer }: { nom: string; onRetirer: () => void }) {
   return (
-    <span className="inline-flex min-h-10 items-center gap-1 rounded-full bg-[#FDECEA] pr-1 pl-3 text-[13px] font-semibold text-[#B91C1C]">
+    <span className="inline-flex min-h-10 items-center gap-1 rounded-full bg-[#E7ECFF] pr-1 pl-3 text-[13px] font-semibold text-[#1D3FD8]">
       {nom}
       <button type="button" aria-label={`Retirer ${nom}`} className="flex h-8 w-8 items-center justify-center" onClick={onRetirer}><X size={14} aria-hidden /></button>
     </span>
@@ -969,7 +969,7 @@ function PastilleStatut({ evenement }: { evenement: Pick<EvenementAdmin, "statut
   const termine = evenement.date_debut ? estTermine(evenement) && evenement.statut === "publie" : false;
   const libelle = termine ? "Terminé" : LIBELLES_STATUT[evenement.statut as "brouillon"] ?? evenement.statut;
   const style = termine || evenement.statut === "retire"
-    ? "bg-[#EFE9DC] text-[#8A7B66]"
+    ? "bg-[#EEF0F4] text-[#5B6472]"
     : evenement.statut === "publie"
       ? "bg-[#E4F3EA] text-[#177E54]"
       : "bg-[#FEF3C7] text-[#92400E]";
@@ -978,7 +978,7 @@ function PastilleStatut({ evenement }: { evenement: Pick<EvenementAdmin, "statut
 
 function Modal({ titre, children, onFermer, large = false }: { titre: string; children: ReactNode; onFermer: () => void; large?: boolean }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#191410]/40 p-4 sm:items-center" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#12161F]/40 p-4 sm:items-center" role="dialog" aria-modal="true">
       <div className={`max-h-[90vh] w-full overflow-auto rounded-[20px] bg-white p-5 ${large ? "max-w-3xl" : "max-w-md"}`}>
         <div className="mb-3 flex items-start justify-between gap-3">
           <h2 className="font-[family-name:var(--font-display)] text-[18px] font-extrabold">{titre}</h2>
@@ -992,11 +992,11 @@ function Modal({ titre, children, onFermer, large = false }: { titre: string; ch
 
 function ApercuPublic({ evenement }: { evenement: EvenementPublic }) {
   return (
-    <div className="space-y-4 bg-[#FBF7EF] p-3">
+    <div className="space-y-4 bg-[#F3F4F7] p-3">
       <CarteEvenement evenement={{ ...evenement, source_url: null }} />
       <ZoneFlyer evenement={{ ...evenement, source_url: null }} />
       <h3 className="font-[family-name:var(--font-display)] text-[28px] font-extrabold">{evenement.titre}</h3>
-      <p className="text-[#4A4136]">{formaterQuand(evenement.date_debut, evenement.fuseau)}</p>
+      <p className="text-[#3C4452]">{formaterQuand(evenement.date_debut, evenement.fuseau)}</p>
     </div>
   );
 }
