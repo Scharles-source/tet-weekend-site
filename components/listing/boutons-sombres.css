@@ -1,0 +1,13 @@
+/* Boutons du thème nuit : graphite sombre avec un liseré clair.
+   Les flyers apportent déjà les couleurs vives ; le rouge de marque reste réservé aux textes d'accent. */
+.theme-nuit {
+  --bouton: #2E2622;
+}
+.theme-nuit .bg-\[var\(--accent\)\],
+.theme-nuit .bg-\[\#A63446\] {
+  background-color: var(--bouton);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+.theme-nuit .border-\[var\(--accent\)\] {
+  border-color: rgba(255, 255, 255, 0.4);
+}
