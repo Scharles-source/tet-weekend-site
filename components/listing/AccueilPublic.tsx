@@ -57,7 +57,7 @@ export function AccueilPublic({
           Partying <span className="text-[var(--accent-texte)]">in Haiti</span>
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-[var(--nuit-muet)] lg:text-[17px]">
-          Find your night out, in Haiti and across the diaspora. Bals, concerts, kompa parties and festivals, all in one place. No tickets sold here: we tell you where, when and with whom.
+          Find your night out, in Haiti and across the diaspora, all in one place. No tickets sold here: we tell you where, when and with whom.
         </p>
       </header>
 
