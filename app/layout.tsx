@@ -1,7 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+export const viewport: Viewport = { themeColor: "#191410" };
+
 export const metadata: Metadata = {
+  applicationName: "Tèt Weekend",
+  appleWebApp: { capable: true, title: "Tèt Weekend", statusBarStyle: "default" },
   metadataBase: new URL("https://www.tetweekend.com"),
   verification: {
     google: "z0RYQLMp3mSHvtPSquY51QKux-vOoNwak_phgEBB5Uk",

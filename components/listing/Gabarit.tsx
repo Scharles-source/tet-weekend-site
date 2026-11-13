@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EnTete } from "@/components/listing/EnTete";
+import { InstallerApp } from "@/components/listing/InstallerApp";
 import { Logo } from "@/components/listing/Logo";
 import { Mesure } from "@/components/listing/Mesure";
 import { NavBasse } from "@/components/listing/NavBasse";
@@ -41,6 +42,7 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
       </footer>
       <NavBasse email={email} />
       <Mesure />
+      <InstallerApp />
     </div>
   );
 }
