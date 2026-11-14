@@ -2,7 +2,6 @@ import { altFlyer } from "./flyer.ts";
 import { estTermine, formaterQuand } from "./dates.ts";
 import { lieuDepuisDescription } from "./faits.ts";
 import { rangsParVille } from "./preuve.ts";
-import { lireRecapsPublics, type RecapPublic } from "./recaps.ts";
 import { signauxRarete } from "./rarete.ts";
 import { nomVilleCanonique } from "./villes.ts";
 import type { ArtistePublic, EvenementPublic, FlyerPublic, LieuPublic } from "./types.ts";
@@ -302,27 +301,6 @@ async function lireEngagement(): Promise<Map<string, { interets: number; vues: n
     );
   } catch {
     return new Map();
-  }
-}
-
-/**
- * Récaps vidéo publiés (rangée « Recaps » de l'accueil). Lecture séparée et
- * tolérante : tant que la migration 20261113220000_recaps_video.sql n'est pas
- * appliquée, ou au moindre échec, la rangée ne s'affiche simplement pas.
- */
-export async function chargerRecapsPublics(): Promise<RecapPublic[]> {
-  const { url, cle } = configuration();
-  try {
-    const res = await fetch(`${url}/rest/v1/rpc/recaps_publics`, {
-      method: "POST",
-      headers: { apikey: cle, Authorization: `Bearer ${cle}`, "Content-Type": "application/json" },
-      body: "{}",
-      next: { revalidate: 300, tags: [TAG] },
-    });
-    if (!res.ok) return [];
-    return lireRecapsPublics(await res.json());
-  } catch {
-    return [];
   }
 }
 

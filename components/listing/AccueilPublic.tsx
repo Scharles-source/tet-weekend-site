@@ -6,9 +6,7 @@ import { Affiche } from "@/components/listing/Affiche";
 import { BanniereAccueil, type Panneau } from "@/components/listing/BanniereAccueil";
 import { LigneEvenement } from "@/components/listing/CarteEvenement";
 import { PastilleLieu, usePosition } from "@/components/listing/PositionFil";
-import { RangeeRecaps } from "@/components/listing/Recaps";
 import { dansLeWeekend } from "@/lib/listing/dates";
-import type { RecapPublic } from "@/lib/listing/recaps";
 import { dansLaPeriode, type Periode } from "@/lib/listing/periode";
 import { pointDeReference, trierParDistance } from "@/lib/listing/proximite";
 import { CATEGORIES } from "@/lib/listing/schema";
@@ -35,7 +33,6 @@ export function AccueilPublic({
   total,
   panneaux,
   email,
-  recaps = [],
 }: {
   evenements: EvenementPublic[];
   /** Comptes par ville sur la liste complète (les pastilles restent exactes même si seul un premier jeu est rendu). */
@@ -44,8 +41,6 @@ export function AccueilPublic({
   total?: number;
   panneaux: Panneau[];
   email: string;
-  /** Récaps vidéo publiés (rangée sous le H1 ; vide = rangée absente). */
-  recaps?: RecapPublic[];
   auto?: boolean;
 }) {
   // L'accueil reçoit un premier jeu (ce soir, ce weekend, les prochains). La
@@ -152,12 +147,10 @@ export function AccueilPublic({
         <h1 className="mt-2 font-[family-name:var(--font-display)] text-[40px] leading-[1.02] font-black tracking-tight text-balance text-[var(--nuit-texte)] lg:text-[60px]">
           Partying <span className="text-[var(--accent-texte)]">in Haiti</span>
         </h1>
+        <p className="mt-3 text-[15px] leading-relaxed text-[var(--nuit-muet)] lg:text-[17px]">
+          Find your night out, in Haiti and across the diaspora, all in one place. No tickets sold here: we tell you where, when and with whom.
+        </p>
       </header>
-
-      {/* Section Récaps (décision de Smith, 13 nov. 2026) : remplace le
-          paragraphe sous le H1. Vignettes différées seulement ; le lecteur
-          ne se charge qu'au clic (lightbox). Absente si aucun récap publié. */}
-      <RangeeRecaps recaps={recaps} />
 
       <PastilleLieu position={position} evenements={listeBase} villes={villes.map(([nom]) => nom)} choisie={choisie} onChoisir={choisir} />
 
