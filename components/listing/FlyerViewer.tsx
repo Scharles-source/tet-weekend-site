@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { altFlyer, creditPublic } from "@/lib/listing/flyer";
 import { formaterQuand } from "@/lib/listing/dates";
 import type { EvenementPublic } from "@/lib/listing/types";
+import { flyerAllege } from "@/lib/listing/image-url";
 
 export function FlyerViewer({
   evenement,
@@ -76,7 +77,7 @@ function FlyerOuvert({ evenement, onClose }: { evenement: EvenementPublic; onClo
         {/* Fichier original, zoomable, sans recadrage. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={flyer.publicUrl}
+          src={flyerAllege(flyer.publicUrl, 1080, 80)}
           alt={altFlyer(evenement.titre, lieu, quand)}
           style={{ maxWidth: "100vw", maxHeight: "calc(100dvh - 96px)", objectFit: "contain", transform: `scale(${zoom})` }}
           onClick={(e) => e.stopPropagation()}

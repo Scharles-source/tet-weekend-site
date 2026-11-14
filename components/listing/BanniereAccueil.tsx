@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
 import { formaterKicker } from "@/lib/listing/dates";
 import type { EvenementPublic } from "@/lib/listing/types";
+import { flyerAllege } from "@/lib/listing/image-url";
 
 export interface Panneau {
   evenement: EvenementPublic;
@@ -69,7 +70,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
         {/* Fond : le flyer lui-même, flouté */}
         {e.flyer ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={e.flyer.publicUrl} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-125 object-cover brightness-[.55] blur-[26px]" />
+          <img src={flyerAllege(e.flyer.publicUrl, 64)} alt="" aria-hidden decoding="async" className="absolute inset-0 h-full w-full scale-125 object-cover brightness-[.55] blur-[26px]" />
         ) : (
           <div className="absolute inset-0" style={{ background: "linear-gradient(150deg, #F97316, #A63446 55%, #5B2EE5)" }} />
         )}
@@ -79,7 +80,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
           <div className="flex items-center justify-center px-4 pt-4 lg:py-[30px] lg:pr-0 lg:pl-[34px]">
             {e.flyer ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={e.flyer.publicUrl} alt={e.titre} className="h-[220px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
+              <img src={flyerAllege(e.flyer.publicUrl, 640)} alt={e.titre} decoding="async" className="h-[220px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
             ) : (
               <div className="flex h-[220px] w-[240px] items-center justify-center rounded-[14px] bg-[rgba(0,0,0,.25)] px-4 text-center lg:h-[320px]">
                 <p className="font-[family-name:var(--font-display)] text-[22px] font-black text-white">{e.titre}</p>

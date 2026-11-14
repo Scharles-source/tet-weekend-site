@@ -4,6 +4,7 @@ import { Expand } from "lucide-react";
 import { useState, type Ref } from "react";
 import { altFlyer, flyerFrameStyle } from "@/lib/listing/flyer";
 import type { FlyerPublic } from "@/lib/listing/types";
+import { flyerAllege } from "@/lib/listing/image-url";
 
 const DEGRADE = "linear-gradient(150deg, #F97316, #E02B20 55%, #5B2EE5)";
 
@@ -47,14 +48,15 @@ export function FlyerHeader({
           {/* Image originale : contain, repli immédiat si le chargement échoue. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={url}
+            src={flyerAllege(url, 64)}
             alt=""
             aria-hidden
+            decoding="async"
             className="absolute inset-0 h-full w-full scale-110 object-cover blur-[16px] brightness-[0.55]"
             onError={() => setEchec(true)}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={flyer?.publicUrl ?? url} alt={alt} className="absolute inset-0 h-full w-full object-contain" onError={() => setEchec(true)} />
+          <img src={flyerAllege(flyer?.publicUrl ?? url, 828)} alt={alt} decoding="async" className="absolute inset-0 h-full w-full object-contain" onError={() => setEchec(true)} />
           <button
             ref={boutonRef}
             type="button"
