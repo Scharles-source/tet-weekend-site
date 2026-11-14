@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { codePays, etiquettePosition, nombreProches, POSITION_DEFAUT, positionDepuisVille, positionDetecteeFiable, rangProximite, trierParProximite, villeDuCatalogue } from "./proximite.ts";
+import { codePays, etiquettePosition, nombreProches, pointDeReference, pointExact, POSITION_DEFAUT, positionDepuisEntetes, positionDepuisVille, positionDetecteeFiable, rangProximite, trierParDistance, trierParProximite, villeDuCatalogue } from "./proximite.ts";
+import { coordonneesVille } from "./coordonnees.ts";
 import type { EvenementPublic } from "./types.ts";
 
 function ev(id: string, ville: string | null, pays: string | null = null): EvenementPublic {
@@ -99,4 +100,75 @@ test("ville détectée hors catalogue : retirée, la zone et le pays restent (ca
   assert.equal(rangProximite(ev("a", "Brooklyn"), fiable), 1);
   const inchangee = positionDetecteeFiable({ ville: "Brooklyn", region: "NY", pays: "US" }, villes);
   assert.equal(inchangee.ville, "Brooklyn");
+});
+
+test("tri radial depuis New York : Brooklyn, puis Boston, puis Miami, puis Haïti", () => {
+  const point = pointDeReference(positionDepuisVille("New York", []));
+  assert.deepEqual(point, coordonneesVille("New York"));
+  const liste = [ev("miami", "Miami"), ev("pv", "Pétion-Ville", "Haïti"), ev("boston", "Boston"), ev("brooklyn", "Brooklyn")];
+  assert.deepEqual(trierParDistance(liste, point).map((e) => e.id), ["brooklyn", "boston", "miami", "pv"]);
+});
+
+test("tri radial depuis le Cap-Haïtien : le Cap d'abord, puis le Nord, puis le reste", () => {
+  const point = pointDeReference(positionDepuisVille("Cap-Haïtien", []));
+  const liste = [ev("miami", "Miami"), ev("pv", "Port-au-Prince", "Haïti"), ev("gonaives", "Gonaïves", "Haïti"), ev("cap", "Cap-Haïtien", "Haïti")];
+  assert.deepEqual(trierParDistance(liste, point).map((e) => e.id), ["cap", "gonaives", "pv", "miami"]);
+});
+
+test("tri radial : stable à distance égale, et les villes hors catalogue ferment la marche", () => {
+  const point = coordonneesVille("Brooklyn");
+  const liste = [ev("loin", "Ville Inexistante"), ev("b1", "Brooklyn"), ev("b2", "Brooklyn"), ev("queens", "Queens")];
+  assert.deepEqual(trierParDistance(liste, point).map((e) => e.id), ["b1", "b2", "queens", "loin"]);
+  const liste2 = [ev("a", "Miami"), ev("b", "Brooklyn")];
+  assert.deepEqual(trierParDistance(liste2, null), liste2); // sans point, rien ne bouge
+});
+
+test("sélection du point : le point exact prime sur la ville, qui prime sur la zone, qui prime sur le pays", () => {
+  // Point exact fourni par le réseau : il gagne, même si la ville dit autre chose.
+  assert.deepEqual(pointDeReference({ ville: "Miami", region: "FL", pays: "US", lat: 40.7, lng: -74.0 }), { lat: 40.7, lng: -74.0 });
+  // Ville au catalogue : ses coordonnées.
+  assert.deepEqual(pointDeReference({ ville: "Boston", region: "MA", pays: "US" }), coordonneesVille("Boston"));
+  // Région seule : l'ancre de la zone (NY → New York).
+  assert.deepEqual(pointDeReference({ ville: null, region: "NY", pays: "US" }), coordonneesVille("New York"));
+  // Pays à zone unique : Haïti → Pétion-Ville.
+  assert.deepEqual(pointDeReference({ ville: null, region: null, pays: "HT" }), coordonneesVille("Pétion-Ville"));
+  // Rien d'exploitable : pas de point, l'ordre par date reste.
+  assert.equal(pointDeReference({ ville: null, region: "CO", pays: "US" }), null);
+  assert.equal(pointDeReference(null), null);
+  // La position par défaut et la ville choisie portent leurs coordonnées.
+  assert.deepEqual(pointDeReference(POSITION_DEFAUT), coordonneesVille("Pétion-Ville"));
+  assert.deepEqual(pointExact(positionDepuisVille("Miami", [])), coordonneesVille("Miami"));
+});
+
+test("position détectée avec point exact : l'étiquette prend la ville du catalogue la plus proche", () => {
+  const villes = ["Brooklyn", "Pétion-Ville", "Miami"];
+  // « Clifton » annoncé par le réseau, mais le point est à Manhattan : l'étiquette devient New York, le point reste.
+  const fiable = positionDetecteeFiable({ ville: "Clifton", region: "NJ", pays: "US", lat: 40.723, lng: -74.002 }, villes);
+  assert.equal(fiable.ville, "New York");
+  assert.deepEqual(pointExact(fiable), { lat: 40.723, lng: -74.002 });
+  // Point loin de toute ville du catalogue (Denver) : pas d'étiquette ville, mais le point trie quand même.
+  const denver = positionDetecteeFiable({ ville: "Denver", region: "CO", pays: "US", lat: 39.74, lng: -104.99 }, villes);
+  assert.equal(denver.ville, null);
+  assert.deepEqual(pointDeReference(denver), { lat: 39.74, lng: -104.99 });
+  // Ville détectée au catalogue : inchangée, point conservé.
+  const brooklyn = positionDetecteeFiable({ ville: "Brooklyn", region: "NY", pays: "US", lat: 40.68, lng: -73.95 }, villes);
+  assert.equal(brooklyn.ville, "Brooklyn");
+});
+
+test("en-têtes Vercel : ville décodée, point exact lu et borné", () => {
+  const h = new Headers({
+    "x-vercel-ip-city": "Cap-Ha%C3%AFtien",
+    "x-vercel-ip-country-region": "NORD",
+    "x-vercel-ip-country": "HT",
+    "x-vercel-ip-latitude": "19.76",
+    "x-vercel-ip-longitude": "-72.20",
+  });
+  const p = positionDepuisEntetes(h);
+  assert.equal(p.ville, "Cap-Haïtien");
+  assert.equal(p.region, "NORD");
+  assert.equal(p.pays, "HT");
+  assert.deepEqual(pointExact(p), { lat: 19.76, lng: -72.2 });
+  const invalide = positionDepuisEntetes(new Headers({ "x-vercel-ip-latitude": "abc", "x-vercel-ip-longitude": "999" }));
+  assert.equal(pointExact(invalide), null);
+  assert.equal(pointExact(positionDepuisEntetes(new Headers())), null);
 });
