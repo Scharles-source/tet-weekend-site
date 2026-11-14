@@ -35,13 +35,21 @@ function visiteur(): string {
   return v;
 }
 
-/** Ni mesure si le navigateur demande « Ne pas me suivre », ni pour un appareil exclu (le tien : ?exclure=1). */
-function mesureAutorisee(): boolean {
+type EtatMesure = "ok" | "exclu" | "bloque";
+
+/**
+ * « Ne pas me suivre » : aucune mesure (« bloque »). Appareil exclu (le tien : ?exclure=1) :
+ * la visite part quand même, marquée « exclu », pour que la base l'écarte des chiffres —
+ * et que l'exclusion soit vérifiable dans l'admin. Tout le reste (présence, actions, app)
+ * reste réservé aux navigateurs « ok ».
+ */
+function etatMesure(): EtatMesure {
   const params = new URLSearchParams(window.location.search);
   if (params.get("exclure") === "1") ecrire("local", CLE_EXCLURE, "1");
   if (params.get("exclure") === "0") ecrire("local", CLE_EXCLURE, null);
-  if (lire("local", CLE_EXCLURE) === "1") return false;
-  return navigator.doNotTrack !== "1";
+  if (navigator.doNotTrack === "1") return "bloque";
+  if (lire("local", CLE_EXCLURE) === "1") return "exclu";
+  return "ok";
 }
 
 function source(): string {
@@ -88,18 +96,25 @@ function appInstallee(): boolean {
 /** Mesure d'audience anonyme du site public : pages vues, présence en ligne, clics flyer et agenda. */
 export function Mesure() {
   const chemin = usePathname();
-  const autorise = useRef<boolean | null>(null);
+  const etat = useRef<EtatMesure | null>(null);
 
   useEffect(() => {
-    if (autorise.current === null) autorise.current = mesureAutorisee();
-    if (!autorise.current) return;
-    envoyer({ type: "vue", chemin, slug: slugEvenement(chemin), source: source() });
+    if (etat.current === null) etat.current = etatMesure();
+    if (etat.current === "bloque") return;
+    envoyer({
+      type: "vue",
+      chemin,
+      slug: slugEvenement(chemin),
+      source: source(),
+      ua: navigator.userAgent,
+      ...(etat.current === "exclu" ? { exclu: true } : {}),
+    });
   }, [chemin]);
 
   // Web app : ouverture depuis l'écran d'accueil (une fois par jour) et installation signalée par le navigateur.
   useEffect(() => {
-    if (autorise.current === null) autorise.current = mesureAutorisee();
-    if (!autorise.current) return;
+    if (etat.current === null) etat.current = etatMesure();
+    if (etat.current !== "ok") return;
     if (appInstallee()) {
       const jour = new Date().toISOString().slice(0, 10);
       if (lire("local", "tw_app_ouverte") !== jour) {
@@ -113,8 +128,8 @@ export function Mesure() {
   }, []);
 
   useEffect(() => {
-    if (autorise.current === null) autorise.current = mesureAutorisee();
-    if (!autorise.current) return;
+    if (etat.current === null) etat.current = etatMesure();
+    if (etat.current !== "ok") return;
     const ping = () => {
       if (document.visibilityState === "visible") envoyer({ type: "ping" });
     };

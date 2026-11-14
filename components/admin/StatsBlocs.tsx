@@ -51,12 +51,21 @@ export function InstallationsApp({ stats }: { stats: Statistiques }) {
 
 export function Chiffres({ stats }: { stats: Statistiques }) {
   const comparer = stats.periode === "aujourdhui";
+  const filtres = stats.visiteurs_engages !== undefined || stats.robots_filtres !== undefined || stats.visiteurs_exclus !== undefined;
   return (
-    <div className="grid grid-cols-3 gap-2">
-      <Chiffre valeur={stats.visiteurs} libelle={stats.periode === "aujourdhui" ? "Visiteurs aujourd'hui" : "Visiteurs"} note={comparer ? evolution(stats.visiteurs, stats.visiteurs_hier_meme_heure) : null} />
-      <Chiffre valeur={stats.pages_vues} libelle="Pages vues" note={comparer ? evolution(stats.pages_vues, stats.pages_vues_hier_meme_heure) : null} />
-      <Chiffre valeur={stats.jy_vais} libelle="« J'y vais »" note={comparer ? evolution(stats.jy_vais, stats.jy_vais_hier_meme_heure) : null} />
-      {comparer && <p className="col-span-3 text-[11.5px] text-[#5B6472]">Variation : comparé à hier à la même heure.</p>}
+    <div className="space-y-2">
+      <div className="grid grid-cols-3 gap-2">
+        <Chiffre valeur={stats.visiteurs} libelle={stats.periode === "aujourdhui" ? "Visiteurs aujourd'hui" : "Visiteurs"} note={comparer ? evolution(stats.visiteurs, stats.visiteurs_hier_meme_heure) : null} />
+        <Chiffre valeur={stats.pages_vues} libelle="Pages vues" note={comparer ? evolution(stats.pages_vues, stats.pages_vues_hier_meme_heure) : null} />
+        <Chiffre valeur={stats.jy_vais} libelle="« J'y vais »" note={comparer ? evolution(stats.jy_vais, stats.jy_vais_hier_meme_heure) : null} />
+      </div>
+      {filtres && (
+        <p className="text-[11.5px] leading-snug text-[#5B6472]">
+          Dont <b className="text-[#12161F]">{nombre(stats.visiteurs_engages ?? 0)} visiteur{(stats.visiteurs_engages ?? 0) > 1 ? "s" : ""} engagé{(stats.visiteurs_engages ?? 0) > 1 ? "s" : ""}</b> (au moins 2 pages vues ou une action).
+          {" "}Non comptés ci-dessus : {nombre(stats.robots_filtres ?? 0)} robot{(stats.robots_filtres ?? 0) > 1 ? "s" : ""} filtré{(stats.robots_filtres ?? 0) > 1 ? "s" : ""} et {nombre(stats.visiteurs_exclus ?? 0)} visiteur{(stats.visiteurs_exclus ?? 0) > 1 ? "s" : ""} exclu{(stats.visiteurs_exclus ?? 0) > 1 ? "s" : ""} (tes appareils).
+        </p>
+      )}
+      {comparer && <p className="text-[11.5px] text-[#5B6472]">Variation : comparé à hier à la même heure.</p>}
     </div>
   );
 }

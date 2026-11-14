@@ -28,14 +28,21 @@ export interface InstallationsApp {
   ios: number;
 }
 
-/** Réponse de la fonction SQL statistiques_admin (voir la migration 20261113000000). */
+/** Réponse de la fonction SQL statistiques_admin (voir les migrations 20261113000000 et 20261113230000). */
 export interface Statistiques {
   /** Installations de la web app (absent tant que la migration « installations_app » n'est pas appliquée). */
   app?: InstallationsApp | null;
   periode: Periode;
   heure_actuelle: number;
   en_ligne: { total: number; mobile: number; ordinateur: number };
+  /** Visiteurs nets : ni robots, ni appareils exclus. */
   visiteurs: number;
+  /** Parmi les visiteurs nets : au moins 2 pages vues ou au moins 1 action sur la période. Absent tant que la migration 20261113230000 n'est pas appliquée. */
+  visiteurs_engages?: number;
+  /** Visiteurs robots écartés des chiffres sur la période. Absent tant que la migration 20261113230000 n'est pas appliquée. */
+  robots_filtres?: number;
+  /** Visiteurs exclus (appareils du propriétaire) écartés des chiffres sur la période. Absent tant que la migration 20261113230000 n'est pas appliquée. */
+  visiteurs_exclus?: number;
   pages_vues: number;
   visiteurs_hier_meme_heure: number;
   pages_vues_hier_meme_heure: number;

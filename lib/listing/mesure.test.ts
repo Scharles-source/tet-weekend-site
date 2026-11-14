@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { appareilDepuis, estRobot, slugEvenement, sourceDepuis } from "./mesure.ts";
+import { appareilDepuis, slugEvenement, sourceDepuis } from "./mesure.ts";
 
 test("le marqueur du lien l'emporte sur le référent", () => {
   assert.equal(sourceDepuis({ marqueur: "ig", referrer: "https://www.google.com/" }), "instagram");
@@ -32,10 +32,8 @@ test("seule une fiche d'événement donne un slug", () => {
   assert.equal(slugEvenement("/lieux/yanvalou"), null);
 });
 
-test("appareil et robots", () => {
+test("appareil", () => {
   assert.equal(appareilDepuis(true), "mobile");
   assert.equal(appareilDepuis(false), "ordinateur");
-  assert.equal(estRobot("Googlebot/2.1"), true);
-  assert.equal(estRobot(""), true);
-  assert.equal(estRobot("Mozilla/5.0 (iPhone) Safari"), false);
+  // La détection des robots est testée côté base : fonction SQL ua_est_robot (migration 20261113230000).
 });

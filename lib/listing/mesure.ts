@@ -65,7 +65,9 @@ export function appareilDepuis(ecranTactile: boolean): "mobile" | "ordinateur" {
   return ecranTactile ? "mobile" : "ordinateur";
 }
 
-const ROBOTS = /bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse|pingdom|uptime|monitor/i;
-export function estRobot(ua: string | null | undefined): boolean {
-  return !ua || ROBOTS.test(ua);
-}
+/**
+ * La détection des robots vit en un seul endroit : la fonction SQL `ua_est_robot`
+ * (migration 20261113230000). La route /api/mesure transmet le user-agent à la base,
+ * qui marque les visites et les battements de présence des robots pour les écarter
+ * des statistiques. Rien à décider côté client ou côté route.
+ */
