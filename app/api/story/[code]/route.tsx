@@ -25,8 +25,10 @@ async function flyerEnDonnees(url: string | null): Promise<string | null> {
 }
 
 /** Carte verticale 1080×1920 pour une story Instagram ou un statut WhatsApp : logo, flyer, date, « I'm in », lien. */
-export async function GET(_request: Request, { params }: { params: Promise<{ code: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code: brut } = await params;
+  // ?v=partage : même carte pour le bouton « partager » (sans le macaron « I'm in », qui dit que la personne y va).
+  const partage = new URL(request.url).searchParams.get("v") === "partage";
   const code = brut.toLowerCase();
   if (!estCodeCourt(code)) return new Response("Not found", { status: 404 });
   const charge = await chargerAnnuaire();
@@ -81,6 +83,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
           )}
         </div>
 
+        {!partage && (
         <div
           style={{
             position: "absolute",
@@ -102,6 +105,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
           </svg>
           <div style={{ marginLeft: 20, fontSize: 64, fontWeight: 800 }}>I&apos;m in</div>
         </div>
+        )}
 
         <div style={{ position: "absolute", top: 1291, left: 60, right: 60, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
           <div style={{ fontSize: 84, fontWeight: 800, letterSpacing: 1 }}>{`${jour} · ${heure}`}</div>

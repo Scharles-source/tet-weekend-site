@@ -31,6 +31,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   const [occupe, setOccupe] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [carte, setCarte] = useState(false);
+  const [cartePartage, setCartePartage] = useState(false);
 
   useEffect(() => {
     setDedans(interets().includes(evenement.id));
@@ -155,7 +156,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           <button
             type="button"
             aria-label={`Share ${evenement.titre}`}
-            onClick={partager}
+            onClick={() => setCartePartage(true)}
             className={`ml-auto flex shrink-0 items-center justify-center rounded-full ${etroit ? "h-11" : "h-12"} ${termine ? "flex-1 gap-2 px-5 text-[15px] font-extrabold" : etroit ? "w-11" : "w-12"}`}
             style={{ border: "1.5px solid rgba(255,255,255,0.5)", color: "#FFFFFF" }}
           >
@@ -175,6 +176,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           </button>
         )}
         <CarteStory evenementId={evenement.id} titre={evenement.titre} ouvert={carte} onFermer={() => setCarte(false)} />
+        <CarteStory evenementId={evenement.id} titre={evenement.titre} ouvert={cartePartage} onFermer={() => setCartePartage(false)} mode="partage" secours={partager} />
 
         {(message || preuve) && (
           <div className={`flex items-center gap-1.5 font-semibold ${etroit ? "mt-2 text-[12px]" : "mt-2.5 text-[12.5px]"}`} style={{ color: "rgba(255,255,255,0.88)" }} role="status">
