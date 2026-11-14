@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { chargerAnnuaire, evenementAllege } from "@/lib/listing/data";
 import { estTermine } from "@/lib/listing/dates";
+import { POSITION_DEFAUT, pointDeReference, positionDepuisEntetes, positionDetecteeFiable, trierParDistance } from "@/lib/listing/proximite";
 
 export const dynamic = "force-dynamic";
 
@@ -12,15 +13,33 @@ export const dynamic = "force-dynamic";
  * filtre ville/moment est activé. Les champs lourds et inutiles aux cartes
  * (description, sources, prix) ne voyagent pas ; les badges de rareté, eux,
  * sont pré-calculés au chargement (badges_rarete).
+ *
+ * La liste part triée en radial (13 nov. 2026, demande de Smith) : par
+ * distance croissante depuis le point du visiteur, lu dans les en-têtes
+ * de géolocalisation de la requête — même point, même règle que le tri de
+ * l'accueil. La réponse dépend donc du visiteur : elle n'est plus mise en
+ * cache partagé, seulement en cache privé de son navigateur. Les données
+ * elles-mêmes restent servies par le chargement mis en cache de
+ * l'annuaire, donc le coût par requête reste faible. Quand le visiteur a
+ * choisi une ville à la main, le navigateur retrie de toute façon sa
+ * copie avec cette ville — qui prime sur la détection.
  */
-export async function GET() {
+export async function GET(request: Request) {
   const charge = await chargerAnnuaire();
   if (!charge.ok) {
     return NextResponse.json({ evenements: [] }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }
-  const evenements = charge.annuaire.evenements.filter((e) => !estTermine(e)).map(evenementAllege);
+  const aVenir = charge.annuaire.evenements.filter((e) => !estTermine(e));
+  const villes = new Set<string>();
+  for (const e of charge.annuaire.evenements) {
+    if (e.ville) villes.add(e.ville);
+    if (e.lieu?.ville) villes.add(e.lieu.ville);
+  }
+  const detectee = positionDetecteeFiable(positionDepuisEntetes(request.headers), [...villes]);
+  const point = pointDeReference(detectee) ?? pointDeReference(POSITION_DEFAUT);
+  const evenements = trierParDistance(aVenir, point).map(evenementAllege);
   return NextResponse.json(
     { evenements },
-    { headers: { "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300" } },
+    { headers: { "Cache-Control": "private, max-age=60" } },
   );
 }

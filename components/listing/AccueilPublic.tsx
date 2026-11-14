@@ -8,7 +8,7 @@ import { LigneEvenement } from "@/components/listing/CarteEvenement";
 import { PastilleLieu, usePosition } from "@/components/listing/PositionFil";
 import { dansLeWeekend } from "@/lib/listing/dates";
 import { dansLaPeriode, type Periode } from "@/lib/listing/periode";
-import { trierParProximite } from "@/lib/listing/proximite";
+import { pointDeReference, trierParDistance } from "@/lib/listing/proximite";
 import { CATEGORIES } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 
@@ -49,9 +49,17 @@ export function AccueilPublic({
   const [tous, setTous] = useState<EvenementPublic[] | null>(null);
   const [chargement, setChargement] = useState(false);
   const listeBase = tous ?? evenementsInitiaux;
-  // Fil intelligent : les événements proches du visiteur d'abord (sa ville, sa zone, son pays), puis le reste, chacun par date.
+  // Fil intelligent (tri radial, demande de Smith du 13 nov. 2026) : tous
+  // les événements sont ordonnés par distance croissante depuis le point
+  // du visiteur — point exact du réseau quand il existe, sinon sa ville
+  // détectée ou choisie, sinon le cœur du catalogue. À distance égale
+  // (même ville), l'ordre par date est conservé. Les filtres ci-dessous
+  // (ville stricte, moment) s'appliquent sur cette liste déjà triée :
+  // dans un filtre ville, l'ordre reste donc radial à l'intérieur du
+  // filtre.
   const { position, choisie, choisir } = usePosition(listeBase);
-  const evenements = useMemo(() => trierParProximite(listeBase, position), [listeBase, position]);
+  const point = useMemo(() => pointDeReference(position), [position]);
+  const evenements = useMemo(() => trierParDistance(listeBase, point), [listeBase, point]);
   const [periode, setPeriode] = useState<Periode>("tout");
   const [ville, setVille] = useState<string | null>(null);
 

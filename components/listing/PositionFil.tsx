@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { etiquettePosition, nombreProches, POSITION_DEFAUT, positionDepuisVille, positionDetecteeFiable, type Position } from "@/lib/listing/proximite";
+import { etiquettePosition, nombreProches, pointExact, POSITION_DEFAUT, positionDepuisVille, positionDetecteeFiable, type Position } from "@/lib/listing/proximite";
 import type { EvenementPublic } from "@/lib/listing/types";
 
 const CLE_VILLE = "tw_ville_choisie";
@@ -66,7 +66,7 @@ export function usePosition(evenements: EvenementPublic[]) {
 
   const position = useMemo<Position | null>(() => {
     if (choisie) return positionDepuisVille(choisie, evenements);
-    if (detectee && (detectee.ville || detectee.pays)) {
+    if (detectee && (detectee.ville || detectee.pays || pointExact(detectee))) {
       // Ville détectée hors catalogue = approximation du réseau : on garde la zone et le pays.
       const fiable = positionDetecteeFiable(detectee, villesCatalogue);
       if (fiable.ville || fiable.region || fiable.pays) return fiable;
