@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AccueilPublic } from "@/components/listing/AccueilPublic";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { choisirBanniere } from "@/lib/listing/banniere";
-import { chargerAnnuaire, emailContact } from "@/lib/listing/data";
+import { chargerAnnuaire, emailContact, evenementAllege } from "@/lib/listing/data";
 import { dansLeWeekend, estTermine } from "@/lib/listing/dates";
 import { dansLaPeriode } from "@/lib/listing/periode";
 import type { EvenementPublic } from "@/lib/listing/types";
@@ -86,7 +86,13 @@ export default async function Accueil() {
   const email = await emailContact();
   return (
     <Gabarit large>
-      <AccueilPublic evenements={initiaux} comptesVilles={comptesVilles} total={aVenir.length} panneaux={choisirBanniere(aVenir)} email={email} />
+      <AccueilPublic
+        evenements={initiaux.map(evenementAllege)}
+        comptesVilles={comptesVilles}
+        total={aVenir.length}
+        panneaux={choisirBanniere(aVenir).map((p) => ({ ...p, evenement: evenementAllege(p.evenement) }))}
+        email={email}
+      />
     </Gabarit>
   );
 }

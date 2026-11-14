@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
 import { formaterKicker } from "@/lib/listing/dates";
+import { nomLieuAffiche } from "@/lib/listing/faits";
 import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
 
@@ -30,7 +31,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
   if (!courant) return <BanniereVide email={email} />;
 
   const e = courant.evenement;
-  const lieu = [e.lieu?.nom, e.ville].filter(Boolean).join(" · ") || "Venue not listed";
+  const lieu = [nomLieuAffiche(e), e.ville].filter(Boolean).join(" · ") || "Venue not listed";
   const badge = (
     <span className="rounded-full bg-[#14100B] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
       {courant.sponsorise ? "SPONSORED" : "TRENDING"}

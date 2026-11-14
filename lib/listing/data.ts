@@ -235,6 +235,19 @@ export async function lireAnnuaire(): Promise<Annuaire> {
   };
 }
 
+export function evenementAllege(e: EvenementPublic): EvenementPublic {
+  return {
+    ...e,
+    description: null,
+    prix: null,
+    source: null,
+    source_url: null,
+    source_account: null,
+    lieu: e.lieu ? ({ nom: e.lieu.nom, ville: e.lieu.ville, slug: e.lieu.slug } as unknown as LieuPublic) : null,
+    artistes: e.artistes.map((a) => ({ nom: a.nom, slug: a.slug }) as unknown as ArtistePublic),
+  };
+}
+
 /** Lecture séparée : si les colonnes n'existent pas encore, la bannière reste en trending. */
 async function lireSponsors(): Promise<Map<string, { sponsored_from: string | null; sponsored_to: string | null }>> {
   const { url, cle } = configuration();
