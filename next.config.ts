@@ -5,7 +5,13 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "12mb" },
   },
   images: {
+    formats: ["image/webp"],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+    // Qualités autorisées pour /_next/image (voir lib/listing/image-url.ts) : toute autre valeur est refusée.
+    qualities: [70, 80],
     remotePatterns: [
+      // Flyers des événements (stockage public Supabase), réduits par l'optimiseur d'images.
+      { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" },
       { protocol: "https", hostname: "firebasestorage.googleapis.com" },
       { protocol: "https", hostname: "storage.googleapis.com" },
     ],

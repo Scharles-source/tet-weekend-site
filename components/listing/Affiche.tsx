@@ -4,6 +4,7 @@ import { Urgence } from "@/components/listing/Urgence";
 import { formaterBadge } from "@/lib/listing/dates";
 import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
+import { flyerAllege } from "@/lib/listing/image-url";
 
 const DEGRADES = [
   "linear-gradient(160deg,#C21810 0%,#5B1209 100%)",
@@ -32,7 +33,7 @@ export function Affiche({ evenement, className = "" }: { evenement: EvenementPub
       >
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt={evenement.flyer?.alt || evenement.titre} className="absolute inset-0 h-full w-full object-cover object-top" loading="lazy" />
+          <img src={flyerAllege(url, 640)} alt={evenement.flyer?.alt || evenement.titre} className="absolute inset-0 h-full w-full object-cover object-top" loading="lazy" decoding="async" />
         ) : (
           <div className="absolute inset-x-3.5 bottom-3.5 flex flex-col gap-1">
             {categorie && <span className="text-[11px] font-bold tracking-[0.14em] text-[#FFE3A8] uppercase">{categorie}</span>}

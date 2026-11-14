@@ -10,6 +10,7 @@ import { preuveSociale } from "@/lib/listing/preuve";
 import { signauxRarete } from "@/lib/listing/rarete";
 import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
+import { flyerAllege } from "@/lib/listing/image-url";
 
 const OR = "#FFC247";
 
@@ -88,9 +89,11 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
       {couverture && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={couverture}
+          src={flyerAllege(couverture, 64)}
           alt=""
           aria-hidden
+          loading="lazy"
+          decoding="async"
           className="pointer-events-none absolute inset-0 h-full w-full scale-125 object-cover blur-[28px] saturate-150"
           style={{ filter: "blur(28px) saturate(1.5) brightness(0.42)" }}
         />

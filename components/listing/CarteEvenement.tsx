@@ -8,6 +8,7 @@ import { FlyerViewer } from "@/components/listing/FlyerViewer";
 import { formaterBadge, formaterPastille } from "@/lib/listing/dates";
 import { creditPublic } from "@/lib/listing/flyer";
 import type { EvenementPublic } from "@/lib/listing/types";
+import { flyerAllege } from "@/lib/listing/image-url";
 
 const CARTE = "overflow-hidden rounded-[20px] border-[1.5px] border-[#EFE5D2] bg-white shadow-[0_3px_14px_rgba(80,55,10,0.06)]";
 
@@ -46,7 +47,7 @@ export function LigneEvenement({ evenement }: { evenement: EvenementPublic }) {
       </span>
       {evenement.flyer ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={evenement.flyer.cardUrl || evenement.flyer.publicUrl} alt="" aria-hidden className="h-[56px] w-[56px] shrink-0 rounded-[11px] object-cover" />
+        <img src={flyerAllege(evenement.flyer.cardUrl || evenement.flyer.publicUrl, 128)} alt="" aria-hidden width={56} height={56} loading="lazy" decoding="async" className="h-[56px] w-[56px] shrink-0 rounded-[11px] object-cover" />
       ) : (
         <span className="flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-[11px] bg-[#F3E6D8] font-[family-name:var(--font-display)] text-[20px] font-black text-[#8A7B66]">
           {evenement.titre.charAt(0).toUpperCase()}
@@ -77,7 +78,7 @@ export function CarteEvenementCompacte({ evenement }: { evenement: EvenementPubl
         {urlCouverture ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={urlCouverture} alt={evenement.titre} className="absolute inset-0 h-full w-full object-cover object-top" />
+            <img src={flyerAllege(urlCouverture, 640)} alt={evenement.titre} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-top" />
             <button type="button" className="absolute inset-0 z-10 cursor-pointer" aria-label={`View the full flyer for ${evenement.titre}`} onClick={() => setOuvert(true)} />
           </>
         ) : (

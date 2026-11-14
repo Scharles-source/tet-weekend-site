@@ -7,6 +7,7 @@ import { intervalleJour } from "@/lib/listing/periode";
 import { estGratuit } from "@/lib/listing/recherche";
 import { CATEGORIES, FUSEAU_DEFAUT } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
+import { flyerAllege } from "@/lib/listing/image-url";
 
 const PUCE = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full px-4 text-sm";
 const ON = "bg-[var(--accent)] font-bold text-white";
@@ -122,7 +123,7 @@ export function Agenda({ evenements, maintenantIso, villes }: { evenements: Even
                     <Link href={`/evenements/${e.slug}`} className="flex min-w-0 flex-1 gap-3 rounded-[18px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-2.5 text-inherit no-underline">
                       {e.flyer ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={e.flyer.cardUrl || e.flyer.publicUrl} alt="" aria-hidden className="h-20 w-16 shrink-0 rounded-xl object-cover" />
+                        <img src={flyerAllege(e.flyer.cardUrl || e.flyer.publicUrl, 128)} alt="" aria-hidden width={64} height={80} loading="lazy" decoding="async" className="h-20 w-16 shrink-0 rounded-xl object-cover" />
                       ) : (
                         <span aria-hidden className="flex h-20 w-16 shrink-0 items-center justify-center rounded-xl bg-[var(--nuit-carte2)] font-[family-name:var(--font-display)] text-2xl font-black text-[var(--nuit-muet)]">{e.titre.charAt(0).toUpperCase()}</span>
                       )}
