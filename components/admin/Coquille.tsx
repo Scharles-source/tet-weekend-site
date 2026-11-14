@@ -8,6 +8,7 @@ import {
   CalendarDays,
   ExternalLink,
   House,
+  Inbox,
   MapPin,
   Plus,
   Radio,
@@ -19,13 +20,14 @@ import {
 import { Deconnexion } from "@/components/admin/Deconnexion";
 import { BTN_DANGER_PLEIN, BTN_SECONDAIRE } from "@/components/admin/styles";
 
-export type SectionAdmin = "accueil" | "evenements" | "statistiques" | "lieux" | "artistes" | "categories" | "comptes";
+export type SectionAdmin = "accueil" | "evenements" | "soumissions" | "statistiques" | "lieux" | "artistes" | "categories" | "comptes";
 
 type Entree = { id: SectionAdmin; label: string; icon: LucideIcon; href: string };
 
 const ENTREES: Entree[] = [
   { id: "accueil", label: "Accueil", icon: House, href: "/admin" },
   { id: "evenements", label: "Événements", icon: CalendarDays, href: "/admin?section=evenements" },
+  { id: "soumissions", label: "Soumissions", icon: Inbox, href: "/admin?section=soumissions" },
   { id: "statistiques", label: "Statistiques", icon: ChartColumn, href: "/admin?section=statistiques" },
   { id: "lieux", label: "Lieux", icon: MapPin, href: "/admin?section=lieux" },
   { id: "artistes", label: "Artistes & DJ", icon: Users, href: "/admin?section=artistes" },
@@ -38,6 +40,7 @@ const ANNUAIRE: SectionAdmin[] = ["lieux", "artistes", "categories", "comptes"];
 const ONGLETS: { id: string; label: string; icon: LucideIcon; href: string; groupe: SectionAdmin[] }[] = [
   { id: "accueil", label: "Accueil", icon: House, href: "/admin", groupe: ["accueil"] },
   { id: "evenements", label: "Événements", icon: CalendarDays, href: "/admin?section=evenements", groupe: ["evenements"] },
+  { id: "soumissions", label: "Soumissions", icon: Inbox, href: "/admin?section=soumissions", groupe: ["soumissions"] },
   { id: "statistiques", label: "Stats", icon: ChartColumn, href: "/admin?section=statistiques", groupe: ["statistiques"] },
   { id: "annuaire", label: "Annuaire", icon: BookUser, href: "/admin?section=lieux", groupe: ANNUAIRE },
 ];
