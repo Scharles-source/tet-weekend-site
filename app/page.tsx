@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AccueilPublic } from "@/components/listing/AccueilPublic";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { choisirBanniere } from "@/lib/listing/banniere";
-import { chargerAnnuaire, emailContact, evenementAllege } from "@/lib/listing/data";
+import { chargerAnnuaire, chargerRecapsPublics, emailContact, evenementAllege } from "@/lib/listing/data";
 import { dansLeWeekend, estTermine } from "@/lib/listing/dates";
 import { dansLaPeriode } from "@/lib/listing/periode";
 import type { EvenementPublic } from "@/lib/listing/types";
@@ -84,6 +84,9 @@ export default async function Accueil() {
   for (const e of aVenir) if (e.ville) compte.set(e.ville, (compte.get(e.ville) ?? 0) + 1);
   const comptesVilles = [...compte.entries()].sort((a, b) => b[1] - a[1]);
   const email = await emailContact();
+  // Récaps vidéo publiés : lecture tolérante (échec ou migration absente =
+  // rangée simplement absente, jamais d'erreur d'accueil).
+  const recaps = await chargerRecapsPublics();
   return (
     <Gabarit large>
       <AccueilPublic
@@ -92,6 +95,7 @@ export default async function Accueil() {
         total={aVenir.length}
         panneaux={choisirBanniere(aVenir).map((p) => ({ ...p, evenement: evenementAllege(p.evenement) }))}
         email={email}
+        recaps={recaps}
       />
     </Gabarit>
   );

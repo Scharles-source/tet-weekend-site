@@ -5,6 +5,7 @@ import { CARTE } from "@/components/admin/styles";
 import type { RapportSeo } from "@/lib/admin/search-console-pures";
 import type { Statistiques } from "@/lib/admin/statistiques-pures";
 import type { EvenementAdmin } from "@/lib/admin/charger";
+import { libelleAValider } from "@/lib/admin/recaps-pures";
 import { libelleNouvelles } from "@/lib/admin/soumissions-pures";
 
 function dateCourte(iso: string, fuseau: string): { jour: string; mois: string } {
@@ -13,7 +14,7 @@ function dateCourte(iso: string, fuseau: string): { jour: string; mois: string }
   return { jour: f({ day: "numeric" }), mois: f({ month: "short" }).replace(".", "") };
 }
 
-export function AccueilAdmin({ evenements, maintenantIso, stats, rapportSeo = null, soumissionsNouvelles = null }: { evenements: EvenementAdmin[]; maintenantIso: string; stats: Statistiques | null; rapportSeo?: RapportSeo | null; soumissionsNouvelles?: number | null }) {
+export function AccueilAdmin({ evenements, maintenantIso, stats, rapportSeo = null, soumissionsNouvelles = null, recapsAValider = null }: { evenements: EvenementAdmin[]; maintenantIso: string; stats: Statistiques | null; rapportSeo?: RapportSeo | null; soumissionsNouvelles?: number | null; recapsAValider?: number | null }) {
   const maintenant = new Date(maintenantIso).getTime();
   const aVenir = evenements.filter((e) => new Date(e.date_fin ?? e.date_debut).getTime() >= maintenant);
   const publies = aVenir.filter((e) => e.statut === "publie").length;
@@ -34,6 +35,17 @@ export function AccueilAdmin({ evenements, maintenantIso, stats, rapportSeo = nu
           <span className="min-w-0 flex-1">
             <span className="block text-[14px] font-bold text-[#12161F]">{libelleNouvelles(soumissionsNouvelles)}</span>
             <span className="block text-[12px] text-[#5B6472]">Formulaire « Become a partner »</span>
+          </span>
+          <span className="text-[14px] font-bold text-[#1D3FD8]">Voir</span>
+        </Link>
+      )}
+
+      {recapsAValider !== null && (
+        <Link href="/admin?section=recaps" className={`${CARTE} flex items-center gap-3 p-4 no-underline`}>
+          <span className={`font-[family-name:var(--font-display)] text-[28px] leading-none font-extrabold ${recapsAValider > 0 ? "text-[#9B1C14]" : "text-[#12161F]"}`}>{recapsAValider}</span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[14px] font-bold text-[#12161F]">{libelleAValider(recapsAValider)}</span>
+            <span className="block text-[12px] text-[#5B6472]">Récaps vidéo de soirées pour l&apos;accueil</span>
           </span>
           <span className="text-[14px] font-bold text-[#1D3FD8]">Voir</span>
         </Link>

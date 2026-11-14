@@ -28,6 +28,7 @@ export function DashboardListing({
   periode = "aujourdhui",
   section = "accueil",
   soumissionsNouvelles = null,
+  recapsAValider = null,
 }: {
   lieux: LieuAdmin[];
   artistes: ArtisteAdmin[];
@@ -40,6 +41,7 @@ export function DashboardListing({
   periode?: Periode;
   section?: string;
   soumissionsNouvelles?: number | null;
+  recapsAValider?: number | null;
 }) {
   const router = useRouter();
   const onglet: SectionAdmin = SECTIONS.includes(section as SectionAdmin) ? (section as SectionAdmin) : "accueil";
@@ -77,7 +79,7 @@ export function DashboardListing({
     >
       {erreur && <p className="mb-4 text-[13px] text-[#D92D20]">{erreur}</p>}
       {pending && <p className="mb-4 text-[13px] text-[#5B6472]">Enregistrement…</p>}
-      {onglet === "accueil" && <AccueilAdmin evenements={evenements} maintenantIso={maintenantIso} stats={stats} rapportSeo={rapportSeo} soumissionsNouvelles={soumissionsNouvelles} />}
+      {onglet === "accueil" && <AccueilAdmin evenements={evenements} maintenantIso={maintenantIso} stats={stats} rapportSeo={rapportSeo} soumissionsNouvelles={soumissionsNouvelles} recapsAValider={recapsAValider} />}
       {onglet === "statistiques" && <SectionStatistiques stats={stats} periode={periode} />}
       {onglet === "evenements" && (
         <SectionEvenements
