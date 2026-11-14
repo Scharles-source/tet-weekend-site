@@ -125,6 +125,12 @@ export function AccueilPublic({
     [evenements, maintenant],
   );
   const weekend = evenements.filter((e) => dansLeWeekend(e.date_debut));
+  // « Coming up » de l'accueil : agenda de la suite — les événements déjà
+  // montrés dans « Tonight or never » et « This weekend » n'y sont pas
+  // rendus une deuxième fois (même correctif que les pages villes, et
+  // autant de HTML en moins pour les connexions lentes).
+  const idsMontres = new Set([...ceSoir.map((e) => e.id), ...weekend.map((e) => e.id)]);
+  const aVenirAutres = evenements.filter((e) => !idsMontres.has(e.id));
 
   return (
     <div>
@@ -222,14 +228,16 @@ export function AccueilPublic({
               <EnteteSection titre="Coming up" href="/evenements" />
               {evenements.length === 0 ? (
                 <p className="text-sm text-[var(--nuit-muet)]">No upcoming events for the moment.</p>
+              ) : aVenirAutres.length === 0 ? (
+                <p className="text-sm text-[var(--nuit-muet)]">No other upcoming events.</p>
               ) : (
                 <>
                   <div className="space-y-2.5">
-                    {evenements.slice(0, PLAFOND_A_VENIR).map((e) => (
+                    {aVenirAutres.slice(0, PLAFOND_A_VENIR).map((e) => (
                       <LigneEvenement key={e.id} evenement={e} />
                     ))}
                   </div>
-                  {(total ?? evenements.length) > PLAFOND_A_VENIR && (
+                  {(total ?? evenements.length) > idsMontres.size + PLAFOND_A_VENIR && (
                     <p className="mt-4">
                       <Link href="/evenements" className="text-sm font-bold text-[var(--accent-texte)] no-underline">
                         See all {total ?? evenements.length} events
