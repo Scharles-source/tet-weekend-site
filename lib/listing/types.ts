@@ -53,6 +53,8 @@ export interface EvenementPublic {
   categorie: string | null;
   fuseau: string;
   lieu: LieuPublic | null;
+  /** Nom du lieu affichable : lieu lié, sinon le nom énoncé dans la description (« Lieu : … »). Calculé au chargement. */
+  lieu_nom?: string | null;
   artistes: ArtistePublic[];
   flyer: FlyerPublic | null;
   sponsored_from: string | null;
@@ -68,4 +70,6 @@ export interface EvenementPublic {
   vues_jour?: number | null;
   /** 1 quand l'événement est le plus vu de sa ville (calculé, jamais saisi). */
   rang_ville?: number | null;
+  /** Badges de rareté pré-calculés (la liste allégée de l'API ne transporte pas la description qui sert à les déduire). */
+  badges_rarete?: string[] | null;
 }

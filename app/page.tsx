@@ -3,7 +3,9 @@ import { AccueilPublic } from "@/components/listing/AccueilPublic";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { choisirBanniere } from "@/lib/listing/banniere";
 import { chargerAnnuaire, emailContact } from "@/lib/listing/data";
-import { estTermine } from "@/lib/listing/dates";
+import { dansLeWeekend, estTermine } from "@/lib/listing/dates";
+import { dansLaPeriode } from "@/lib/listing/periode";
+import type { EvenementPublic } from "@/lib/listing/types";
 
 export const revalidate = 300;
 
@@ -65,10 +67,26 @@ export default async function Accueil() {
     );
   }
   const aVenir = charge.annuaire.evenements.filter((e) => !estTermine(e));
+  // Premier jeu rendu côté serveur (correctif audit 13 nov. 2026) : ce soir,
+  // ce weekend et les prochains à venir, plafonné à 40 — l'HTML initial ne
+  // transporte plus les ~150 événements (508 Ko mesurés). La liste complète
+  // arrive par /api/annuaire seulement quand un filtre est activé.
+  const prioritaires = new Set(
+    aVenir
+      .filter((e) => dansLaPeriode(e.date_debut, "ce-soir") || dansLeWeekend(e.date_debut))
+      .map((e) => e.id),
+  );
+  const initiaux: EvenementPublic[] = [];
+  for (const e of aVenir) {
+    if (prioritaires.has(e.id) || initiaux.length < 40) initiaux.push(e);
+  }
+  const compte = new Map<string, number>();
+  for (const e of aVenir) if (e.ville) compte.set(e.ville, (compte.get(e.ville) ?? 0) + 1);
+  const comptesVilles = [...compte.entries()].sort((a, b) => b[1] - a[1]);
   const email = await emailContact();
   return (
     <Gabarit large>
-      <AccueilPublic evenements={aVenir} panneaux={choisirBanniere(aVenir)} email={email} />
+      <AccueilPublic evenements={initiaux} comptesVilles={comptesVilles} total={aVenir.length} panneaux={choisirBanniere(aVenir)} email={email} />
     </Gabarit>
   );
 }

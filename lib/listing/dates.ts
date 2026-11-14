@@ -70,13 +70,45 @@ export function formaterQuand(iso: string, fuseau: string = FUSEAU_DEFAUT): stri
   }).format(new Date(iso));
 }
 
-/** Terminé quand la fin (ou le début, s'il n'y a pas de fin) est passée. */
+/**
+ * Fin effective d'un événement : sa date de fin quand elle existe, sinon la
+ * fin de son jour de début dans son propre fuseau. Une soirée sans heure de
+ * fin annoncée reste donc visible — et « en cours » — jusqu'à la fin de sa
+ * journée au lieu de disparaître dès l'heure de début passée (audit du
+ * 13 nov. 2026 : des soirées commencées à 16 h/17 h étaient invisibles à
+ * 20 h 30).
+ */
+export function finEffective(evenement: { date_debut: string; date_fin: string | null; fuseau?: string }): number {
+  if (evenement.date_fin) {
+    const fin = Date.parse(evenement.date_fin);
+    if (Number.isFinite(fin)) return fin;
+  }
+  if (!Number.isFinite(Date.parse(evenement.date_debut))) return Number.NaN;
+  const fuseau = evenement.fuseau ?? FUSEAU_DEFAUT;
+  try {
+    const jour = saisieDepuisInstant(evenement.date_debut, fuseau).slice(0, 10);
+    return Date.parse(instantDepuisSaisie(`${jour}T23:59`, fuseau)) + 59_999;
+  } catch {
+    return Number.NaN;
+  }
+}
+
+/** Terminé quand la fin effective (voir finEffective) est passée. */
 export function estTermine(
-  evenement: { date_debut: string; date_fin: string | null },
+  evenement: { date_debut: string; date_fin: string | null; fuseau?: string },
   maintenant = Date.now(),
 ): boolean {
-  const fin = Date.parse(evenement.date_fin ?? evenement.date_debut);
+  const fin = finEffective(evenement);
   return Number.isFinite(fin) && fin < maintenant;
+}
+
+/** Commencé mais pas terminé : l'événement est en train de se dérouler. */
+export function estEnCours(
+  evenement: { date_debut: string; date_fin: string | null; fuseau?: string },
+  maintenant = Date.now(),
+): boolean {
+  const debut = Date.parse(evenement.date_debut);
+  return Number.isFinite(debut) && debut <= maintenant && !estTermine(evenement, maintenant);
 }
 
 /**

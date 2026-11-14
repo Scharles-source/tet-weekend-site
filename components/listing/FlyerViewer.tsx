@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { altFlyer, creditPublic } from "@/lib/listing/flyer";
+import { altFlyer } from "@/lib/listing/flyer";
 import { formaterQuand } from "@/lib/listing/dates";
+import { nomLieuAffiche } from "@/lib/listing/faits";
 import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
 
@@ -26,8 +27,7 @@ function FlyerOuvert({ evenement, onClose }: { evenement: EvenementPublic; onClo
   const [zoom, setZoom] = useState(1);
   const flyer = evenement.flyer;
   const quand = formaterQuand(evenement.date_debut, evenement.fuseau);
-  const lieu = evenement.lieu?.nom ?? evenement.ville;
-  const credit = flyer ? creditPublic(flyer.credit, evenement.source_account, evenement.source) : null;
+  const lieu = nomLieuAffiche(evenement);
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -86,7 +86,7 @@ function FlyerOuvert({ evenement, onClose }: { evenement: EvenementPublic; onClo
       <footer className="absolute right-0 bottom-0 left-0 flex h-24 flex-col justify-center gap-1 px-4 text-sm text-white" onClick={(e) => e.stopPropagation()}>
         <p className="font-medium">{evenement.titre}</p>
         <p className="text-white/80">{[quand, lieu].filter(Boolean).join(" · ")}</p>
-        {credit && <p className="text-white/80">Flyer: {credit}</p>}
+        {/* Pas de mention de la source du flyer en public (règle permanente) : la provenance reste dans l'admin. */}
       </footer>
     </div>
   );

@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { CarteEvenement, ZoneFlyer } from "@/components/listing/CarteEvenement";
 import { Engagement } from "@/components/listing/Engagement";
+import { PartageFiche } from "@/components/listing/PartageFiche";
+import { TexteDetails } from "@/components/listing/TexteDetails";
 import { lienGoogleAgenda } from "@/lib/listing/calendrier";
 import { lireAnnuaire, chargerAnnuaire } from "@/lib/listing/data";
 import { estTermine, formaterQuand } from "@/lib/listing/dates";
@@ -106,7 +108,10 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
   const suivantsLieu = tous.filter(
     (e) => e.id !== evenement.id && !estTermine(e) && evenement.lieu && e.lieu?.id === evenement.lieu.id,
   );
-  const questionCarte = [evenement.lieu?.nom, evenement.lieu?.adresse, evenement.ville].filter(Boolean).join(", ");
+  const questionCarte = [evenement.lieu?.nom ?? evenement.lieu_nom, evenement.lieu?.adresse, evenement.ville].filter(Boolean).join(", ");
+  // Nom du lieu dès qu'il existe — lié ou énoncé dans la description — avant de dire « Venue not listed ».
+  const lieuNom = evenement.lieu?.nom ?? evenement.lieu_nom ?? lieuDepuisDescription(evenement.description);
+  const villeDansLeLieu = Boolean(lieuNom && evenement.ville && lieuNom.toLowerCase().includes(evenement.ville.toLowerCase()));
   const jsonLd = jsonLdEvenement(evenement, url);
 
   return (
@@ -141,10 +146,12 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
                 <Link href={`/lieux/${evenement.lieu.slug}`} className="text-[var(--nuit-texte)] underline">
                   {evenement.lieu.nom}
                 </Link>
+              ) : lieuNom ? (
+                lieuNom
               ) : (
                 "Venue not listed"
               )}
-              {evenement.ville && (
+              {evenement.ville && !villeDansLeLieu && (
                 <>
                   {" · "}
                   <Link href={`/villes/${slugVille(evenement.ville)}`} className="text-[var(--nuit-texte)] underline">
@@ -163,6 +170,9 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           )}
         </div>
 
+        {/* « I'm in » juste sous les infos : visible sans défiler (correctif audit 13 nov. 2026). */}
+        <Engagement evenementId={evenement.id} titre={evenement.titre} interetsInitiaux={evenement.interets ?? null} termine={termine} />
+
         {evenement.artistes.length > 0 && (
           <div className="mt-6">
             <h2 className="mb-2.5 font-[family-name:var(--font-display)] text-xl font-black text-[var(--nuit-texte)]">Lineup</h2>
@@ -180,10 +190,11 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
         {evenement.description && (
           <div className="mt-6">
             <h2 className="mb-2 font-[family-name:var(--font-display)] text-xl font-black text-[var(--nuit-texte)]">Details</h2>
-            <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-[var(--nuit-texte2)]">{evenement.description}</p>
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-[var(--nuit-texte2)]">
+              <TexteDetails texte={evenement.description} />
+            </p>
           </div>
         )}
-        <Engagement evenementId={evenement.id} interetsInitiaux={evenement.interets ?? null} termine={termine} />
         <div className="mt-6 flex flex-wrap gap-2">
           <a href={lienGoogleAgenda(evenement, url)} className="inline-flex min-h-12 items-center rounded-[14px] bg-[var(--accent)] px-5 text-[15px] font-extrabold text-white no-underline">
             Add to Google Calendar
@@ -191,6 +202,12 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           <a href={`/evenements/${evenement.slug}/calendrier`} className="inline-flex min-h-12 items-center rounded-[14px] border border-[#6B5B4D] px-5 text-[15px] font-bold text-[var(--nuit-texte)] no-underline">
             Download .ics
           </a>
+          <PartageFiche
+            titre={evenement.titre}
+            quand={formaterQuand(evenement.date_debut, evenement.fuseau)}
+            lieu={lieuNom ?? evenement.ville}
+            url={url}
+          />
         </div>
         {questionCarte && (evenement.lieu?.adresse || evenement.ville) && (
           <iframe

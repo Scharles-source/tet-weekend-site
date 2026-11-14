@@ -148,3 +148,30 @@ export function etiquettePosition(p: Position): string {
   if (p.pays === "HT") return "Haiti";
   return p.region ?? p.pays ?? "you";
 }
+
+/**
+ * Position par défaut quand le réseau ne dit rien d'utilisable (correctif
+ * audit 13 nov. 2026) : le cœur du catalogue, Port-au-Prince / Pétion-Ville,
+ * plutôt qu'un ordre qui laisserait croire que le site vise d'abord une
+ * ville de la diaspora.
+ */
+export const POSITION_DEFAUT: Position = { ville: "Pétion-Ville", region: null, pays: "HT" };
+
+/** La ville fait-elle partie du catalogue (villes des événements ou villes d'une zone connue) ? */
+export function villeDuCatalogue(nom: string, villesEvenements: string[]): boolean {
+  const s = slugVille(nom);
+  if (villesEvenements.some((v) => slugVille(v) === s)) return true;
+  return Boolean(zoneParVille(nom));
+}
+
+/**
+ * Position détectée rendue fiable : la géolocalisation par adresse IP est
+ * approximative au niveau de la ville (elle a déjà annoncé « Clifton », une
+ * ville sans aucun événement, comme point de référence). Une ville détectée
+ * hors catalogue est donc retirée : la zone et le pays, eux, restent
+ * fiables et suffisent au tri comme à l'étiquette affichée.
+ */
+export function positionDetecteeFiable(p: Position, villesEvenements: string[]): Position {
+  if (p.ville && !villeDuCatalogue(p.ville, villesEvenements)) return { ...p, ville: null };
+  return p;
+}

@@ -24,29 +24,92 @@ const PUCE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whit
 const ZONE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-[var(--accent)] px-[18px] text-sm font-bold text-white";
 const ZONE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-[18px] text-sm font-semibold text-[var(--nuit-texte)]";
 
+const CLE_FILTRE_VILLE = "tw_filtre_ville";
+const PLAFOND_A_VENIR = 40;
+
 export function AccueilPublic({
-  evenements: evenementsParDate,
+  evenements: evenementsInitiaux,
+  comptesVilles,
+  total,
   panneaux,
   email,
 }: {
   evenements: EvenementPublic[];
+  /** Comptes par ville sur la liste complète (les pastilles restent exactes même si seul un premier jeu est rendu). */
+  comptesVilles?: [string, number][];
+  /** Nombre total d'événements à venir (pour le lien « See all »). */
+  total?: number;
   panneaux: Panneau[];
   email: string;
   auto?: boolean;
 }) {
+  // L'accueil reçoit un premier jeu (ce soir, ce weekend, les prochains). La
+  // liste complète n'est chargée — par /api/annuaire — que lorsqu'un filtre
+  // ville/moment est activé (correctif poids, audit 13 nov. 2026).
+  const [tous, setTous] = useState<EvenementPublic[] | null>(null);
+  const [chargement, setChargement] = useState(false);
+  const listeBase = tous ?? evenementsInitiaux;
   // Fil intelligent : les événements proches du visiteur d'abord (sa ville, sa zone, son pays), puis le reste, chacun par date.
-  const { position, choisie, choisir } = usePosition(evenementsParDate);
-  const evenements = useMemo(() => trierParProximite(evenementsParDate, position), [evenementsParDate, position]);
+  const { position, choisie, choisir } = usePosition(listeBase);
+  const evenements = useMemo(() => trierParProximite(listeBase, position), [listeBase, position]);
   const [periode, setPeriode] = useState<Periode>("tout");
   const [ville, setVille] = useState<string | null>(null);
 
+  // La ville choisie via les pastilles est mémorisée et restaurée au retour du visiteur.
+  useEffect(() => {
+    let annule = false;
+    (async () => {
+      try {
+        const c = window.localStorage.getItem(CLE_FILTRE_VILLE);
+        if (c && !annule) setVille(c);
+      } catch {
+        /* stockage indisponible : pas de ville mémorisée */
+      }
+    })();
+    return () => {
+      annule = true;
+    };
+  }, []);
+
+  function choisirVille(nom: string | null) {
+    setVille(nom);
+    try {
+      if (nom) window.localStorage.setItem(CLE_FILTRE_VILLE, nom);
+      else window.localStorage.removeItem(CLE_FILTRE_VILLE);
+    } catch {
+      /* ignoré */
+    }
+  }
+
   const villes = useMemo(() => {
+    if (comptesVilles) return comptesVilles;
     const compte = new Map<string, number>();
-    for (const e of evenements) if (e.ville) compte.set(e.ville, (compte.get(e.ville) ?? 0) + 1);
+    for (const e of listeBase) if (e.ville) compte.set(e.ville, (compte.get(e.ville) ?? 0) + 1);
     return [...compte.entries()].sort((a, b) => b[1] - a[1]);
-  }, [evenements]);
+  }, [comptesVilles, listeBase]);
 
   const filtres = periode !== "tout" || ville !== null;
+
+  useEffect(() => {
+    if (!filtres || tous !== null) return;
+    let annule = false;
+    (async () => {
+      setChargement(true);
+      try {
+        const r = await fetch("/api/annuaire");
+        if (!r.ok) throw new Error("annuaire indisponible");
+        const d = (await r.json()) as { evenements: EvenementPublic[] };
+        if (!annule) setTous(d.evenements);
+      } catch {
+        /* le premier jeu reste affiché et filtré au mieux */
+      } finally {
+        if (!annule) setChargement(false);
+      }
+    })();
+    return () => {
+      annule = true;
+    };
+  }, [filtres, tous]);
   const resultats = useMemo(
     () => evenements.filter((e) => dansLaPeriode(e.date_debut, periode) && (ville === null || e.ville === ville)),
     [evenements, periode, ville],
@@ -75,15 +138,15 @@ export function AccueilPublic({
         </p>
       </header>
 
-      <PastilleLieu position={position} evenements={evenementsParDate} villes={villes.map(([nom]) => nom)} choisie={choisie} onChoisir={choisir} />
+      <PastilleLieu position={position} evenements={listeBase} villes={villes.map(([nom]) => nom)} choisie={choisie} onChoisir={choisir} />
 
       {/* Zone + moment */}
       <div className="no-scrollbar -mx-[var(--page-px)] mt-5 flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Choose a city">
-        <button type="button" className={ville === null ? ZONE_ON : ZONE_OFF} aria-pressed={ville === null} onClick={() => setVille(null)}>
+        <button type="button" className={ville === null ? ZONE_ON : ZONE_OFF} aria-pressed={ville === null} onClick={() => choisirVille(null)}>
           All cities
         </button>
         {villes.map(([nom, n]) => (
-          <button key={nom} type="button" className={ville === nom ? ZONE_ON : ZONE_OFF} aria-pressed={ville === nom} onClick={() => setVille(nom)}>
+          <button key={nom} type="button" className={ville === nom ? ZONE_ON : ZONE_OFF} aria-pressed={ville === nom} onClick={() => choisirVille(nom)}>
             {nom} <span className="ml-1.5 opacity-70">{n}</span>
           </button>
         ))}
@@ -100,6 +163,7 @@ export function AccueilPublic({
         <section className="mt-7" aria-live="polite">
           <p className="mb-4 text-[13px] font-bold tracking-[0.12em] text-[var(--nuit-muet)] uppercase">
             {resultats.length} event{resultats.length > 1 ? "s" : ""}
+            {chargement ? " · loading all events…" : ""}
           </p>
           {resultats.length === 0 ? (
             <p className="rounded-[20px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-5 text-[15px] text-[var(--nuit-texte2)]">
@@ -159,11 +223,20 @@ export function AccueilPublic({
               {evenements.length === 0 ? (
                 <p className="text-sm text-[var(--nuit-muet)]">No upcoming events for the moment.</p>
               ) : (
-                <div className="space-y-2.5">
-                  {evenements.map((e) => (
-                    <LigneEvenement key={e.id} evenement={e} />
-                  ))}
-                </div>
+                <>
+                  <div className="space-y-2.5">
+                    {evenements.slice(0, PLAFOND_A_VENIR).map((e) => (
+                      <LigneEvenement key={e.id} evenement={e} />
+                    ))}
+                  </div>
+                  {(total ?? evenements.length) > PLAFOND_A_VENIR && (
+                    <p className="mt-4">
+                      <Link href="/evenements" className="text-sm font-bold text-[var(--accent-texte)] no-underline">
+                        See all {total ?? evenements.length} events
+                      </Link>
+                    </p>
+                  )}
+                </>
               )}
             </section>
             <BlocOrganisateurs />

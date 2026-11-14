@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { codePays, etiquettePosition, nombreProches, positionDepuisVille, rangProximite, trierParProximite } from "./proximite.ts";
+import { codePays, etiquettePosition, nombreProches, POSITION_DEFAUT, positionDepuisVille, positionDetecteeFiable, rangProximite, trierParProximite, villeDuCatalogue } from "./proximite.ts";
 import type { EvenementPublic } from "./types.ts";
 
 function ev(id: string, ville: string | null, pays: string | null = null): EvenementPublic {
@@ -76,4 +76,27 @@ test("ville choisie : le pays vient des événements de cette ville", () => {
   assert.equal(p.pays, "US");
   assert.equal(etiquettePosition(p), "Miami");
   assert.equal(etiquettePosition({ ville: null, region: null, pays: "HT" }), "Haiti");
+});
+
+test("position par défaut : Pétion-Ville, cœur du catalogue (correctif audit 13 nov. 2026)", () => {
+  assert.equal(POSITION_DEFAUT.pays, "HT");
+  assert.equal(etiquettePosition(POSITION_DEFAUT), "Pétion-Ville");
+  assert.equal(rangProximite(ev("a", "Pétion-Ville"), POSITION_DEFAUT), 0);
+  assert.equal(rangProximite(ev("b", "Cap-Haïtien"), POSITION_DEFAUT), 1);
+  assert.equal(rangProximite(ev("c", "Brooklyn"), POSITION_DEFAUT), 3);
+});
+
+test("ville détectée hors catalogue : retirée, la zone et le pays restent (cas « Clifton »)", () => {
+  const villes = ["Brooklyn", "Pétion-Ville", "Miami"];
+  assert.equal(villeDuCatalogue("Clifton", villes), false);
+  assert.equal(villeDuCatalogue("Brooklyn", villes), true);
+  assert.equal(villeDuCatalogue("Newark", villes), true); // ville d'une zone connue
+  const fiable = positionDetecteeFiable({ ville: "Clifton", region: "NJ", pays: "US" }, villes);
+  assert.equal(fiable.ville, null);
+  assert.equal(fiable.region, "NJ");
+  assert.equal(fiable.pays, "US");
+  // Le tri par zone continue de fonctionner sans la ville approximative.
+  assert.equal(rangProximite(ev("a", "Brooklyn"), fiable), 1);
+  const inchangee = positionDetecteeFiable({ ville: "Brooklyn", region: "NY", pays: "US" }, villes);
+  assert.equal(inchangee.ville, "Brooklyn");
 });

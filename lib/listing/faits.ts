@@ -42,6 +42,24 @@ export function lieuDepuisDescription(description: string | null): string | null
   return valeur;
 }
 
+/**
+ * Nom du lieu à afficher sur une carte (correctif audit 13 nov. 2026) : le
+ * lieu lié quand il existe, sinon le nom libre de l'événement (premier
+ * segment de sa ligne « Lieu : … », avant l'adresse), sinon la ville. Pour
+ * les watch parties, le lieu est le critère de choix : il doit être sur la
+ * carte, pas seulement dans la fiche.
+ */
+export function nomLieuAffiche(e: {
+  lieu: { nom: string } | null;
+  lieu_nom?: string | null;
+  ville: string | null;
+}): string | null {
+  if (e.lieu?.nom) return e.lieu.nom;
+  const libre = e.lieu_nom?.split(",")[0]?.trim();
+  if (libre) return libre;
+  return e.ville;
+}
+
 const ARTISTES_GENERIQUES = new Set([
   "animation",
   "dj",

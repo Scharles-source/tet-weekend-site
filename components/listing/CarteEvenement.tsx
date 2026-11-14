@@ -5,8 +5,8 @@ import { useState } from "react";
 import { BandeEvenement } from "@/components/listing/BandeEvenement";
 import { FlyerHeader } from "@/components/listing/FlyerHeader";
 import { FlyerViewer } from "@/components/listing/FlyerViewer";
-import { formaterBadge, formaterPastille } from "@/lib/listing/dates";
-import { creditPublic } from "@/lib/listing/flyer";
+import { estEnCours, formaterBadge, formaterPastille } from "@/lib/listing/dates";
+import { nomLieuAffiche } from "@/lib/listing/faits";
 import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
 
@@ -21,7 +21,7 @@ export function CarteEvenement({ evenement }: { evenement: EvenementPublic }) {
           flyer={evenement.flyer}
           title={evenement.titre}
           dateLabel={formaterBadge(evenement.date_debut, evenement.fuseau)}
-          lieu={evenement.lieu?.nom ?? evenement.ville}
+          lieu={nomLieuAffiche(evenement)}
           variant="carte"
           onOpen={() => setOuvert(true)}
         />
@@ -34,7 +34,9 @@ export function CarteEvenement({ evenement }: { evenement: EvenementPublic }) {
 
 export function LigneEvenement({ evenement }: { evenement: EvenementPublic }) {
   const pastille = formaterPastille(evenement.date_debut, evenement.fuseau);
-  const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(" · ") || "Venue not listed";
+  const nomLieu = nomLieuAffiche(evenement);
+  const ou = [nomLieu, evenement.ville].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i).join(" · ");
+  const enCours = estEnCours(evenement);
   return (
     <Link href={`/evenements/${evenement.slug}`} className="flex items-center gap-3 rounded-[16px] border-[1.5px] border-[#EFE5D2] bg-white p-3 text-inherit no-underline shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
       <span className="flex h-[56px] w-[56px] shrink-0 flex-col items-center justify-center rounded-xl bg-[#FDECEA]">
@@ -43,7 +45,10 @@ export function LigneEvenement({ evenement }: { evenement: EvenementPublic }) {
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[14.5px] font-bold text-[#191410]">{evenement.titre}</span>
-        <span className="block truncate text-[12.5px] text-[#8A7B66]">{ou}</span>
+        <span className="block truncate text-[12.5px] text-[#8A7B66]">
+          {enCours && <span className="font-extrabold text-[#B91C1C]">Happening now · </span>}
+          {ou}
+        </span>
       </span>
       {evenement.flyer ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -68,7 +73,7 @@ export function CarteEvenementCompacte({ evenement }: { evenement: EvenementPubl
           flyer={evenement.flyer}
           title={evenement.titre}
           dateLabel={formaterBadge(evenement.date_debut, evenement.fuseau)}
-          lieu={evenement.lieu?.nom ?? evenement.ville}
+          lieu={nomLieuAffiche(evenement)}
           variant="carte"
           onOpen={() => setOuvert(true)}
         />
@@ -98,8 +103,7 @@ export function CarteEvenementCompacte({ evenement }: { evenement: EvenementPubl
 
 export function ZoneFlyer({ evenement }: { evenement: EvenementPublic }) {
   const [ouvert, setOuvert] = useState(false);
-  const lieu = evenement.lieu?.nom ?? evenement.ville;
-  const credit = evenement.flyer ? creditPublic(evenement.flyer.credit, evenement.source_account, evenement.source) : null;
+  const lieu = nomLieuAffiche(evenement);
   return (
     <div className="mb-6" style={{ containerType: "inline-size" }}>
       <FlyerHeader
@@ -115,7 +119,7 @@ export function ZoneFlyer({ evenement }: { evenement: EvenementPublic }) {
           <button type="button" className="min-h-11 rounded-full border border-[#EFE5D2] bg-white px-4 text-[#191410]" onClick={() => setOuvert(true)}>
             View the full flyer
           </button>
-          {credit && <span className="text-[#8A7B66]">Flyer: {credit}</span>}
+          {/* La provenance du flyer (plateforme source) n'est jamais affichée au public : elle reste dans l'admin. */}
         </div>
       )}
       <FlyerViewer evenement={evenement} open={ouvert} onClose={() => setOuvert(false)} />

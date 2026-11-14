@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CarteStory } from "@/components/listing/CarteStory";
-import { estTermine, formaterQuand } from "@/lib/listing/dates";
+import { estEnCours, estTermine, formaterQuand } from "@/lib/listing/dates";
 import { envoyer, interets, memoriserInteret, visiteur } from "@/lib/listing/engagement-client";
+import { nomLieuAffiche } from "@/lib/listing/faits";
 import { lienCourt } from "@/lib/listing/lien-court";
 import { preuveSociale } from "@/lib/listing/preuve";
 import { signauxRarete } from "@/lib/listing/rarete";
@@ -21,9 +22,11 @@ const OR = "#FFC247";
  */
 export function BandeEvenement({ evenement, compact = false, etroit = false }: { evenement: EvenementPublic; compact?: boolean; etroit?: boolean }) {
   const termine = estTermine(evenement);
+  const enCours = estEnCours(evenement);
   const categorie = nomCategorie(evenement.categorie);
   const quand = formaterQuand(evenement.date_debut, evenement.fuseau);
-  const ou = [evenement.lieu?.nom, evenement.ville].filter(Boolean).join(" · ");
+  const nomLieu = nomLieuAffiche(evenement);
+  const ou = [nomLieu, evenement.ville].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i).join(" · ");
   const couverture = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
 
   const [dedans, setDedans] = useState(false);
@@ -83,7 +86,8 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
 
   const nombre = total !== null && total >= 1 ? total : null;
   const preuve = preuveSociale(evenement);
-  const raretes = signauxRarete(evenement).slice(0, etroit ? 1 : 2);
+  // Badges pré-calculés au chargement quand la description n'a pas voyagé (liste allégée de l'API).
+  const raretes = (evenement.badges_rarete ?? signauxRarete(evenement)).slice(0, etroit ? 1 : 2);
 
   return (
     <div className="relative overflow-hidden text-white" style={{ background: "#2A1F1B" }}>
@@ -101,8 +105,14 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
       )}
       <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,12,10,0.25), rgba(20,12,10,0.55))" }} />
       <div className={`relative ${etroit ? "p-3" : compact ? "p-3.5" : "p-4"}`}>
-        {raretes.length > 0 && (
+        {(enCours || raretes.length > 0) && (
           <div className="mb-1.5 flex flex-wrap gap-1.5">
+            {enCours && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E02B20] px-2 py-0.5 text-[10.5px] font-extrabold tracking-[0.06em] uppercase text-white">
+                <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
+                Happening now
+              </span>
+            )}
             {raretes.map((r) => (
               <span key={r} className="rounded-full px-2 py-0.5 text-[10.5px] font-extrabold tracking-[0.06em] uppercase" style={{ border: `1px solid ${OR}`, color: OR }}>
                 {r}
@@ -114,7 +124,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           <p className="text-[10.5px] font-bold tracking-[0.12em] uppercase" style={{ color: OR }}>
             {quand}
             {categorie ? ` · ${categorie}` : ""}
-            {termine ? " · Event ended" : ""}
+            {termine ? " · Event ended" : enCours ? " · Happening now" : ""}
           </p>
         )}
         <h3 className={`font-[family-name:var(--font-display)] font-black leading-tight ${etroit ? "line-clamp-2 text-[15px]" : `mt-1 ${compact ? "text-[17px] lg:text-[18.5px]" : "text-[20px]"}`}`}>
@@ -123,7 +133,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           </Link>
         </h3>
         <p className={`mt-1 font-semibold ${etroit ? "truncate text-[13px]" : "text-[13.5px]"}`} style={{ color: "rgba(255,255,255,0.8)" }}>
-          {ou || "Venue not listed"}
+          {ou}
         </p>
         {!etroit && evenement.artistes.length > 0 && (
           <p className="mt-1 truncate text-[12.5px]" style={{ color: "rgba(255,255,255,0.66)" }}>

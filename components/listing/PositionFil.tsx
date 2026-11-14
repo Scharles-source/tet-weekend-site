@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { etiquettePosition, nombreProches, positionDepuisVille, type Position } from "@/lib/listing/proximite";
+import { etiquettePosition, nombreProches, POSITION_DEFAUT, positionDepuisVille, positionDetecteeFiable, type Position } from "@/lib/listing/proximite";
 import type { EvenementPublic } from "@/lib/listing/types";
 
 const CLE_VILLE = "tw_ville_choisie";
@@ -10,6 +10,7 @@ const CLE_CACHE = "tw_position";
 /** Position du visiteur : la ville qu'il a choisie, sinon celle détectée par son réseau (approximative, jamais enregistrée). */
 export function usePosition(evenements: EvenementPublic[]) {
   const [detectee, setDetectee] = useState<Position | null>(null);
+  const [detectionFaite, setDetectionFaite] = useState(false);
   const [choisie, setChoisie] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,7 +25,10 @@ export function usePosition(evenements: EvenementPublic[]) {
       try {
         const cache = window.sessionStorage.getItem(CLE_CACHE);
         if (cache) {
-          if (!annule) setDetectee(JSON.parse(cache) as Position);
+          if (!annule) {
+            setDetectee(JSON.parse(cache) as Position);
+            setDetectionFaite(true);
+          }
           return;
         }
       } catch {
@@ -41,7 +45,9 @@ export function usePosition(evenements: EvenementPublic[]) {
         }
         if (!annule) setDetectee(p);
       } catch {
-        /* hors ligne ou bloqué : le fil garde son ordre par date */
+        /* hors ligne ou bloqué : la position par défaut (Haïti) prend le relais */
+      } finally {
+        if (!annule) setDetectionFaite(true);
       }
     })();
     return () => {
@@ -49,11 +55,25 @@ export function usePosition(evenements: EvenementPublic[]) {
     };
   }, []);
 
+  const villesCatalogue = useMemo(() => {
+    const noms = new Set<string>();
+    for (const e of evenements) {
+      if (e.ville) noms.add(e.ville);
+      if (e.lieu?.ville) noms.add(e.lieu.ville);
+    }
+    return [...noms];
+  }, [evenements]);
+
   const position = useMemo<Position | null>(() => {
     if (choisie) return positionDepuisVille(choisie, evenements);
-    if (detectee && (detectee.ville || detectee.pays)) return detectee;
-    return null;
-  }, [choisie, detectee, evenements]);
+    if (detectee && (detectee.ville || detectee.pays)) {
+      // Ville détectée hors catalogue = approximation du réseau : on garde la zone et le pays.
+      const fiable = positionDetecteeFiable(detectee, villesCatalogue);
+      if (fiable.ville || fiable.region || fiable.pays) return fiable;
+    }
+    // Rien d'utilisable : le point de référence par défaut est le cœur du catalogue (Haïti).
+    return detectionFaite ? POSITION_DEFAUT : null;
+  }, [choisie, detectee, evenements, villesCatalogue, detectionFaite]);
 
   function choisir(nom: string | null) {
     setChoisie(nom);

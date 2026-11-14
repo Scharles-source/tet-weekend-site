@@ -35,7 +35,9 @@ export default async function PageVille({ params }: { params: Promise<{ slug: st
     if (!ville) notFound();
     const ici = annuaire.evenements.filter((e) => (e.ville ? slugVille(e.ville) : "") === slug);
     const weekend = ici.filter((e) => !estTermine(e) && dansLeWeekend(e.date_debut));
-    const aVenir = ici.filter((e) => !estTermine(e));
+    const idsWeekend = new Set(weekend.map((e) => e.id));
+    // « Coming up » ne répète pas « This weekend » (correctif audit 13 nov. 2026).
+    const aVenir = ici.filter((e) => !estTermine(e) && !idsWeekend.has(e.id));
     const lieux = annuaire.lieux.filter((l) => l.ville && slugVille(l.ville) === slug);
     return (
       <Gabarit>
@@ -52,7 +54,7 @@ export default async function PageVille({ params }: { params: Promise<{ slug: st
         <section className="mt-8 space-y-3">
           <h2 className="font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">Coming up</h2>
           {aVenir.length === 0 ? (
-            <p className="text-sm text-[var(--text-sec)]">No upcoming events.</p>
+            <p className="text-sm text-[var(--text-sec)]">{weekend.length > 0 ? "No other upcoming events." : "No upcoming events."}</p>
           ) : (
             aVenir.map((e) => <CarteEvenement key={e.id} evenement={e} />)
           )}

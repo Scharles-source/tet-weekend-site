@@ -1,6 +1,9 @@
 import { altFlyer } from "./flyer.ts";
 import { estTermine, formaterQuand } from "./dates.ts";
+import { lieuDepuisDescription } from "./faits.ts";
 import { rangsParVille } from "./preuve.ts";
+import { signauxRarete } from "./rarete.ts";
+import { nomVilleCanonique } from "./villes.ts";
 import type { ArtistePublic, EvenementPublic, FlyerPublic, LieuPublic } from "./types.ts";
 
 export class ConfigurationSupabaseManquante extends Error {
@@ -57,14 +60,39 @@ function texte(v: unknown): string | null {
   return t ? t : null;
 }
 
+/**
+ * Affichage public des lieux géographiques (correctif audit 13 nov. 2026) :
+ * la ville est ramenée à sa forme canonique (« Tampa, Floride » → « Tampa »,
+ * « Boston, Massachusetts » → « Boston ») pour que les listes anglaises ne
+ * mélangent plus États et pays en français et en anglais, et le pays des
+ * lieux est affiché en anglais (« États-Unis » → « United States »).
+ */
+function villeAffichee(v: string | null): string | null {
+  return v ? nomVilleCanonique(v) : null;
+}
+
+const PAYS_AFFICHES: Record<string, string> = {
+  "haiti": "Haiti",
+  "haïti": "Haiti",
+  "etats-unis": "United States",
+  "états-unis": "United States",
+  "etats-unis d'amerique": "United States",
+  "états-unis d'amérique": "United States",
+};
+
+function paysAffiche(v: string | null): string | null {
+  if (!v) return null;
+  return PAYS_AFFICHES[v.trim().toLowerCase()] ?? v;
+}
+
 function lieuDe(brut: Record<string, unknown> | null): LieuPublic | null {
   if (!brut || typeof brut.id !== "string") return null;
   return {
     id: brut.id,
     slug: String(brut.slug),
     nom: String(brut.nom),
-    ville: texte(brut.ville),
-    pays: texte(brut.pays),
+    ville: villeAffichee(texte(brut.ville)),
+    pays: paysAffiche(texte(brut.pays)),
     adresse: texte(brut.adresse),
     type: texte(brut.type),
     description: texte(brut.description),
@@ -125,7 +153,7 @@ function evenementDe(brut: EvenementBrut): EvenementPublic {
     titre: String(brut.titre),
     date_debut: String(brut.date_debut),
     date_fin: texte(brut.date_fin),
-    ville: texte(brut.ville) ?? lieuDe(venueBrut ?? null)?.ville ?? null,
+    ville: villeAffichee(texte(brut.ville) ?? lieuDe(venueBrut ?? null)?.ville ?? null),
     description: descriptionPublique(texte(brut.description)),
     prix: texte(brut.prix),
     source: texte(brut.source),
@@ -143,6 +171,9 @@ function evenementDe(brut: EvenementBrut): EvenementPublic {
   };
   const lieu = evenement.lieu?.nom ?? evenement.ville;
   evenement.flyer = flyerDe(brut, evenement.titre, lieu, formaterQuand(evenement.date_debut, evenement.fuseau));
+  // Nom du lieu affichable même sans lieu lié : celui énoncé dans la description.
+  evenement.lieu_nom = evenement.lieu?.nom ?? lieuDepuisDescription(evenement.description);
+  evenement.badges_rarete = signauxRarete(evenement);
   return evenement;
 }
 

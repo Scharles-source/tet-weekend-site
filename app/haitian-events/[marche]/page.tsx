@@ -39,6 +39,9 @@ export default async function PageMarche({ params }: { params: Promise<{ marche:
   const ici = annuaire.evenements.filter((e) => evenementDuMarche(e, marche));
   const aVenir = ici.filter((e) => !estTermine(e));
   const weekend = aVenir.filter((e) => dansLeWeekend(e.date_debut));
+  const idsWeekend = new Set(weekend.map((e) => e.id));
+  // « Coming up » ne répète pas « This weekend » (correctif audit 13 nov. 2026).
+  const aVenirApres = aVenir.filter((e) => !idsWeekend.has(e.id));
   const slugsMarches = new Set(marche.villes.map((v) => slugVille(v)));
   const villes = villesDe({ lieux: [], evenements: aVenir }).filter((v) => slugsMarches.has(v.slug));
   const autres = MARCHES.filter((m) => m.slug !== marche.slug);
@@ -67,10 +70,10 @@ export default async function PageMarche({ params }: { params: Promise<{ marche:
       </section>
       <section className="mt-8 space-y-3">
         <h2 className="font-[family-name:var(--font-display)] text-[19px] font-black text-[#191410]">Coming up</h2>
-        {aVenir.length === 0 ? (
-          <p className="text-sm text-[var(--text-sec)]">No upcoming events.</p>
+        {aVenirApres.length === 0 ? (
+          <p className="text-sm text-[var(--text-sec)]">{weekend.length > 0 ? "No other upcoming events." : "No upcoming events."}</p>
         ) : (
-          aVenir.map((e) => <CarteEvenement key={e.id} evenement={e} />)
+          aVenirApres.map((e) => <CarteEvenement key={e.id} evenement={e} />)
         )}
       </section>
       {villes.length > 0 && (
