@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
+import { BlocDate } from "@/components/listing/BlocDate";
 import { estEnCours, formaterKicker } from "@/lib/listing/dates";
 import { nomLieuAffiche } from "@/lib/listing/faits";
 import type { EvenementPublic } from "@/lib/listing/types";
@@ -34,7 +35,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
   const enCours = estEnCours(e);
   const lieu = [nomLieuAffiche(e), e.ville].filter(Boolean).join(" · ") || "Venue not listed";
   const badge = (
-    <span className="rounded-full bg-[#26262C] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
+    <span className="rounded-full bg-[#3F3F4C] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
       {courant.sponsorise ? "SPONSORED" : "TRENDING"}
     </span>
   );
@@ -78,16 +79,27 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
         )}
 
         <div className="relative flex h-[460px] flex-col lg:h-auto lg:min-h-[380px] lg:flex-row lg:items-center">
-          {/* Flyer entier, jamais recadré */}
+          {/* Flyer entier, jamais recadré ; le bloc date aux couleurs du
+              flyer se pose en haut à gauche de l'image (le badge
+              « Happening now » vit dans la colonne d'infos, pas sur l'image). */}
           <div className="flex items-center justify-center px-4 pt-4 lg:py-[30px] lg:pr-0 lg:pl-[34px]">
-            {e.flyer ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={flyerAllege(e.flyer.publicUrl, 640)} alt={e.titre} decoding="async" className="h-[220px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
-            ) : (
-              <div className="flex h-[220px] w-[240px] items-center justify-center rounded-[14px] bg-[rgba(0,0,0,.25)] px-4 text-center lg:h-[320px]">
-                <p className="font-[family-name:var(--font-display)] text-[22px] font-black text-white">{e.titre}</p>
-              </div>
-            )}
+            <div className="relative">
+              {e.flyer ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={flyerAllege(e.flyer.publicUrl, 640)} alt={e.titre} decoding="async" className="h-[220px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
+              ) : (
+                <div className="flex h-[220px] w-[240px] items-center justify-center rounded-[14px] bg-[rgba(0,0,0,.25)] px-4 text-center lg:h-[320px]">
+                  <p className="font-[family-name:var(--font-display)] text-[22px] font-black text-white">{e.titre}</p>
+                </div>
+              )}
+              <BlocDate
+                iso={e.date_debut}
+                fuseau={e.fuseau}
+                flyerUrl={e.flyer ? (flyerAllege(e.flyer.publicUrl, 128) ?? null) : null}
+                grand
+                className="absolute top-2 left-2"
+              />
+            </div>
           </div>
 
           {/* Informations : bloc blanc sur mobile, texte blanc sur le fond flouté sur desktop */}
@@ -111,14 +123,14 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
             <h2 className="mt-2 line-clamp-2 h-[51px] font-[family-name:var(--font-display)] text-[22px] font-black leading-tight text-white lg:h-auto lg:text-[37px] lg:leading-[1.12]">
               {e.titre}
             </h2>
-            <p className="mt-2 flex min-w-0 items-center gap-1.5 text-[14px] text-[#D8D8DC] lg:text-[16.5px]">
+            <p className="mt-2 flex min-w-0 items-center gap-1.5 text-[14px] text-[#E4E4EA] lg:text-[16.5px]">
               <MapPin size={16} aria-hidden className="shrink-0" />
               <span className="truncate">{lieu}</span>
             </p>
             <div className="mt-auto flex items-center gap-5 pt-5 pr-[172px] lg:pt-0 lg:pr-0">
               {e.prix ? (
                 <div className="h-[64px] overflow-hidden lg:h-auto">
-                  <p className="text-[11px] font-bold tracking-[1.5px] text-[#B4B4BC]">ADMISSION</p>
+                  <p className="text-[11px] font-bold tracking-[1.5px] text-[#CBCBD4]">ADMISSION</p>
                   <p className="line-clamp-2 font-[family-name:var(--font-display)] text-[20px] font-black text-white lg:text-[26px]">{e.prix}</p>
                 </div>
               ) : null}

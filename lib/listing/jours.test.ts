@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { cleJour, joursAvecEvenements, nomJour } from "./jours.ts";
+import { cleJour, grouperParJour, joursAvecEvenements, libelleGroupeJour, nomJour } from "./jours.ts";
 
 test("cleJour : le jour d'un événement est son jour local, dans son propre fuseau", () => {
   // 3 h 30 UTC : encore la veille au soir à New York (UTC-4 en juin), déjà le matin du 15 à Auckland (UTC+12).
@@ -49,4 +49,45 @@ test("joursAvecEvenements : comptes exacts par jour, ordre chronologique, jour a
 
 test("joursAvecEvenements : aucun événement, aucun jour", () => {
   assert.deepEqual(joursAvecEvenements([], new Date("2026-11-15T15:00:00.000Z")), []);
+});
+
+test("grouperParJour : groupes chronologiques, ordre d'entrée conservé dans chaque jour", () => {
+  // Dimanche 15 nov. 2026, 10 h à Port-au-Prince.
+  const maintenant = new Date("2026-11-15T15:00:00.000Z");
+  // Liste déjà triée (radial, par exemple) : le samedi 21 passe avant le
+  // dimanche 15 dans l'entrée, les groupes ressortent quand même par date,
+  // et dans le groupe du 15, « b » reste avant « a » comme dans l'entrée.
+  const groupes = grouperParJour(
+    [
+      { id: "loin", date_debut: "2026-11-22T01:00:00.000Z", fuseau: "America/Port-au-Prince" },
+      { id: "b", date_debut: "2026-11-15T18:00:00.000Z", fuseau: "America/Port-au-Prince" },
+      { id: "a", date_debut: "2026-11-16T01:00:00.000Z", fuseau: "America/Port-au-Prince" },
+    ],
+    maintenant,
+  );
+  assert.deepEqual(
+    groupes.map((g) => ({ cle: g.jour.cle, compte: g.jour.compte, ids: g.evenements.map((e) => e.id) })),
+    [
+      { cle: "2026-11-15", compte: 2, ids: ["b", "a"] },
+      { cle: "2026-11-21", compte: 1, ids: ["loin"] },
+    ],
+  );
+});
+
+test("grouperParJour : aucun événement, aucun groupe", () => {
+  assert.deepEqual(grouperParJour([], new Date("2026-11-15T15:00:00.000Z")), []);
+});
+
+test("libelleGroupeJour : Tonight, Tomorrow, puis « Sat, Nov 21 »", () => {
+  // Dimanche 15 nov. 2026, 10 h à Port-au-Prince.
+  const maintenant = new Date("2026-11-15T15:00:00.000Z");
+  const jours = joursAvecEvenements(
+    [
+      { date_debut: "2026-11-15T18:00:00.000Z", fuseau: "America/Port-au-Prince" },
+      { date_debut: "2026-11-16T18:00:00.000Z", fuseau: "America/Port-au-Prince" },
+      { date_debut: "2026-11-22T01:00:00.000Z", fuseau: "America/Port-au-Prince" },
+    ],
+    maintenant,
+  );
+  assert.deepEqual(jours.map((j) => libelleGroupeJour(j, maintenant)), ["Tonight", "Tomorrow", "Sat, Nov 21"]);
 });

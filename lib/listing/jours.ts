@@ -20,6 +20,7 @@ export interface JourEvenements {
 }
 
 const NOMS_JOURS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MOIS_COURTS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 /**
  * Clé du jour calendaire d'un instant dans un fuseau (« AAAA-MM-JJ »).
@@ -70,4 +71,54 @@ export function joursAvecEvenements(
       compte: n,
       aujourdhui: cle === actuel,
     }));
+}
+
+/** Un groupe du fil de l'accueil : un jour, et ses événements dans l'ordre où la liste triée les a donnés. */
+export interface GroupeJour<T> {
+  jour: JourEvenements;
+  evenements: T[];
+}
+
+/**
+ * Regroupe des événements par jour calendaire (celui de chaque événement,
+ * dans son fuseau), groupes en ordre chronologique. L'ordre à l'intérieur
+ * d'un groupe est celui de la liste d'entrée : le fil trie d'abord (radial
+ * en mode « Near me », chronologique en mode « All »), puis regroupe — le
+ * regroupement ne réordonne jamais à l'intérieur d'un jour.
+ */
+export function grouperParJour<T extends { date_debut: string; fuseau?: string }>(
+  evenements: T[],
+  maintenant = new Date(),
+): GroupeJour<T>[] {
+  const parCle = new Map<string, T[]>();
+  for (const e of evenements) {
+    const cle = cleJour(e.date_debut, e.fuseau ?? FUSEAU_DEFAUT);
+    const liste = parCle.get(cle);
+    if (liste) liste.push(e);
+    else parCle.set(cle, [e]);
+  }
+  return joursAvecEvenements(evenements, maintenant).map((jour) => ({
+    jour,
+    evenements: parCle.get(jour.cle) ?? [],
+  }));
+}
+
+/** Clé du lendemain du jour actuel (fuseau par défaut), pour le libellé « Tomorrow ». */
+function cleDemain(maintenant: Date): string {
+  const [annee, mois, numero] = cleJourActuel(maintenant).split("-").map(Number);
+  const d = new Date(Date.UTC(annee, (mois ?? 1) - 1, (numero ?? 1) + 1));
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const jj = String(d.getUTCDate()).padStart(2, "0");
+  return `${d.getUTCFullYear()}-${mm}-${jj}`;
+}
+
+/**
+ * Libellé d'un en-tête de groupe du fil : « Tonight » pour aujourd'hui,
+ * « Tomorrow » pour demain, sinon le jour et la date (« Sat, Nov 22 »).
+ */
+export function libelleGroupeJour(jour: JourEvenements, maintenant = new Date()): string {
+  if (jour.aujourdhui) return "Tonight";
+  if (jour.cle === cleDemain(maintenant)) return "Tomorrow";
+  const mois = MOIS_COURTS[Number(jour.cle.slice(5, 7)) - 1] ?? "";
+  return `${jour.nom}, ${mois} ${jour.numero}`;
 }

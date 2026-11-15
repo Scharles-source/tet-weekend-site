@@ -1,15 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Affiche } from "@/components/listing/Affiche";
 import { BanniereAccueil, type Panneau } from "@/components/listing/BanniereAccueil";
 import { usePosition } from "@/components/listing/PositionFil";
-import { cleJour, type JourEvenements } from "@/lib/listing/jours";
+import { grouperParJour, libelleGroupeJour, type JourEvenements } from "@/lib/listing/jours";
 import { etiquettePosition, pointDeReference, trierParDistance, zoneDePosition } from "@/lib/listing/proximite";
 import type { EvenementPublic } from "@/lib/listing/types";
 
 type Mode = "proche" | "tout";
+
+/** Morceaux du fil infini : le fil révèle les événements par paquets de 18, au fil du défilement. */
+const TAILLE_MORCEAU = 18;
 
 const SEG_ON = "flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-[var(--nuit-carte2)] px-4 text-sm font-bold text-white";
 const SEG_OFF = "flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-full px-4 text-sm font-semibold text-[var(--nuit-muet)]";
@@ -27,48 +29,27 @@ export function AccueilPublic({
   panneaux: Panneau[];
   email: string;
 }) {
-  // L'accueil reçoit un premier jeu (ce soir, ce weekend, les prochains). La
-  // liste complète n'est chargée — par /api/annuaire — que si le jour choisi
-  // n'est pas entièrement couvert par ce premier jeu (correctif poids,
-  // audit 13 nov. 2026).
+  // Le fil montre TOUT, groupé par jour (fil infini, demande de Smith,
+  // 15 nov. 2026). Le premier jeu vient du serveur ; la liste complète
+  // arrive par /api/annuaire dès le montage — même mécanique que l'ancien
+  // correctif de poids (audit 13 nov. 2026) : l'HTML initial reste léger,
+  // et /api/annuaire sert déjà la liste complète en version allégée.
   const [tous, setTous] = useState<EvenementPublic[] | null>(null);
-  const [chargement, setChargement] = useState(false);
+  const [chargement, setChargement] = useState(true);
   const listeBase = tous ?? evenementsInitiaux;
   const { position } = usePosition(listeBase);
   const point = useMemo(() => pointDeReference(position), [position]);
 
-  // Jour affiché : aujourd'hui s'il a des événements, sinon le premier jour
-  // du bandeau (qui ne liste que des jours avec événements). Le choix du
-  // visiteur, quand il touche une autre case, prime ensuite.
-  const [jourChoisi, setJourChoisi] = useState<string | null>(null);
-  const jourDefaut = jours.find((j) => j.aujourdhui)?.cle ?? jours[0]?.cle ?? null;
-  const jourActif = jourChoisi ?? jourDefaut;
-  const jour = jours.find((j) => j.cle === jourActif) ?? null;
-
-  // « Near me » par défaut, comme la maquette validée ; « All » = tout le
-  // catalogue du jour, en ordre chronologique.
-  const [mode, setMode] = useState<Mode>("proche");
-
-  // Couverture du jour affiché : le compte exact vient du serveur (liste
-  // complète) ; si le premier jeu en contient moins, on charge tout.
-  const compteCharge = useMemo(
-    () => (jour ? listeBase.filter((e) => cleJour(e.date_debut, e.fuseau) === jour.cle).length : 0),
-    [listeBase, jour],
-  );
-  const manque = jour !== null && tous === null && compteCharge < jour.compte;
-
   useEffect(() => {
-    if (!manque) return;
     let annule = false;
     (async () => {
-      setChargement(true);
       try {
         const r = await fetch("/api/annuaire");
         if (!r.ok) throw new Error("annuaire indisponible");
         const d = (await r.json()) as { evenements: EvenementPublic[] };
         if (!annule) setTous(d.evenements);
       } catch {
-        /* le premier jeu reste affiché, filtré au mieux */
+        /* le premier jeu reste affiché, au mieux */
       } finally {
         if (!annule) setChargement(false);
       }
@@ -76,19 +57,116 @@ export function AccueilPublic({
     return () => {
       annule = true;
     };
-  }, [manque]);
+  }, []);
 
-  // Mode « Near me » : le tri radial existant (distance croissante depuis le
-  // point du visiteur). Mode « All » : ordre chronologique, sans distance.
+  // « Near me » par défaut, comme la maquette validée ; « All » = tout le
+  // catalogue, en ordre chronologique.
+  const [mode, setMode] = useState<Mode>("proche");
+
+  // Mode « Near me » : le tri radial existant (distance croissante depuis
+  // le point du visiteur). Mode « All » : ordre chronologique. Le
+  // regroupement par jour conserve ensuite l'ordre du tri dans chaque jour.
   const evenements = useMemo(() => {
     if (mode === "proche") return trierParDistance(listeBase, point);
     return [...listeBase].sort((a, b) => Date.parse(a.date_debut) - Date.parse(b.date_debut));
   }, [listeBase, mode, point]);
 
-  const duJour = useMemo(
-    () => (jour ? evenements.filter((e) => cleJour(e.date_debut, e.fuseau) === jour.cle) : []),
-    [evenements, jour],
-  );
+  const groupes = useMemo(() => grouperParJour(evenements), [evenements]);
+
+  // Révélation progressive : un premier morceau rendu tout de suite, les
+  // suivants s'ajoutent quand la sentinelle de fin de fil entre à l'écran.
+  // Changer de mode repart du premier morceau (dans le clic, pas un effet).
+  const [nombreAffiches, setNombreAffiches] = useState(TAILLE_MORCEAU);
+  function changerMode(m: Mode) {
+    setMode(m);
+    setNombreAffiches(TAILLE_MORCEAU);
+  }
+
+  const groupesVisibles = useMemo(() => {
+    let restant = nombreAffiches;
+    const resultat: { jour: JourEvenements; evenements: EvenementPublic[] }[] = [];
+    for (const g of groupes) {
+      if (restant <= 0) break;
+      const pris = g.evenements.slice(0, restant);
+      if (pris.length > 0) resultat.push({ jour: g.jour, evenements: pris });
+      restant -= pris.length;
+    }
+    return resultat;
+  }, [groupes, nombreAffiches]);
+
+  const total = evenements.length;
+  const affiches = groupesVisibles.reduce((n, g) => n + g.evenements.length, 0);
+  const reste = total - affiches;
+
+  const sentinelle = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = sentinelle.current;
+    if (!el || reste <= 0) return;
+    const obs = new IntersectionObserver(
+      (entrees) => {
+        if (entrees.some((e) => e.isIntersecting)) setNombreAffiches((n) => n + TAILLE_MORCEAU);
+      },
+      { rootMargin: "800px 0px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [reste, groupesVisibles]);
+
+  // Bandeau de dates = navigateur de jours : la case active suit le groupe
+  // visible à l'écran (scrollspy), et toucher une case fait défiler le fil
+  // jusqu'au groupe du jour.
+  const [jourChoisi, setJourChoisi] = useState<string | null>(null);
+  const jourActif = jourChoisi ?? jours.find((j) => j.aujourdhui)?.cle ?? jours[0]?.cle ?? null;
+  const sections = useRef(new Map<string, HTMLElement>());
+  const cibleDefilement = useRef<string | null>(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entrees) => {
+        for (const e of entrees) {
+          if (e.isIntersecting) {
+            const cle = (e.target as HTMLElement).dataset.jour;
+            if (cle) setJourChoisi(cle);
+          }
+        }
+      },
+      { rootMargin: "-40% 0px -55% 0px" },
+    );
+    for (const el of sections.current.values()) obs.observe(el);
+    return () => obs.disconnect();
+  }, [groupesVisibles]);
+
+  // Après un toucher de case dont le groupe n'était pas encore rendu, le
+  // défilement a lieu dès que le groupe apparaît.
+  useEffect(() => {
+    const cle = cibleDefilement.current;
+    if (!cle) return;
+    const el = sections.current.get(cle);
+    if (el) {
+      cibleDefilement.current = null;
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [groupesVisibles]);
+
+  function allerAuJour(cle: string) {
+    setJourChoisi(cle);
+    cibleDefilement.current = cle;
+    // Révéler le groupe entier s'il est au-delà du morceau déjà affiché.
+    let cumul = 0;
+    for (const g of groupes) {
+      cumul += g.evenements.length;
+      if (g.jour.cle === cle) break;
+    }
+    if (nombreAffiches < cumul) {
+      setNombreAffiches(cumul);
+    } else {
+      const el = sections.current.get(cle);
+      if (el) {
+        cibleDefilement.current = null;
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }
 
   // Le deuxième segment dit « All of Haiti » tant que le visiteur est en
   // Haïti (ou pas encore situé : le site y est ancré par défaut) ; ailleurs,
@@ -109,10 +187,11 @@ export function AccueilPublic({
       </header>
 
       {/* Dates + portée, collées sous l'en-tête dès que la page défile (l'en-tête
-          global, fixe, mesure 65 px bordure comprise) : le visiteur peut changer
-          de jour à tout moment, sans remonter en haut de la page. */}
-      <div className="sticky top-[65px] z-30 -mx-[var(--page-px)] mt-5 border-b border-[var(--nuit-ligne)] bg-[rgba(38,38,44,0.92)] px-[var(--page-px)] pt-3 pb-3 backdrop-blur-lg">
-      {/* Bandeau de dates : seuls les jours qui ont des événements. */}
+          global, fixe, mesure 65 px bordure comprise) : le visiteur navigue
+          dans le fil par jour, sans remonter en haut de la page. */}
+      <div className="sticky top-[65px] z-30 -mx-[var(--page-px)] mt-5 border-b border-[var(--nuit-ligne)] bg-[rgba(63,63,76,0.92)] px-[var(--page-px)] pt-3 pb-3 backdrop-blur-lg">
+      {/* Bandeau de dates : seuls les jours qui ont des événements. Chaque
+          case fait défiler le fil jusqu'au groupe de ce jour. */}
       {jours.length > 0 && (
         <div className="no-scrollbar -mx-[var(--page-px)] flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Choose a day">
           {jours.map((j) => {
@@ -122,7 +201,7 @@ export function AccueilPublic({
                 key={j.cle}
                 type="button"
                 aria-pressed={actif}
-                onClick={() => setJourChoisi(j.cle)}
+                onClick={() => allerAuJour(j.cle)}
                 className={`flex min-w-[64px] shrink-0 flex-col items-center rounded-2xl px-3 py-2.5 ${
                   actif
                     ? "bg-[var(--nuit-texte)] text-[var(--encre)]"
@@ -141,7 +220,7 @@ export function AccueilPublic({
 
       {/* Près de moi, ou tout le catalogue. */}
       <div className={`${jours.length > 0 ? "mt-3" : ""} flex rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-1`} role="group" aria-label="Near me or everywhere">
-        <button type="button" aria-pressed={mode === "proche"} onClick={() => setMode("proche")} className={mode === "proche" ? SEG_ON : SEG_OFF}>
+        <button type="button" aria-pressed={mode === "proche"} onClick={() => changerMode("proche")} className={mode === "proche" ? SEG_ON : SEG_OFF}>
           {mode === "proche" && (
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M4 12.5l5 5L20 6.5" />
@@ -149,7 +228,7 @@ export function AccueilPublic({
           )}
           {libelleProche}
         </button>
-        <button type="button" aria-pressed={mode === "tout"} onClick={() => setMode("tout")} className={mode === "tout" ? SEG_ON : SEG_OFF}>
+        <button type="button" aria-pressed={mode === "tout"} onClick={() => changerMode("tout")} className={mode === "tout" ? SEG_ON : SEG_OFF}>
           {mode === "tout" && (
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M4 12.5l5 5L20 6.5" />
@@ -166,38 +245,53 @@ export function AccueilPublic({
         <BanniereAccueil panneaux={panneaux} email={email} />
       </section>
 
-      {/* Le jour choisi, et lui seul. */}
-      <section className="mt-9 lg:mt-12" aria-live="polite">
-        {jour ? (
-          <>
-            <div className="mb-3.5 flex items-baseline justify-between gap-3 lg:mb-5">
-              <h2 className="font-[family-name:var(--font-display)] text-2xl font-black tracking-tight text-[var(--nuit-texte)] lg:text-[30px]">
-                {jour.nom} {jour.numero} · {mode === "proche" ? "Near you" : libelleTout}
-              </h2>
-              <span className="shrink-0 text-[13px] font-semibold text-[var(--nuit-muet)]">
-                {jour.compte} event{jour.compte > 1 ? "s" : ""}
-                {chargement ? " · loading…" : ""}
-              </span>
-            </div>
-            {duJour.length === 0 ? (
-              <p className="rounded-[20px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-5 text-[15px] text-[var(--nuit-texte2)]">
-                Nothing published for this day yet.
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-                {duJour.map((e) => (
-                  <Affiche key={e.id} evenement={e} large />
-                ))}
-              </div>
-            )}
-            <p className="mt-5">
-              <Link href="/evenements" className="text-sm font-bold text-[var(--accent-texte)] no-underline">
-                See all events
-              </Link>
-            </p>
-          </>
-        ) : (
+      {/* Le fil infini : tous les événements à venir, groupés par jour. */}
+      <section className="mt-9 lg:mt-12">
+        <div className="mb-3.5 flex items-baseline justify-between gap-3 lg:mb-5">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-black tracking-tight text-[var(--nuit-texte)] lg:text-[30px]">
+            {mode === "proche" ? "Near you" : libelleTout}
+          </h2>
+          <span className="shrink-0 text-[13px] font-semibold text-[var(--nuit-muet)]">
+            {total} event{total > 1 ? "s" : ""}
+            {chargement ? " · loading…" : ""}
+          </span>
+        </div>
+        {groupes.length === 0 ? (
           <p className="text-sm text-[var(--nuit-muet)]">No upcoming events for the moment.</p>
+        ) : (
+          <>
+            {groupesVisibles.map((g) => (
+              <section
+                key={g.jour.cle}
+                id={`jour-${g.jour.cle}`}
+                data-jour={g.jour.cle}
+                ref={(el) => {
+                  if (el) sections.current.set(g.jour.cle, el);
+                  else sections.current.delete(g.jour.cle);
+                }}
+                className="mt-8 scroll-mt-[218px] first:mt-0"
+                aria-label={libelleGroupeJour(g.jour)}
+              >
+                <div className="mb-3.5 flex items-baseline justify-between gap-3">
+                  <h3 className="font-[family-name:var(--font-display)] text-[19px] font-black tracking-tight text-[var(--nuit-texte)] lg:text-[22px]">
+                    {libelleGroupeJour(g.jour)}
+                  </h3>
+                  <span className="shrink-0 text-[13px] font-semibold text-[var(--nuit-muet)]">
+                    {g.jour.compte} event{g.jour.compte > 1 ? "s" : ""}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+                  {g.evenements.map((e) => (
+                    <Affiche key={e.id} evenement={e} large />
+                  ))}
+                </div>
+              </section>
+            ))}
+            <div ref={sentinelle} aria-hidden="true" />
+            {reste > 0 && (
+              <p className="mt-6 text-center text-[13px] font-semibold text-[var(--nuit-muet)]">Loading more events…</p>
+            )}
+          </>
         )}
       </section>
     </div>

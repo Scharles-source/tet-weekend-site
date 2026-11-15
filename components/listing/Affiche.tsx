@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BandeEvenement } from "@/components/listing/BandeEvenement";
+import { BlocDate } from "@/components/listing/BlocDate";
 import { Urgence } from "@/components/listing/Urgence";
-import { formaterBadge } from "@/lib/listing/dates";
 import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
@@ -30,7 +30,7 @@ export function Affiche({ evenement, className = "", large = false }: { evenemen
   const url = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
   const categorie = nomCategorie(evenement.categorie);
   return (
-    <article className={`flex h-full flex-col overflow-hidden rounded-[22px] bg-[#303037] ${className}`}>
+    <article className={`flex h-full flex-col overflow-hidden rounded-[22px] bg-[#4C4C5B] ${className}`}>
       <Link
         href={`/evenements/${evenement.slug}`}
         aria-label={evenement.titre}
@@ -46,9 +46,15 @@ export function Affiche({ evenement, className = "", large = false }: { evenemen
             <span className="font-[family-name:var(--font-display)] text-[28px] leading-none font-black text-balance text-white">{evenement.titre}</span>
           </div>
         )}
-        <span className="absolute top-2.5 left-2.5 rounded-full bg-[rgba(18,18,22,0.82)] px-2.5 py-1 text-xs font-bold text-[var(--nuit-texte)]">
-          {formaterBadge(evenement.date_debut, evenement.fuseau)}
-        </span>
+        {/* Bloc date aux couleurs du flyer (grand numéro + mois), en haut à
+            gauche de l'image ; le badge « Happening now » vit dans la bande
+            d'infos, aucun recouvrement. */}
+        <BlocDate
+          iso={evenement.date_debut}
+          fuseau={evenement.fuseau}
+          flyerUrl={url ? (flyerAllege(url, 128) ?? null) : null}
+          className="absolute top-2.5 left-2.5"
+        />
         <Urgence evenement={evenement} className="absolute top-2.5 right-2.5" />
       </Link>
       <BandeEvenement evenement={evenement} etroit={!large} />
