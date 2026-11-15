@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { LigneEvenement } from "@/components/listing/CarteEvenement";
+import { Affiche } from "@/components/listing/Affiche";
 import type { Periode } from "@/lib/listing/periode";
 import { CRITERES_VIDES, nombreFiltres, rechercher, type Criteres, type Donnees, type Portee } from "@/lib/listing/recherche";
 import { CATEGORIES } from "@/lib/listing/schema";
@@ -148,9 +148,9 @@ export function Recherche({ donnees, villes }: { donnees: Donnees; villes: strin
         <div className="mt-6 space-y-8" aria-live="polite">
           {res.evenements.length > 0 && (
             <Section titre="Events" nombre={res.evenements.length}>
-              <div className="space-y-2.5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {res.evenements.map((e) => (
-                  <LigneEvenement key={e.id} evenement={e} />
+                  <Affiche key={e.id} evenement={e} large />
                 ))}
               </div>
             </Section>
