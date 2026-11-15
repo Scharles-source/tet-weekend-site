@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
-import { formaterKicker } from "@/lib/listing/dates";
+import { estEnCours, formaterKicker } from "@/lib/listing/dates";
 import { nomLieuAffiche } from "@/lib/listing/faits";
 import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
@@ -31,6 +31,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
   if (!courant) return <BanniereVide email={email} />;
 
   const e = courant.evenement;
+  const enCours = estEnCours(e);
   const lieu = [nomLieuAffiche(e), e.ville].filter(Boolean).join(" · ") || "Venue not listed";
   const badge = (
     <span className="rounded-full bg-[#26262C] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
@@ -92,6 +93,12 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
           {/* Informations : bloc blanc sur mobile, texte blanc sur le fond flouté sur desktop */}
           <div className="flex flex-1 flex-col px-5 pt-1 pb-6 lg:py-[30px] lg:pr-[34px] lg:pl-7">
             <div className="mb-3 flex items-center gap-3">
+              {enCours && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E02B20] px-2 py-0.5 text-[10.5px] font-extrabold tracking-[0.06em] uppercase text-white">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
+                  Happening now
+                </span>
+              )}
               <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-[2.5px] text-white">
                 <span className="h-[9px] w-[9px] rounded-full bg-[var(--accent)]" />
                 FEATURED
