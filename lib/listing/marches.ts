@@ -3,8 +3,10 @@ import type { EvenementPublic } from "./types.ts";
 
 /**
  * Pages marchés en anglais (bascule du site en anglais, 13 nov. 2026) :
- * les quatre zones que Smith a choisies — Haïti, l'État de New York, la
- * Floride et le Massachusetts (Boston en tête). Ce sont les requêtes que
+ * les zones que Smith a choisies — Haïti, l'État de New York, la
+ * Floride et le Massachusetts (Boston en tête) — plus Montréal, ajoutée
+ * le 15 nov. 2026 : pôle majeur de la diaspora, déjà des événements en
+ * base sans page marché. Ce sont les requêtes que
  * la diaspora tape réellement dans Google (« haitian events in New York »,
  * « haitian events this weekend »…). L'appartenance d'un événement à un
  * marché se décide sur sa ville canonique (voir villes.ts) ; les villes
@@ -66,6 +68,18 @@ export const MARCHES: Marche[] = [
       "Somerville", "Revere", "Chelsea", "Quincy", "Stoughton", "Mattapan", "Dorchester",
       "Hyde Park", "Roslindale", "Avon", "Braintree", "Fall River", "Lowell", "Lawrence",
       "Framingham", "Norwood", "Taunton",
+    ],
+  },
+  {
+    slug: "montreal",
+    nom: "Montreal",
+    titre: "Haitian Events in Montreal — This Weekend & Coming Up",
+    description:
+      "Haitian events in Montreal: kompa parties, bals, concerts and festivals in Montreal, Laval, Longueuil, Brossard and across the Greater Montreal area — this weekend, tonight and coming up.",
+    intro:
+      "Kompa parties, bals, concerts and festivals across the Montreal area — Montreal, Laval, Longueuil, Brossard and beyond. Every Haitian event announced in Quebec's Haitian community, in one place: what's on this weekend, tonight and in the weeks ahead.",
+    villes: [
+      "Montréal", "Laval", "Longueuil", "Brossard", "Terrebonne", "Repentigny", "Saint-Jérôme", "Gatineau",
     ],
   },
   {

@@ -25,10 +25,11 @@ function evenement(partiel: Partial<EvenementPublic>): EvenementPublic {
 const ny = marcheParSlug("new-york")!;
 const fl = marcheParSlug("florida")!;
 const ma = marcheParSlug("massachusetts")!;
+const qc = marcheParSlug("montreal")!;
 const ht = marcheParSlug("haiti")!;
 
-test("les quatre marchés existent", () => {
-  assert.ok(ny && fl && ma && ht);
+test("les cinq marchés existent", () => {
+  assert.ok(ny && fl && ma && qc && ht);
   assert.equal(marcheParSlug("texas"), undefined);
 });
 
@@ -41,6 +42,11 @@ test("appartenance par ville canonique (formes base de données comprises)", () 
   assert.equal(evenementDuMarche(evenement({ ville: "Pétion-Ville" }), ht), true);
   assert.equal(evenementDuMarche(evenement({ ville: "Montréal" }), ny), false);
   assert.equal(evenementDuMarche(evenement({ ville: "Montréal" }), ht), false);
+  // Montréal (marché ajouté le 15 nov. 2026) : la forme base « Montréal, Québec » matche.
+  assert.equal(evenementDuMarche(evenement({ ville: "Montréal, Québec" }), qc), true);
+  assert.equal(evenementDuMarche(evenement({ ville: "Montréal" }), qc), true);
+  assert.equal(evenementDuMarche(evenement({ ville: "Laval, Québec" }), qc), true);
+  assert.equal(evenementDuMarche(evenement({ ville: "Montréal, Québec" }), ny), false);
 });
 
 test("Haïti : le pays du lieu rattrape une ville hors liste", () => {

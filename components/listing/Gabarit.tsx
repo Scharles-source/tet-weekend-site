@@ -36,6 +36,7 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
             <Link href="/haitian-events/new-york" className="no-underline">Haitian Events in New York</Link>
             <Link href="/haitian-events/florida" className="no-underline">Haitian Events in Florida</Link>
             <Link href="/haitian-events/massachusetts" className="no-underline">Haitian Events in Massachusetts</Link>
+            <Link href="/haitian-events/montreal" className="no-underline">Haitian Events in Montreal</Link>
             <Link href="/haitian-events/haiti" className="no-underline">Haitian Events in Haiti</Link>
           </nav>
         </div>
