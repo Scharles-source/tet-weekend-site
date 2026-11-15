@@ -76,7 +76,7 @@ body {
 .mobile-nav {
   position: fixed;
   top: 65px; left: 0; right: 0;
-  background: rgba(38,38,44,0.97);
+  background: rgba(63,63,76,0.97);
   backdrop-filter: blur(20px);
   z-index: 99;
   flex-direction: column;
@@ -128,21 +128,21 @@ body {
 
 /* Thème « nuit » des pages publiques (l'accent se change ici, en un seul endroit). */
 .theme-nuit {
-  --nuit-fond: #26262C;
-  --nuit-carte: #303037;
-  --nuit-carte2: #3A3A42;
-  --nuit-ligne: #4A4A53;
+  --nuit-fond: #3F3F4C;
+  --nuit-carte: #4C4C5B;
+  --nuit-carte2: #595968;
+  --nuit-ligne: #6E6E82;
   --nuit-texte: #F7F7F5;
-  --nuit-texte2: #D8D8DC;
-  --nuit-muet: #B4B4BC;
+  --nuit-texte2: #E4E4EA;
+  --nuit-muet: #CBCBD4;
   --creme: #F7F7F5;
   --encre: #17171B;
   --encre2: #55555E;
   --accent: #E9A13B;
   --accent-texte: #E9A13B;
   --or: #E9A13B;
-  --text-sec: #B4B4BC;
-  --surface: #303037;
+  --text-sec: #CBCBD4;
+  --surface: #4C4C5B;
   background: var(--nuit-fond);
   color: var(--nuit-texte);
   font-family: var(--font-body);
@@ -152,7 +152,7 @@ body {
 /* Pont temporaire : les anciennes classes « crème » prennent les couleurs du thème nuit.
    À supprimer quand chaque composant utilisera directement les jetons --nuit-*. */
 .theme-nuit .bg-white { background-color: var(--nuit-carte); }
-.theme-nuit .bg-white\/75, .theme-nuit .bg-white\/85 { background-color: rgba(48, 48, 55, 0.94); }
+.theme-nuit .bg-white\/75, .theme-nuit .bg-white\/85 { background-color: rgba(76, 76, 91, 0.94); }
 .theme-nuit .bg-\[\#FBF7EF\] { background-color: var(--nuit-fond); }
 .theme-nuit .bg-\[\#FFFDF8\] { background-color: var(--nuit-carte); }
 .theme-nuit .bg-\[\#F3E6D8\] { background-color: var(--nuit-carte2); }
@@ -167,7 +167,7 @@ body {
 
 /* En-tête fixe du thème nuit : fond sombre translucide, simple flou — aucun effet de lueur. */
 .theme-nuit header[class*="sticky"] {
-  background-color: rgba(38, 38, 44, 0.88);
+  background-color: rgba(63, 63, 76, 0.88);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
 }

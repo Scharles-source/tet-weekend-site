@@ -183,7 +183,7 @@ export default function EventDetailPage() {
                 {(event.viralScore ?? 0) > 50 && (
                   <div style={{
                     position: "absolute", top: 16, right: 16,
-                    background: "rgba(38,38,44,0.85)", backdropFilter: "blur(8px)",
+                    background: "rgba(63,63,76,0.85)", backdropFilter: "blur(8px)",
                     padding: "6px 14px", borderRadius: 100,
                     fontSize: 12, color: "#ff6b6b",
                     border: "1px solid rgba(255,107,107,0.3)", fontWeight: 500,

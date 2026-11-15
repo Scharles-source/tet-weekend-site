@@ -30,7 +30,7 @@ export default function Navbar() {
         alignItems: "center",
         justifyContent: "space-between",
         padding: "14px var(--page-px, 32px)",
-        background: "rgba(38,38,44,0.88)",
+        background: "rgba(63,63,76,0.88)",
         backdropFilter: "blur(16px)",
         borderBottom: "1px solid rgba(107,138,255,0.12)",
       }}>
@@ -83,7 +83,7 @@ export default function Navbar() {
         <div style={{
           position: "fixed",
           top: 65, left: 0, right: 0,
-          background: "rgba(38,38,44,0.97)",
+          background: "rgba(63,63,76,0.97)",
           backdropFilter: "blur(20px)",
           zIndex: 99,
           display: "flex",

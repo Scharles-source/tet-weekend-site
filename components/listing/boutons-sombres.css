@@ -1,7 +1,7 @@
 /* Boutons du thème nuit : l'accent ambre unique (--accent) reste tel quel pour les
    boutons d'action ; --bouton sert aux boutons neutres foncés (formulaire, installation). */
 .theme-nuit {
-  --bouton: #4A4A53;
+  --bouton: #6E6E82;
 }
 .theme-nuit .border-\[var\(--accent\)\] {
   border-color: var(--accent);
