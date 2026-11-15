@@ -10,6 +10,7 @@ function evt(partiel: Partial<Parameters<typeof choisirBanniere>[0][number]> & {
     sponsored_from: null,
     sponsored_to: null,
     vues: null,
+    partages: null,
     ...partiel,
   };
 }
@@ -72,4 +73,77 @@ test("un sponsoring terminé ne prend pas le badge", () => {
   });
   assert.equal(estSponsorise(evenement, maintenant), false);
   assert.equal(choisirBanniere([evenement], maintenant)[0]?.sponsorise, false);
+});
+
+test("règle trending : un événement en cours (« Happening now ») passe devant, même sans vues ni partages", () => {
+  const liste = choisirBanniere(
+    [
+      evt({ id: "populaire", date_debut: "2026-10-24T02:00:00.000Z", vues: 500, partages: 100 }),
+      evt({ id: "en-cours", date_debut: "2026-10-23T02:00:00.000Z", date_fin: "2026-10-23T20:00:00.000Z", vues: 0, partages: 0 }),
+      evt({ id: "en-cours-partage", date_debut: "2026-10-23T04:00:00.000Z", date_fin: "2026-10-23T22:00:00.000Z", vues: 3, partages: 7 }),
+    ],
+    maintenant,
+  );
+  // Les deux en cours d'abord (entre eux : le plus partagé), puis le plus populaire des à venir.
+  assert.deepEqual(
+    liste.map((p) => p.evenement.id),
+    ["en-cours-partage", "en-cours", "populaire"],
+  );
+});
+
+test("règle trending : les partages priment sur les seules ouvertures", () => {
+  const liste = choisirBanniere(
+    [
+      evt({ id: "tres-ouvert", date_debut: "2026-10-24T02:00:00.000Z", vues: 300, partages: 0 }),
+      evt({ id: "tres-partage", date_debut: "2026-10-25T02:00:00.000Z", vues: 10, partages: 12 }),
+      evt({ id: "milieu", date_debut: "2026-10-26T02:00:00.000Z", vues: 50, partages: 12 }),
+    ],
+    maintenant,
+  );
+  // tres-ouvert a le plus de vues (300) mais aucun partage : il ferme la marche.
+  // Entre les deux à 12 partages, les vues départagent : milieu (50) devant tres-partage (10).
+  assert.deepEqual(
+    liste.map((p) => p.evenement.id),
+    ["milieu", "tres-partage", "tres-ouvert"],
+  );
+});
+
+test("règle trending : sans aucun partage, repli sur en cours puis vues", () => {
+  const liste = choisirBanniere(
+    [
+      evt({ id: "a", date_debut: "2026-10-24T02:00:00.000Z", vues: 5, partages: 0 }),
+      evt({ id: "b", date_debut: "2026-10-25T02:00:00.000Z", vues: 40 }),
+      evt({ id: "c", date_debut: "2026-10-23T01:00:00.000Z", date_fin: "2026-10-23T23:00:00.000Z", vues: 1, partages: 0 }),
+    ],
+    maintenant,
+  );
+  assert.deepEqual(
+    liste.map((p) => p.evenement.id),
+    ["c", "b", "a"],
+  );
+});
+
+test("règle trending : un sponsorisé aussi en cours et très partagé n'apparaît qu'une fois, en sponsorisé", () => {
+  const liste = choisirBanniere(
+    [
+      evt({
+        id: "sponsor-star",
+        date_debut: "2026-10-23T02:00:00.000Z",
+        date_fin: "2026-10-23T21:00:00.000Z",
+        sponsored_from: "2026-10-01T00:00:00.000Z",
+        sponsored_to: "2026-11-01T00:00:00.000Z",
+        vues: 900,
+        partages: 300,
+      }),
+      evt({ id: "autre", date_debut: "2026-10-24T02:00:00.000Z", vues: 20, partages: 2 }),
+    ],
+    maintenant,
+  );
+  assert.deepEqual(
+    liste.map((p) => [p.evenement.id, p.sponsorise]),
+    [
+      ["sponsor-star", true],
+      ["autre", false],
+    ],
+  );
 });

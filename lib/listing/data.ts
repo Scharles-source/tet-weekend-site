@@ -218,6 +218,7 @@ export async function lireAnnuaire(): Promise<Annuaire> {
         evenement.vues = eng.vues;
         evenement.interets = eng.interets;
         evenement.vues_jour = eng.vues_jour;
+        evenement.partages = eng.partages;
       }
       const sponsor = sponsors.get(evenement.id);
       if (sponsor) {
@@ -281,7 +282,7 @@ async function lireAjouts(): Promise<Map<string, string>> {
 }
 
 /** Lecture séparée : tant que les migrations d'engagement ne sont pas appliquées, rien n'est affiché. */
-async function lireEngagement(): Promise<Map<string, { interets: number; vues: number; vues_jour: number | null }>> {
+async function lireEngagement(): Promise<Map<string, { interets: number; vues: number; vues_jour: number | null; partages: number }>> {
   const { url, cle } = configuration();
   const appeler = (fonction: string) =>
     fetch(`${url}/rest/v1/rpc/${fonction}`, {
@@ -291,13 +292,22 @@ async function lireEngagement(): Promise<Map<string, { interets: number; vues: n
       next: { revalidate: 300, tags: [TAG] },
     });
   try {
-    // Version avec les vues du jour ; sinon, la version d'origine.
-    let res = await appeler("evenements_engagement_jour");
+    // Version avec les partages ; sinon celle avec les vues du jour ; sinon, la version d'origine.
+    let res = await appeler("evenements_engagement_partages");
+    if (!res.ok) res = await appeler("evenements_engagement_jour");
     if (!res.ok) res = await appeler("evenements_engagement");
     if (!res.ok) return new Map();
-    const rows = (await res.json()) as { event_id: string; interets: number; vues: number; vues_jour?: number }[];
+    const rows = (await res.json()) as { event_id: string; interets: number; vues: number; vues_jour?: number; partages?: number }[];
     return new Map(
-      rows.map((r) => [r.event_id, { interets: Number(r.interets), vues: Number(r.vues), vues_jour: r.vues_jour === undefined ? null : Number(r.vues_jour) }]),
+      rows.map((r) => [
+        r.event_id,
+        {
+          interets: Number(r.interets),
+          vues: Number(r.vues),
+          vues_jour: r.vues_jour === undefined ? null : Number(r.vues_jour),
+          partages: r.partages === undefined ? 0 : Number(r.partages),
+        },
+      ]),
     );
   } catch {
     return new Map();

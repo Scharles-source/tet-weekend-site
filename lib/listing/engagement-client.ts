@@ -47,3 +47,15 @@ export async function envoyer(corps: Record<string, string>) {
   const res = await fetch("/api/engagement", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) });
   return res.ok ? ((await res.json()) as { ok: boolean; interesse?: boolean; total?: number }) : null;
 }
+
+/**
+ * Compte un partage au clic sur « Invite friends » : un par jour et par visiteur, comme les vues.
+ * Best-effort : un échec d'enregistrement n'empêche jamais le partage lui-même.
+ */
+export function enregistrerPartage(evenementId: string) {
+  const jour = new Date().toISOString().slice(0, 10);
+  const cle = `tw_partage_${evenementId}`;
+  if (lire(cle) === jour) return;
+  ecrire(cle, jour);
+  void envoyer({ type: "partage", evenementId, visiteur: visiteur() }).catch(() => undefined);
+}

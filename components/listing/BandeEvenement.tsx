@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { CarteStory } from "@/components/listing/CarteStory";
 import { estEnCours, estTermine, formaterQuand } from "@/lib/listing/dates";
+import { enregistrerPartage } from "@/lib/listing/engagement-client";
 import { nomLieuAffiche } from "@/lib/listing/faits";
 import { lienCourt } from "@/lib/listing/lien-court";
 import { libelleVues, preuveSociale } from "@/lib/listing/preuve";
@@ -136,7 +137,10 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           <button
             type="button"
             aria-label={`Invite friends to ${evenement.titre}`}
-            onClick={() => setCartePartage(true)}
+            onClick={() => {
+              enregistrerPartage(evenement.id);
+              setCartePartage(true);
+            }}
             className={`flex shrink-0 items-center justify-center gap-2 rounded-full font-extrabold ${etroit ? "min-h-11 px-3.5 text-[13px]" : "min-h-12 px-5 text-[14.5px]"}`}
             style={{ background: OR, color: "#1C1305" }}
           >

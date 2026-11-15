@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CarteStory } from "@/components/listing/CarteStory";
-import { envoyer, ecrire, lire, visiteur } from "@/lib/listing/engagement-client";
+import { enregistrerPartage, envoyer, ecrire, lire, visiteur } from "@/lib/listing/engagement-client";
 import { lienCourt } from "@/lib/listing/lien-court";
 import { libelleVues } from "@/lib/listing/preuve";
 
@@ -51,7 +51,10 @@ export function Engagement({ evenementId, titre = "", termine, vues = null }: { 
     <div className="mt-6 flex flex-col gap-2.5">
       <button
         type="button"
-        onClick={() => setCarte(true)}
+        onClick={() => {
+          enregistrerPartage(evenementId);
+          setCarte(true);
+        }}
         className="inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-2xl border-0 bg-[var(--accent)] px-5 text-[16px] font-extrabold text-[#1C1305]"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

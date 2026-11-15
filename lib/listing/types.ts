@@ -68,6 +68,8 @@ export interface EvenementPublic {
   interets?: number | null;
   /** Vues d'aujourd'hui (une par visiteur) ; absent tant que la migration « engagement social » n'est pas appliquée. */
   vues_jour?: number | null;
+  /** Nombre de partages « Invite friends » (un par visiteur et par jour) ; absent tant que la migration « partages » n'est pas appliquée. */
+  partages?: number | null;
   /** 1 quand l'événement est le plus vu de sa ville (calculé, jamais saisi). */
   rang_ville?: number | null;
   /** Badges de rareté pré-calculés (la liste allégée de l'API ne transporte pas la description qui sert à les déduire). */
