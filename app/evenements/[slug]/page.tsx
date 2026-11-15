@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BoutonRetour } from "@/components/listing/BoutonRetour";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { CarteEvenement, ZoneFlyer } from "@/components/listing/CarteEvenement";
 import { Engagement } from "@/components/listing/Engagement";
@@ -118,6 +119,9 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
     <Gabarit>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <article>
+        <div className="mb-4">
+          <BoutonRetour repli="/" />
+        </div>
         {termine && (
           <p className="mb-3 rounded-xl bg-[rgba(255,77,63,0.16)] px-3 py-2 text-sm font-semibold text-[var(--accent-texte)]">
             Event ended

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BoutonRetour } from "@/components/listing/BoutonRetour";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { CarteEvenement } from "@/components/listing/CarteEvenement";
 import { chargerAnnuaire, urlFacebook, urlInstagram, urlSite } from "@/lib/listing/data";
@@ -51,6 +52,9 @@ export default async function PageLieu({ params }: { params: Promise<{ slug: str
     const site = urlSite(lieu.site_web);
     return (
       <Gabarit>
+        <div className="mb-4">
+          <BoutonRetour repli="/lieux" />
+        </div>
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold">{lieu.nom}</h1>
         <p className="mt-2 text-sm text-[var(--text-sec)]">{[lieu.type, lieu.ville, lieu.pays].filter(Boolean).join(" · ")}</p>
         {lieu.adresse && <p className="mt-1">{lieu.adresse}</p>}

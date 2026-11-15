@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BoutonRetour } from "@/components/listing/BoutonRetour";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
 import { CarteEvenement } from "@/components/listing/CarteEvenement";
 import { chargerAnnuaire, urlFacebook, urlInstagram, urlSite } from "@/lib/listing/data";
@@ -52,6 +53,9 @@ export default async function PageArtiste({ params }: { params: Promise<{ slug: 
     }
     return (
       <Gabarit>
+        <div className="mb-4">
+          <BoutonRetour repli="/artistes" />
+        </div>
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold">{artiste.nom}</h1>
         <p className="mt-2 text-sm text-[var(--text-sec)]">{[artiste.type, artiste.ville_base].filter(Boolean).join(" · ")}</p>
         {artiste.bio && <p className="mt-4 whitespace-pre-wrap">{artiste.bio}</p>}

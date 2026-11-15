@@ -98,6 +98,82 @@ export function AccueilPublic({
   const affiches = groupesVisibles.reduce((n, g) => n + g.evenements.length, 0);
   const reste = total - affiches;
 
+  // Retour d'une fiche événement : retrouver le fil où on l'avait laissé.
+  // Pendant la consultation, le nombre de morceaux révélés et la position
+  // de défilement sont persistés (sessionStorage). Au remontage du fil, si
+  // la page précédente de la session est une fiche (le marqueur de parcours
+  // « tw_trajet », posé par le Gabarit, n'a pas encore été mis à jour pour
+  // cette page), on restaure les deux. Une visite fraîche de l'accueil —
+  // arrivée d'ailleurs que d'une fiche — repart du haut, comme avant.
+  const scrollARestaurer = useRef<number | null>(null);
+  const nombreARestaurer = useRef(0);
+
+  // Déclaré AVANT l'effet de persistance : au montage, la lecture des
+  // valeurs sauvegardées doit précéder leur réécriture par l'état initial.
+  useEffect(() => {
+    let trajet: { actuel?: string | null } | null = null;
+    try {
+      trajet = JSON.parse(sessionStorage.getItem("tw_trajet") ?? "null") as { actuel?: string | null } | null;
+    } catch {
+      /* marqueur illisible : pas de restauration */
+    }
+    if (!trajet?.actuel?.startsWith("/evenements/")) return;
+    let n = 0;
+    let y = 0;
+    try {
+      n = Number(sessionStorage.getItem("tw_fil_nombre"));
+      y = Number(sessionStorage.getItem("tw_fil_scroll"));
+    } catch {
+      /* stockage indisponible */
+    }
+    const raf = requestAnimationFrame(() => {
+      if (Number.isFinite(n) && n > TAILLE_MORCEAU) {
+        nombreARestaurer.current = n;
+        setNombreAffiches(n);
+      }
+      if (Number.isFinite(y) && y > 0) scrollARestaurer.current = y;
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("tw_fil_nombre", String(nombreAffiches));
+    } catch {
+      /* stockage indisponible : pas de restauration, le fil repart du haut */
+    }
+  }, [nombreAffiches]);
+
+  useEffect(() => {
+    let enAttente = false;
+    const surDefilement = () => {
+      if (enAttente) return;
+      enAttente = true;
+      requestAnimationFrame(() => {
+        enAttente = false;
+        try {
+          sessionStorage.setItem("tw_fil_scroll", String(window.scrollY));
+        } catch {
+          /* stockage indisponible */
+        }
+      });
+    };
+    window.addEventListener("scroll", surDefilement, { passive: true });
+    return () => window.removeEventListener("scroll", surDefilement);
+  }, []);
+
+  // Le défilement n'est appliqué que lorsque les morceaux restaurés sont
+  // effectivement rendus (les cartes ont une hauteur fixe, flyer ou non :
+  // la position retombe juste dès que le contenu est là).
+  useEffect(() => {
+    const y = scrollARestaurer.current;
+    if (y === null) return;
+    if (affiches >= Math.min(nombreARestaurer.current, total)) {
+      scrollARestaurer.current = null;
+      window.scrollTo(0, y);
+    }
+  }, [groupesVisibles, affiches, total]);
+
   const sentinelle = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = sentinelle.current;

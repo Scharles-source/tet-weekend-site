@@ -3,6 +3,7 @@ import { BarreOutilsMorph } from "@/components/listing/BarreOutilsMorph";
 import { EnTete } from "@/components/listing/EnTete";
 import { InstallerApp } from "@/components/listing/InstallerApp";
 import { Logo } from "@/components/listing/Logo";
+import { MarqueurParcours } from "@/components/listing/MarqueurParcours";
 import { Mesure } from "@/components/listing/Mesure";
 import { ConfigurationSupabaseManquante, emailContact } from "@/lib/listing/data";
 
@@ -44,6 +45,10 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
       <BarreOutilsMorph email={email} />
       <Mesure />
       <InstallerApp />
+      {/* En dernier, volontairement : le marqueur de parcours met à jour
+          « tw_trajet » après les effets des pages, qui lisent donc le
+          trajet tel qu'il était avant leur propre arrivée. */}
+      <MarqueurParcours />
     </div>
   );
 }
