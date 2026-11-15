@@ -30,7 +30,7 @@ export function Affiche({ evenement, className = "", large = false }: { evenemen
   const url = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
   const categorie = nomCategorie(evenement.categorie);
   return (
-    <article className={`flex flex-col overflow-hidden rounded-[22px] bg-[#17171C] ${className}`}>
+    <article className={`flex h-full flex-col overflow-hidden rounded-[22px] bg-[#17171C] ${className}`}>
       <Link
         href={`/evenements/${evenement.slug}`}
         aria-label={evenement.titre}

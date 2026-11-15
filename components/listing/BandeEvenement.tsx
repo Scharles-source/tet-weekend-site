@@ -59,7 +59,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   const raretes = (evenement.badges_rarete ?? signauxRarete(evenement)).slice(0, etroit ? 1 : 2);
 
   return (
-    <div className="relative flex-1 overflow-hidden text-white" style={{ background: "#17171C" }}>
+    <div className="relative flex flex-1 flex-col overflow-hidden text-white" style={{ background: "#17171C" }}>
       {couverture && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -73,7 +73,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
         />
       )}
       <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,12,0.25), rgba(10,10,12,0.55))" }} />
-      <div className={`relative ${etroit ? "p-3" : compact ? "p-3.5" : "p-4"}`}>
+      <div className={`relative flex flex-1 flex-col ${etroit ? "p-3" : compact ? "p-3.5" : "p-4"}`}>
         {(enCours || raretes.length > 0) && (
           <div className="mb-1.5 flex flex-wrap gap-1.5">
             {enCours && (
@@ -110,7 +110,18 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           </p>
         )}
 
-        <div className={`flex items-center justify-between gap-2 ${etroit ? "mt-2.5" : "mt-3.5"}`}>
+        {(message || preuve) && (
+          <div className={`flex items-center gap-1.5 font-semibold ${etroit ? "mt-2 text-[12px]" : "mt-2.5 text-[12.5px]"}`} style={{ color: "rgba(255,255,255,0.88)" }} role="status">
+            {!message && (
+              <svg className="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={OR} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+              </svg>
+            )}
+            <span className="min-w-0 truncate">{message ?? (etroit ? preuve?.court : preuve?.texte)}</span>
+          </div>
+        )}
+
+        <div className={`mt-auto flex items-center justify-between gap-2 ${etroit ? "pt-2.5" : "pt-3.5"}`}>
           {vues ? (
             <p className="flex min-w-0 items-center gap-1.5 text-[12.5px] font-semibold" style={{ color: "rgba(255,255,255,0.92)" }}>
               <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={OR} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -139,17 +150,6 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
         </div>
 
         <CarteStory evenementId={evenement.id} titre={evenement.titre} ouvert={cartePartage} onFermer={() => setCartePartage(false)} mode="partage" secours={partager} />
-
-        {(message || preuve) && (
-          <div className={`flex items-center gap-1.5 font-semibold ${etroit ? "mt-2 text-[12px]" : "mt-2.5 text-[12.5px]"}`} style={{ color: "rgba(255,255,255,0.88)" }} role="status">
-            {!message && (
-              <svg className="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={OR} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-              </svg>
-            )}
-            <span className="min-w-0 truncate">{message ?? (etroit ? preuve?.court : preuve?.texte)}</span>
-          </div>
-        )}
       </div>
     </div>
   );
