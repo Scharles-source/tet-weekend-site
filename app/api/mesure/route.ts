@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   if (!url || !cle) return NextResponse.json({ ok: false }, { status: 503 });
 
   const texte = await request.text();
-  if (texte.length > 1024) return NextResponse.json({ ok: false }, { status: 413 });
+  if (texte.length > 2048) return NextResponse.json({ ok: false }, { status: 413 });
   let corps: Record<string, unknown>;
   try {
     corps = JSON.parse(texte) as Record<string, unknown>;
@@ -51,6 +51,10 @@ export async function POST(request: Request) {
       p_appareil: appareil,
       p_user_agent: userAgent,
       p_exclu: exclu,
+      p_referrer: champ(corps.referrer, 300),
+      p_utm_source: champ(corps.utm_source, 60),
+      p_utm_medium: champ(corps.utm_medium, 60),
+      p_utm_campaign: champ(corps.utm_campaign, 80),
     };
   } else if (corps.type === "ping") {
     fonction = "signaler_presence";
@@ -80,6 +84,13 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ ok: false }, { status: 502 });
   }
+}
+
+/** Champ d'étiquette de lien (utm_*, référent) : texte court, sans caractères de contrôle. */
+function champ(brut: unknown, max: number): string | null {
+  if (typeof brut !== "string") return null;
+  const v = brut.trim().slice(0, max);
+  return v && !/[\u0000-\u001f\u007f]/.test(v) ? v : null;
 }
 
 function ville(brut: string | null): string | null {

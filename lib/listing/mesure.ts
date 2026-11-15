@@ -33,12 +33,15 @@ function sourceDepuisHote(hote: string): Source {
 }
 
 /**
- * D'où vient le visiteur : marqueur `?s=` du lien (le plus fiable), sinon site d'origine,
- * sinon navigateur intégré d'une application (Instagram, Facebook, TikTok), sinon accès direct.
+ * D'où vient le visiteur : marqueur `?s=` du lien (le plus fiable), sinon `utm_source`
+ * du lien, sinon site d'origine, sinon navigateur intégré d'une application
+ * (Instagram, Facebook, TikTok), sinon accès direct.
  */
-export function sourceDepuis(entrees: { marqueur?: string | null; referrer?: string | null; ua?: string | null; hoteLocal?: string | null }): Source {
+export function sourceDepuis(entrees: { marqueur?: string | null; utmSource?: string | null; referrer?: string | null; ua?: string | null; hoteLocal?: string | null }): Source {
   const marqueur = entrees.marqueur?.trim().toLowerCase();
   if (marqueur) return MARQUEURS[marqueur] ?? "autre";
+  const utm = entrees.utmSource?.trim().toLowerCase();
+  if (utm) return MARQUEURS[utm] ?? ((SOURCES as readonly string[]).includes(utm) ? (utm as Source) : "autre");
   const referrer = entrees.referrer?.trim();
   if (referrer) {
     try {
@@ -53,6 +56,42 @@ export function sourceDepuis(entrees: { marqueur?: string | null; referrer?: str
   if (/FBAN|FBAV|FB_IAB/i.test(ua)) return "facebook";
   if (/TikTok|musical_ly|BytedanceWebview/i.test(ua)) return "tiktok";
   return "direct";
+}
+
+export type Etiquette = { utmSource: string | null; utmMedium: string | null; utmCampaign: string | null };
+
+const MOTIF_ETIQUETTE = /^[\p{L}\p{N} _.\-+@]+$/u;
+
+function champEtiquette(brut: string | null, max: number): string | null {
+  const v = brut?.trim().toLowerCase().slice(0, max) ?? "";
+  return v && MOTIF_ETIQUETTE.test(v) ? v : null;
+}
+
+/**
+ * L'étiquette d'un lien partagé : les paramètres `utm_*` de l'adresse, nettoyés.
+ * C'est elle qui dit, visite par visite, quel partage a amené le visiteur
+ * (ex. utm_source=whatsapp&utm_campaign=floride-14nov) — là où la source seule
+ * ne donne que le canal. Lue une fois à l'arrivée, gardée pour la session.
+ */
+export function etiquetteDepuis(params: URLSearchParams): Etiquette {
+  return {
+    utmSource: champEtiquette(params.get("utm_source"), 60),
+    utmMedium: champEtiquette(params.get("utm_medium"), 60),
+    utmCampaign: champEtiquette(params.get("utm_campaign"), 80),
+  };
+}
+
+/** Le site d'origine complet, gardé seulement s'il est extérieur au site (300 caractères max). */
+export function referrerExterne(referrer: string | null, hoteLocal: string | null): string | null {
+  const brut = referrer?.trim();
+  if (!brut) return null;
+  try {
+    const u = new URL(brut);
+    if (!u.hostname || u.hostname === hoteLocal) return null;
+    return brut.slice(0, 300);
+  } catch {
+    return null;
+  }
 }
 
 /** Adresse d'une fiche : /evenements/<slug>, sans sous-page. */

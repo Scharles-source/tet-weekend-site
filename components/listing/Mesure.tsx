@@ -2,11 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { appareilDepuis, slugEvenement, sourceDepuis } from "@/lib/listing/mesure";
+import { appareilDepuis, etiquetteDepuis, referrerExterne, slugEvenement, sourceDepuis, type Etiquette } from "@/lib/listing/mesure";
 
 const CLE_VISITEUR = "tw_visiteur";
 const CLE_EXCLURE = "tw_exclure";
 const CLE_SOURCE = "tw_source";
+const CLE_ETIQUETTE = "tw_etiquette";
 const PING_MS = 60_000;
 
 function lire(stockage: "local" | "session", cle: string): string | null {
@@ -56,9 +57,27 @@ function source(): string {
   const memo = lire("session", CLE_SOURCE);
   if (memo) return memo;
   const params = new URLSearchParams(window.location.search);
-  const trouve = sourceDepuis({ marqueur: params.get("s"), referrer: document.referrer, ua: navigator.userAgent, hoteLocal: window.location.hostname });
+  const trouve = sourceDepuis({ marqueur: params.get("s"), utmSource: etiquetteDepuis(params).utmSource, referrer: document.referrer, ua: navigator.userAgent, hoteLocal: window.location.hostname });
   ecrire("session", CLE_SOURCE, trouve);
   return trouve;
+}
+
+type EtiquetteSession = Etiquette & { referrer: string | null };
+
+/** L'étiquette du lien d'arrivée (utm_* + site d'origine), lue une fois et gardée pour la session. */
+function etiquette(): EtiquetteSession {
+  const memo = lire("session", CLE_ETIQUETTE);
+  if (memo) {
+    try {
+      return JSON.parse(memo) as EtiquetteSession;
+    } catch {
+      /* mémo illisible : on relit l'adresse */
+    }
+  }
+  const params = new URLSearchParams(window.location.search);
+  const lu: EtiquetteSession = { ...etiquetteDepuis(params), referrer: referrerExterne(document.referrer, window.location.hostname) };
+  ecrire("session", CLE_ETIQUETTE, JSON.stringify(lu));
+  return lu;
 }
 
 function appareil(): "mobile" | "ordinateur" {
@@ -101,12 +120,17 @@ export function Mesure() {
   useEffect(() => {
     if (etat.current === null) etat.current = etatMesure();
     if (etat.current === "bloque") return;
+    const et = etiquette();
     envoyer({
       type: "vue",
       chemin,
       slug: slugEvenement(chemin),
       source: source(),
       ua: navigator.userAgent,
+      ...(et.utmSource ? { utm_source: et.utmSource } : {}),
+      ...(et.utmMedium ? { utm_medium: et.utmMedium } : {}),
+      ...(et.utmCampaign ? { utm_campaign: et.utmCampaign } : {}),
+      ...(et.referrer ? { referrer: et.referrer } : {}),
       ...(etat.current === "exclu" ? { exclu: true } : {}),
     });
   }, [chemin]);
