@@ -170,8 +170,8 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           )}
         </div>
 
-        {/* « I'm in » juste sous les infos : visible sans défiler (correctif audit 13 nov. 2026). */}
-        <Engagement evenementId={evenement.id} titre={evenement.titre} interetsInitiaux={evenement.interets ?? null} termine={termine} />
+        {/* « Invite your friends » et les vues juste sous les infos : visibles sans défiler (correctif audit 13 nov. 2026). */}
+        <Engagement evenementId={evenement.id} titre={evenement.titre} termine={termine} vues={evenement.vues ?? null} />
 
         {evenement.artistes.length > 0 && (
           <div className="mt-6">
