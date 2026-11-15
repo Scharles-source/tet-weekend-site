@@ -1,21 +1,8 @@
-/* Boutons du thème nuit : graphite sombre avec un liseré clair.
-   Les flyers apportent déjà les couleurs vives ; le rouge de marque reste réservé aux textes d'accent. */
+/* Boutons du thème nuit : l'accent ambre unique (--accent) reste tel quel pour les
+   boutons d'action ; --bouton sert aux boutons neutres foncés (formulaire, installation). */
 .theme-nuit {
-  --bouton: #2E2622;
-}
-.theme-nuit .bg-\[var\(--accent\)\],
-.theme-nuit .bg-\[\#A63446\] {
-  background-color: var(--bouton);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  --bouton: #26262E;
 }
 .theme-nuit .border-\[var\(--accent\)\] {
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-/* Bouton recherche de la barre du bas : léger reflet blanc diffus derrière le bouton. */
-.theme-nuit nav a[aria-label="Rechercher"] {
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
-    0 0 18px 4px rgba(255, 255, 255, 0.22),
-    0 0 36px 10px rgba(255, 255, 255, 0.10);
+  border-color: var(--accent);
 }

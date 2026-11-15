@@ -71,7 +71,7 @@ export default async function PageVilles() {
           {une && (
             <section aria-labelledby="v-haiti">
               <h2 id="v-haiti" className="mb-3 text-xs font-bold tracking-[0.14em] text-[var(--nuit-muet)] uppercase">In Haiti</h2>
-              <Link href={`/villes/${une.slug}`} className="block rounded-[24px] bg-[linear-gradient(160deg,#C21810,#5B1209)] p-5 text-white no-underline">
+              <Link href={`/villes/${une.slug}`} className="block rounded-[24px] bg-[linear-gradient(160deg,#5C1A26,#38121C)] p-5 text-white no-underline">
                 <span className="block font-[family-name:var(--font-display)] text-2xl font-black">{une.nom}</span>
                 <span className="mt-1 block text-sm text-white/85">{compte(une)}</span>
               </Link>

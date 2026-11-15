@@ -22,8 +22,8 @@ const PERIODES: { valeur: Periode; label: string }[] = [
 ];
 
 const PUCE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-xl bg-[var(--nuit-texte)] px-4 text-sm font-extrabold text-[var(--encre)]";
-const PUCE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-xl border border-[#6B5B4D] px-4 text-sm font-semibold text-[var(--nuit-texte)]";
-const ZONE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-[var(--accent)] px-[18px] text-sm font-bold text-white";
+const PUCE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-xl border border-[#3F3F46] px-4 text-sm font-semibold text-[var(--nuit-texte)]";
+const ZONE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-[var(--accent)] px-[18px] text-sm font-bold text-[#1C1305]";
 const ZONE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-[18px] text-sm font-semibold text-[var(--nuit-texte)]";
 
 const CLE_FILTRE_VILLE = "tw_filtre_ville";
@@ -148,7 +148,7 @@ export function AccueilPublic({
     <div>
       <header className="max-w-[640px]">
         <h1 className="mt-2 font-[family-name:var(--font-display)] text-[40px] leading-[1.02] font-black tracking-tight text-balance text-[var(--nuit-texte)] lg:text-[60px]">
-          Partying <span className="text-[#B8642F]">in Haiti</span>
+          Partying <span className="text-[var(--accent-texte)]">in Haiti</span>
         </h1>
         <p className="mt-2 text-[15px] leading-snug text-[var(--nuit-muet)] lg:text-[17px]">What&apos;s on, and what&apos;s close to you.</p>
       </header>
@@ -296,14 +296,14 @@ function EnteteSection({ titre, href }: { titre: string; href: string }) {
 function BlocOrganisateurs({ className = "" }: { className?: string }) {
   return (
     <section className={`mt-9 lg:mt-0 ${className}`}>
-      <div className="rounded-[24px] bg-[var(--creme)] p-[22px] text-[var(--encre)]">
+      <div className="rounded-[24px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-[22px] text-[var(--nuit-texte)]">
         <h2 className="font-[family-name:var(--font-display)] text-[26px] leading-[1.05] font-black tracking-tight">Throwing a party?</h2>
-        <p className="mt-2.5 text-[14.5px] leading-relaxed text-[var(--encre2)]">
+        <p className="mt-2.5 text-[14.5px] leading-relaxed text-[var(--nuit-muet)]">
           Put your event in front of the whole community, in Haiti and across the diaspora.
         </p>
         <Link
           href="/ajouter-evenement"
-          className="mt-4 flex min-h-12 items-center justify-center rounded-[14px] bg-[var(--accent)] px-6 text-[15px] font-extrabold text-white no-underline"
+          className="mt-4 flex min-h-12 items-center justify-center rounded-[14px] bg-[var(--accent)] px-6 text-[15px] font-extrabold text-[#1C1305] no-underline"
         >
           Submit my event
         </Link>
@@ -319,22 +319,22 @@ function PetiteAffiche({ evenement, rang }: { evenement: EvenementPublic; rang: 
   return (
     <Link
       href={`/evenements/${evenement.slug}`}
-      className="relative block h-[230px] w-[160px] shrink-0 snap-start overflow-hidden rounded-[18px] bg-[#2A1F1B] text-white no-underline shadow-[0_6px_16px_rgba(31,27,24,0.16)] lg:h-[270px] lg:w-[190px]"
+      className="relative block h-[230px] w-[160px] shrink-0 snap-start overflow-hidden rounded-[18px] bg-[#17171C] text-white no-underline shadow-[0_6px_16px_rgba(0,0,0,0.4)] lg:h-[270px] lg:w-[190px]"
     >
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={flyerAllege(url, 384)} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover object-top" loading="lazy" decoding="async" />
       ) : (
-        <span className="absolute inset-0" style={{ background: "linear-gradient(160deg,#C21810 0%,#5B1209 100%)" }} />
+        <span className="absolute inset-0" style={{ background: "linear-gradient(160deg,#5C1A26 0%,#38121C 100%)" }} />
       )}
-      <span className="absolute inset-x-0 bottom-0 h-[130px]" style={{ background: "linear-gradient(180deg, rgba(20,14,10,0), rgba(20,14,10,0.9))" }} />
+      <span className="absolute inset-x-0 bottom-0 h-[130px]" style={{ background: "linear-gradient(180deg, rgba(14,14,17,0), rgba(14,14,17,0.9))" }} />
       <span className="absolute top-2 left-2.5 font-[family-name:var(--font-display)] text-[34px] leading-none font-black" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.55)" }}>
         {rang}
       </span>
       <span className="absolute inset-x-2.5 bottom-2.5 block">
         <span className="line-clamp-2 block font-[family-name:var(--font-display)] text-[15px] leading-tight font-black">{evenement.titre}</span>
         {evenement.ville && <span className="mt-0.5 block truncate text-[12px] opacity-90">{evenement.ville}</span>}
-        {vues && <span className="mt-1 block text-[12px] font-semibold text-[#FFC247]">{vues}</span>}
+        {vues && <span className="mt-1 block text-[12px] font-semibold text-[#E9A13B]">{vues}</span>}
       </span>
     </Link>
   );

@@ -129,7 +129,7 @@ export function PastilleLieu({
               onChoisir(null);
               setOuvert(false);
             }}
-            className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-4 text-[13.5px] font-bold ${choisie === null ? "bg-[var(--accent)] text-white" : "border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] text-[var(--nuit-texte)]"}`}
+            className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-4 text-[13.5px] font-bold ${choisie === null ? "bg-[var(--accent)] text-[#1C1305]" : "border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] text-[var(--nuit-texte)]"}`}
           >
             My location
           </button>
@@ -142,7 +142,7 @@ export function PastilleLieu({
                 onChoisir(v);
                 setOuvert(false);
               }}
-              className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-4 text-[13.5px] font-semibold ${choisie === v ? "bg-[var(--accent)] text-white" : "border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] text-[var(--nuit-texte)]"}`}
+              className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-4 text-[13.5px] font-semibold ${choisie === v ? "bg-[var(--accent)] text-[#1C1305]" : "border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] text-[var(--nuit-texte)]"}`}
             >
               {v}
             </button>

@@ -12,7 +12,7 @@ import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
 
-const OR = "#FFC247";
+const OR = "#E9A13B";
 
 /**
  * Bande sous le flyer : fond tiré du flyer lui-même (flou assombri), infos de l'événement,
@@ -59,7 +59,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   const raretes = (evenement.badges_rarete ?? signauxRarete(evenement)).slice(0, etroit ? 1 : 2);
 
   return (
-    <div className="relative flex-1 overflow-hidden text-white" style={{ background: "#2A1F1B" }}>
+    <div className="relative flex-1 overflow-hidden text-white" style={{ background: "#17171C" }}>
       {couverture && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -68,11 +68,11 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           aria-hidden
           loading="lazy"
           decoding="async"
-          className="pointer-events-none absolute inset-0 h-full w-full scale-125 object-cover blur-[28px] saturate-150"
-          style={{ filter: "blur(28px) saturate(1.5) brightness(0.42)" }}
+          className="pointer-events-none absolute inset-0 h-full w-full scale-125 object-cover blur-[28px]"
+          style={{ filter: "blur(28px) saturate(0.8) brightness(0.4)" }}
         />
       )}
-      <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,12,10,0.25), rgba(20,12,10,0.55))" }} />
+      <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,12,0.25), rgba(10,10,12,0.55))" }} />
       <div className={`relative ${etroit ? "p-3" : compact ? "p-3.5" : "p-4"}`}>
         {(enCours || raretes.length > 0) && (
           <div className="mb-1.5 flex flex-wrap gap-1.5">
@@ -127,7 +127,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
             aria-label={`Invite friends to ${evenement.titre}`}
             onClick={() => setCartePartage(true)}
             className={`flex shrink-0 items-center justify-center gap-2 rounded-full font-extrabold ${etroit ? "min-h-11 px-3.5 text-[13px]" : "min-h-12 px-5 text-[14.5px]"}`}
-            style={{ background: OR, color: "#191410" }}
+            style={{ background: OR, color: "#1C1305" }}
           >
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="9" cy="8" r="3.5" />

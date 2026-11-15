@@ -32,7 +32,7 @@ export function ListeEvenements({ evenements, vide }: { evenements: EvenementPub
         value={recherche}
         onChange={(e) => setRecherche(e.target.value)}
         placeholder="Event name, DJ, city…"
-        className="min-h-11 w-full rounded-[14px] border border-[#EFE5D2] bg-white px-3 text-[#191410] outline-none placeholder:text-[#8A7B66]"
+        className="min-h-11 w-full rounded-[14px] border border-[#EFE5D2] bg-white px-3 text-[#191410] outline-none placeholder:text-[#71717A]"
       />
       {filtres.length === 0 ? (
         <p className="text-sm text-[#8A7B66]">{vide}</p>

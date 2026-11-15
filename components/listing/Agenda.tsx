@@ -10,7 +10,7 @@ import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
 
 const PUCE = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full px-4 text-sm";
-const ON = "bg-[var(--accent)] font-bold text-white";
+const ON = "bg-[var(--accent)] font-bold text-[#1C1305]";
 const OFF = "border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] font-semibold text-[var(--nuit-texte2)]";
 
 const ymd = (iso: string, fuseau: string) => saisieDepuisInstant(iso, fuseau).slice(0, 10);

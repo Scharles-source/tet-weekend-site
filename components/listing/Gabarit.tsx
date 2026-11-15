@@ -10,7 +10,7 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
   const email = await emailContact();
   const largeur = large ? "max-w-[1240px]" : "max-w-3xl";
   return (
-    <div className="theme-clair min-h-dvh">
+    <div className="theme-nuit min-h-dvh">
       <EnTete large={large} email={email} />
       <main className="pb-24 md:pb-10">
         <div className={`mx-auto w-full ${largeur} px-[var(--page-px)] py-6`}>{children}</div>
@@ -50,7 +50,7 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
 
 export function MessageEtat({ titre, texte }: { titre: string; texte: string }) {
   return (
-    <div role="status" className="rounded-[20px] border-[1.5px] border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-6 text-center shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
+    <div role="status" className="rounded-[20px] border-[1.5px] border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-6 text-center shadow-[0_3px_14px_rgba(0,0,0,0.3)]">
       <h2 className="mb-2 font-[family-name:var(--font-display)] text-lg font-black">{titre}</h2>
       <p className="text-sm text-[var(--nuit-texte2)]">{texte}</p>
     </div>

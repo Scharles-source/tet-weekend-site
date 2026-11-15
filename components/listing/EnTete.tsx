@@ -26,7 +26,7 @@ export function EnTete({ large = false }: { large?: boolean; email?: string }) {
         {/* Mobile : devenir partenaire / proposer un événement (la recherche vit dans la barre du bas) */}
         <Link
           href="/ajouter-evenement"
-          className="flex h-10 items-center rounded-full bg-[var(--accent)] px-4 text-[14px] font-extrabold text-white shadow-[0_4px_12px_rgba(166,52,70,.35)] no-underline md:hidden"
+          className="flex h-10 items-center rounded-full bg-[var(--accent)] px-4 text-[14px] font-extrabold text-[#1C1305] shadow-[0_4px_12px_rgba(0,0,0,.35)] no-underline md:hidden"
         >
           Become a partner
         </Link>
@@ -47,7 +47,7 @@ export function EnTete({ large = false }: { large?: boolean; email?: string }) {
           })}
           <Link
             href="/ajouter-evenement"
-            className="rounded-full bg-[var(--accent)] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_rgba(166,52,70,.3)] no-underline"
+            className="rounded-full bg-[var(--accent)] px-5 py-2.5 text-[14px] font-bold text-[#1C1305] shadow-[0_6px_16px_rgba(0,0,0,.3)] no-underline"
           >
             Become a partner
           </Link>

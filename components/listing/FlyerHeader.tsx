@@ -6,7 +6,7 @@ import { altFlyer, flyerFrameStyle } from "@/lib/listing/flyer";
 import type { FlyerPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
 
-const DEGRADE = "linear-gradient(150deg, #F97316, #E02B20 55%, #5B2EE5)";
+const DEGRADE = "linear-gradient(150deg, #4B2A5E, #2B1A3A 55%, #17171C)";
 
 export function FlyerHeader({
   flyer,
@@ -31,13 +31,13 @@ export function FlyerHeader({
   const cadre = flyer ? flyerFrameStyle({ publicUrl: flyer.publicUrl, cardUrl: flyer.cardUrl }) : null;
   const style =
     variant === "carte"
-      ? { backgroundColor: "#F3E6D8", aspectRatio: cadre?.aspectRatio ?? "4 / 3", borderTopLeftRadius: 20, borderTopRightRadius: 20 }
+      ? { backgroundColor: "#1C1C22", aspectRatio: cadre?.aspectRatio ?? "4 / 3", borderTopLeftRadius: 20, borderTopRightRadius: 20 }
       : {
           width: "100%",
           minHeight: 240,
           maxHeight: 680,
           height: hauteurBanniere(flyer?.width, flyer?.height),
-          backgroundColor: "#F3E6D8",
+          backgroundColor: "#1C1C22",
           borderRadius: 20,
         };
 

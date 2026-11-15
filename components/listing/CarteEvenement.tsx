@@ -10,7 +10,7 @@ import { nomLieuAffiche } from "@/lib/listing/faits";
 import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
 
-const CARTE = "overflow-hidden rounded-[20px] border-[1.5px] border-[#EFE5D2] bg-white shadow-[0_3px_14px_rgba(80,55,10,0.06)]";
+const CARTE = "overflow-hidden rounded-[20px] border-[1.5px] border-[#EFE5D2] bg-white shadow-[0_3px_14px_rgba(0,0,0,0.3)]";
 
 export function CarteEvenement({ evenement }: { evenement: EvenementPublic }) {
   const [ouvert, setOuvert] = useState(false);
@@ -38,7 +38,7 @@ export function LigneEvenement({ evenement }: { evenement: EvenementPublic }) {
   const ou = [nomLieu, evenement.ville].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i).join(" · ");
   const enCours = estEnCours(evenement);
   return (
-    <Link href={`/evenements/${evenement.slug}`} className="flex items-center gap-3 rounded-[16px] border-[1.5px] border-[#EFE5D2] bg-white p-3 text-inherit no-underline shadow-[0_3px_14px_rgba(80,55,10,0.06)]">
+    <Link href={`/evenements/${evenement.slug}`} className="flex items-center gap-3 rounded-[16px] border-[1.5px] border-[#EFE5D2] bg-white p-3 text-inherit no-underline shadow-[0_3px_14px_rgba(0,0,0,0.3)]">
       <span className="flex h-[56px] w-[56px] shrink-0 flex-col items-center justify-center rounded-xl bg-[#FDECEA]">
         <span className="font-[family-name:var(--font-display)] text-[19px] font-black leading-none text-[#191410]">{pastille.jour}</span>
         <span className="mt-0.5 text-[10px] font-semibold text-[#B91C1C]">{pastille.mois}</span>
@@ -87,7 +87,7 @@ export function CarteEvenementCompacte({ evenement }: { evenement: EvenementPubl
             <button type="button" className="absolute inset-0 z-10 cursor-pointer" aria-label={`View the full flyer for ${evenement.titre}`} onClick={() => setOuvert(true)} />
           </>
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center px-6 text-center" style={{ background: "linear-gradient(150deg, #F97316, #E02B20 55%, #5B2EE5)" }}>
+          <div className="absolute inset-0 flex items-center justify-center px-6 text-center" style={{ background: "linear-gradient(150deg, #4B2A5E, #2B1A3A 55%, #17171C)" }}>
             <p className="font-[family-name:var(--font-display)] text-[22px] font-black text-white">{evenement.titre}</p>
           </div>
         )}
