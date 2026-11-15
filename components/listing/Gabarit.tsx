@@ -55,7 +55,7 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
 
 export function MessageEtat({ titre, texte }: { titre: string; texte: string }) {
   return (
-    <div role="status" className="rounded-[20px] border-[1.5px] border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-6 text-center shadow-[0_3px_14px_rgba(0,0,0,0.3)]">
+    <div role="status" className="rounded-[20px] border-[1.5px] border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-6 text-center shadow-[0_3px_14px_rgba(23,23,28,0.1)]">
       <h2 className="mb-2 font-[family-name:var(--font-display)] text-lg font-black">{titre}</h2>
       <p className="text-sm text-[var(--nuit-texte2)]">{texte}</p>
     </div>

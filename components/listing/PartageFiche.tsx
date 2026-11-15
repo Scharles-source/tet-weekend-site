@@ -56,7 +56,7 @@ export function PartageFiche({
       <button
         type="button"
         onClick={partager}
-        className="inline-flex min-h-12 items-center gap-2 rounded-[14px] border border-[#55555E] px-5 text-[15px] font-bold text-[var(--nuit-texte)]"
+        className="inline-flex min-h-12 items-center gap-2 rounded-[14px] border border-[var(--nuit-ligne)] px-5 text-[15px] font-bold text-[var(--nuit-texte)]"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="18" cy="5" r="3" />

@@ -87,16 +87,16 @@ export function CarteStory({
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center" role="dialog" aria-modal="true" aria-label={partage ? "Share this event" : "Share your card"}>
       <button type="button" aria-label="Close" onClick={onFermer} className="absolute inset-0 bg-black/60" />
-      <div className="relative w-full max-w-[480px] rounded-t-3xl border-t border-[var(--nuit-ligne)] bg-[#4C4C5B] px-5 pt-3 pb-[max(20px,env(safe-area-inset-bottom))] text-[#F7F7F5] shadow-2xl">
-        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#55555E]" />
+      <div className="relative w-full max-w-[480px] rounded-t-3xl border-t border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-5 pt-3 pb-[max(20px,env(safe-area-inset-bottom))] text-[var(--nuit-texte)] shadow-2xl">
+        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[var(--nuit-ligne)]" />
         <div className="flex items-start gap-4">
           {!imageKo && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={src} alt="Your event card" width={126} height={224} onError={() => setImageKo(true)} className="h-[224px] w-[126px] shrink-0 rounded-xl bg-[#3F3F4C] object-cover shadow-lg" />
+            <img src={src} alt="Your event card" width={126} height={224} onError={() => setImageKo(true)} className="h-[224px] w-[126px] shrink-0 rounded-xl bg-[var(--nuit-carte2)] object-cover shadow-lg" />
           )}
           <div className="min-w-0">
             <p className="font-[family-name:var(--font-display)] text-[24px] leading-[1.05] font-black">{partage ? <>Share this event.<br />Bring your crew.</> : <>You&apos;re in.<br />Bring your crew.</>}</p>
-            <p className="mt-2.5 text-[13px] leading-relaxed text-[#CBCBD4]">{partage ? "The card is ready: the flyer, the date and the link to the event. One tap to post it." : "Your card is ready: the flyer, the date and the link back to the event. One tap to post it."}</p>
+            <p className="mt-2.5 text-[13px] leading-relaxed text-[var(--nuit-muet)]">{partage ? "The card is ready: the flyer, the date and the link to the event. One tap to post it." : "Your card is ready: the flyer, the date and the link back to the event. One tap to post it."}</p>
           </div>
         </div>
         <div className="mt-5 flex flex-col gap-2.5">
@@ -110,16 +110,16 @@ export function CarteStory({
             </button>
           )}
           <div className="flex gap-2.5">
-            <button type="button" onClick={sauver} disabled={occupe || imageKo} className="h-[46px] flex-1 rounded-xl border border-[#55555E] text-[14px] font-bold disabled:opacity-60">
+            <button type="button" onClick={sauver} disabled={occupe || imageKo} className="h-[46px] flex-1 rounded-xl border border-[var(--nuit-ligne)] text-[14px] font-bold disabled:opacity-60">
               Save image
             </button>
-            <button type="button" onClick={onFermer} className="h-[46px] flex-1 rounded-xl text-[14px] font-semibold text-[#CBCBD4]">
+            <button type="button" onClick={onFermer} className="h-[46px] flex-1 rounded-xl text-[14px] font-semibold text-[var(--nuit-muet)]">
               Not now
             </button>
           </div>
         </div>
         {erreur && (
-          <p className="mt-3 text-[12.5px] text-[#E9A13B]" role="status">
+          <p className="mt-3 text-[12.5px] text-[var(--accent-texte)]" role="status">
             {erreur}
           </p>
         )}

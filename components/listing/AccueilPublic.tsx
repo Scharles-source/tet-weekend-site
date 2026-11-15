@@ -13,7 +13,7 @@ type Mode = "proche" | "tout";
 /** Morceaux du fil infini : le fil révèle les événements par paquets de 18, au fil du défilement. */
 const TAILLE_MORCEAU = 18;
 
-const SEG_ON = "flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-[var(--nuit-carte2)] px-4 text-sm font-bold text-white";
+const SEG_ON = "flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-[var(--nuit-texte)] px-4 text-sm font-bold text-[var(--encre)]";
 const SEG_OFF = "flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-full px-4 text-sm font-semibold text-[var(--nuit-muet)]";
 
 export function AccueilPublic({
@@ -265,7 +265,7 @@ export function AccueilPublic({
       {/* Dates + portée, collées sous l'en-tête dès que la page défile (l'en-tête
           global, fixe, mesure 65 px bordure comprise) : le visiteur navigue
           dans le fil par jour, sans remonter en haut de la page. */}
-      <div className="sticky top-[65px] z-30 -mx-[var(--page-px)] mt-5 border-b border-[var(--nuit-ligne)] bg-[rgba(63,63,76,0.92)] px-[var(--page-px)] pt-3 pb-3 backdrop-blur-lg">
+      <div className="sticky top-[65px] z-30 -mx-[var(--page-px)] mt-5 border-b border-[var(--nuit-ligne)] bg-[rgba(250,250,247,0.92)] px-[var(--page-px)] pt-3 pb-3 backdrop-blur-lg">
       {/* Bandeau de dates : seuls les jours qui ont des événements. Chaque
           case fait défiler le fil jusqu'au groupe de ce jour. */}
       {jours.length > 0 && (
@@ -295,7 +295,7 @@ export function AccueilPublic({
       )}
 
       {/* Près de moi, ou tout le catalogue. */}
-      <div className={`${jours.length > 0 ? "mt-3" : ""} flex rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-1`} role="group" aria-label="Near me or everywhere">
+      <div className={`${jours.length > 0 ? "mt-3" : ""} flex rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte2)] p-1`} role="group" aria-label="Near me or everywhere">
         <button type="button" aria-pressed={mode === "proche"} onClick={() => changerMode("proche")} className={mode === "proche" ? SEG_ON : SEG_OFF}>
           {mode === "proche" && (
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

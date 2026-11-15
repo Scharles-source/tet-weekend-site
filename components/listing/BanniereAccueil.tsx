@@ -35,7 +35,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
   const enCours = estEnCours(e);
   const lieu = [nomLieuAffiche(e), e.ville].filter(Boolean).join(" · ") || "Venue not listed";
   const badge = (
-    <span className="rounded-full bg-[#3F3F4C] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
+    <span className="rounded-full bg-[#17171C] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
       {courant.sponsorise ? "SPONSORED" : "TRENDING"}
     </span>
   );

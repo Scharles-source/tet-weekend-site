@@ -130,7 +130,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
         <ZoneFlyer evenement={evenement} />
         {categorie && (
           <p className="mb-2">
-            <Link href={`/categories/${evenement.categorie}`} className="inline-flex min-h-8 items-center rounded-full border border-[#55555E] px-3 text-xs font-bold tracking-[0.08em] text-[var(--nuit-texte2)] uppercase no-underline">
+            <Link href={`/categories/${evenement.categorie}`} className="inline-flex min-h-8 items-center rounded-full border border-[var(--nuit-ligne)] px-3 text-xs font-bold tracking-[0.08em] text-[var(--nuit-texte2)] uppercase no-underline">
               {categorie}
             </Link>
           </p>
@@ -168,7 +168,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           </div>
           {evenement.prix && (
             <div className="rounded-2xl border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-3.5">
-              <p className="text-[15px] font-bold text-[var(--or)]">Admission: {evenement.prix}</p>
+              <p className="text-[15px] font-bold text-[var(--accent-texte)]">Admission: {evenement.prix}</p>
               <p className="text-[13px] text-[var(--nuit-muet)]">Price given by the organizer. Tèt Weekend does not sell tickets.</p>
             </div>
           )}
@@ -203,7 +203,7 @@ function Fiche({ evenement, tous }: { evenement: EvenementPublic; tous: Evenemen
           <a href={lienGoogleAgenda(evenement, url)} className="inline-flex min-h-12 items-center rounded-[14px] bg-[var(--accent)] px-5 text-[15px] font-extrabold text-[#1C1305] no-underline">
             Add to Google Calendar
           </a>
-          <a href={`/evenements/${evenement.slug}/calendrier`} className="inline-flex min-h-12 items-center rounded-[14px] border border-[#55555E] px-5 text-[15px] font-bold text-[var(--nuit-texte)] no-underline">
+          <a href={`/evenements/${evenement.slug}/calendrier`} className="inline-flex min-h-12 items-center rounded-[14px] border border-[var(--nuit-ligne)] px-5 text-[15px] font-bold text-[var(--nuit-texte)] no-underline">
             Download .ics
           </a>
           <PartageFiche

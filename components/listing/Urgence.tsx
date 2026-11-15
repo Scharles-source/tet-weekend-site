@@ -17,10 +17,10 @@ export function Urgence({ evenement, className = "" }: { evenement: { date_debut
   const u = urgenceDe(evenement, maintenant);
   if (!u) {
     if (!estNouveau(evenement, maintenant)) return null;
-    return <span className={`rounded-full bg-[var(--or)] px-2.5 py-1 text-xs font-extrabold text-[var(--encre)] ${className}`}>New</span>;
+    return <span className={`rounded-full bg-[var(--or)] px-2.5 py-1 text-xs font-extrabold text-[#1C1305] ${className}`}>New</span>;
   }
   return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${u.urgent ? "bg-[var(--accent)] text-[#1C1305]" : "bg-[rgba(18,18,22,0.82)] text-[var(--nuit-texte)]"} ${className}`}>
+    <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${u.urgent ? "bg-[var(--accent)] text-[#1C1305]" : "bg-[rgba(18,18,22,0.82)] text-white"} ${className}`}>
       {u.texte}
     </span>
   );

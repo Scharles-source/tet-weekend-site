@@ -44,7 +44,7 @@ export function NavBasse({ email, masquee = false }: { email?: string; masquee?:
       aria-hidden={masquee}
     >
       {plus && (
-        <div className="pointer-events-auto mb-2 ml-auto w-56 rounded-[24px] border border-[var(--nuit-ligne)] bg-[rgba(63,63,76,0.92)] px-4 py-2 shadow-[0_12px_32px_rgba(0,0,0,.5)] backdrop-blur-xl">
+        <div className="pointer-events-auto mb-2 ml-auto w-56 rounded-[24px] border border-[var(--nuit-ligne)] bg-[rgba(255,255,255,0.94)] px-4 py-2 shadow-[0_12px_32px_rgba(23,23,28,.14)] backdrop-blur-xl">
           {PLUS.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setPlus(false)} className="block py-3 text-sm font-semibold text-[var(--nuit-texte)] no-underline">
               {l.label}
@@ -57,10 +57,10 @@ export function NavBasse({ email, masquee = false }: { email?: string; masquee?:
           )}
         </div>
       )}
-      <ul className="pointer-events-auto grid grid-cols-5 rounded-full border border-[var(--nuit-ligne)] bg-[rgba(63,63,76,0.92)] shadow-[0_12px_30px_rgba(0,0,0,.5)] backdrop-blur-xl">
+      <ul className="pointer-events-auto grid grid-cols-5 rounded-full border border-[var(--nuit-ligne)] bg-[rgba(255,255,255,0.94)] shadow-[0_12px_30px_rgba(23,23,28,.14)] backdrop-blur-xl">
         {GAUCHE.map(lien)}
         <li className="flex items-center justify-center">
-          <Link href="/recherche" aria-label="Search" className="-mt-7 flex h-[60px] w-[60px] items-center justify-center rounded-full border-4 border-[var(--nuit-fond)] bg-[var(--accent)] text-[#1C1305] shadow-[0_8px_20px_rgba(0,0,0,.45)] no-underline">
+          <Link href="/recherche" aria-label="Search" className="-mt-7 flex h-[60px] w-[60px] items-center justify-center rounded-full border-4 border-[var(--nuit-fond)] bg-[var(--accent)] text-[#1C1305] shadow-[0_8px_20px_rgba(23,23,28,.3)] no-underline">
             <Search size={24} strokeWidth={2.4} aria-hidden />
           </Link>
         </li>

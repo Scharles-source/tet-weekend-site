@@ -60,7 +60,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   const raretes = (evenement.badges_rarete ?? signauxRarete(evenement)).slice(0, etroit ? 1 : 2);
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden text-white" style={{ background: "#4C4C5B" }}>
+    <div className="relative flex flex-1 flex-col overflow-hidden text-white" style={{ background: "#17171C" }}>
       {couverture && (
         // eslint-disable-next-line @next/next/no-img-element
         <img

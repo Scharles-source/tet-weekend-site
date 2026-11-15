@@ -63,7 +63,7 @@ export function FormulaireEvenement() {
   }
 
   const occupe = etat === "envoi";
-  const err = (k: string) => (erreurs[k] ? <p className="mt-1 text-[13px] font-semibold text-[#F87171]" role="alert">{erreurs[k]}</p> : null);
+  const err = (k: string) => (erreurs[k] ? <p className="mt-1 text-[13px] font-semibold text-[#C81E1E]" role="alert">{erreurs[k]}</p> : null);
 
   return (
     <form onSubmit={envoyer} className="space-y-4" noValidate>
@@ -125,12 +125,12 @@ export function FormulaireEvenement() {
       </label>
 
       {etat === "indisponible" && (
-        <p role="alert" className="rounded-[14px] bg-[rgba(233,161,59,0.12)] p-3 text-[14px] text-[#E9A13B]">
+        <p role="alert" className="rounded-[14px] bg-[rgba(233,161,59,0.12)] p-3 text-[14px] text-[var(--accent-texte)]">
           Submissions are temporarily unavailable. Please email your flyer and details to <a href={`mailto:${EMAIL_CONTACT}`} className="font-bold underline">{EMAIL_CONTACT}</a>.
         </p>
       )}
       {etat === "echec" && (
-        <p role="alert" className="rounded-[14px] bg-[rgba(224,43,32,0.12)] p-3 text-[14px] text-[#F87171]">
+        <p role="alert" className="rounded-[14px] bg-[rgba(224,43,32,0.12)] p-3 text-[14px] text-[#C81E1E]">
           We couldn&apos;t send your event. Check your connection and try again, or email <a href={`mailto:${EMAIL_CONTACT}`} className="font-bold underline">{EMAIL_CONTACT}</a>.
         </p>
       )}

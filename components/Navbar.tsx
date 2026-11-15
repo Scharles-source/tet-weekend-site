@@ -30,9 +30,9 @@ export default function Navbar() {
         alignItems: "center",
         justifyContent: "space-between",
         padding: "14px var(--page-px, 32px)",
-        background: "rgba(63,63,76,0.88)",
+        background: "rgba(250,250,247,0.88)",
         backdropFilter: "blur(16px)",
-        borderBottom: "1px solid rgba(107,138,255,0.12)",
+        borderBottom: "1px solid rgba(23,23,28,0.08)",
       }}>
         <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
           <Image
@@ -68,7 +68,7 @@ export default function Navbar() {
             onClick={() => setCheminOuvert(open ? null : pathname)}
             aria-label="Menu"
             style={{
-              background: "none", border: "none", color: "var(--white)",
+              background: "none", border: "none", color: "#17171C",
               cursor: "pointer", padding: 6, display: "flex",
               alignItems: "center", justifyContent: "center", borderRadius: 8,
             }}
@@ -83,12 +83,12 @@ export default function Navbar() {
         <div style={{
           position: "fixed",
           top: 65, left: 0, right: 0,
-          background: "rgba(63,63,76,0.97)",
+          background: "rgba(250,250,247,0.97)",
           backdropFilter: "blur(20px)",
           zIndex: 99,
           display: "flex",
           flexDirection: "column",
-          borderBottom: "1px solid rgba(107,138,255,0.15)",
+          borderBottom: "1px solid rgba(23,23,28,0.08)",
           paddingBottom: 16,
         }}>
           <MobileLink href="/" active={pathname === "/"} onClick={() => setCheminOuvert(null)}>Home</MobileLink>
@@ -117,7 +117,7 @@ export default function Navbar() {
 function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
   return (
     <Link href={href} style={{
-      color: active ? "var(--white)" : "var(--text-sec)",
+      color: active ? "#17171C" : "#6B6B74",
       textDecoration: "none", fontSize: 14, fontWeight: 400, transition: "color 0.2s",
     }}>
       {children}
@@ -130,10 +130,10 @@ function MobileLink({ href, active, onClick, children }: { href: string; active:
     <Link href={href} onClick={onClick} style={{
       display: "block",
       padding: "15px 24px",
-      color: active ? "var(--white)" : "var(--text-sec)",
+      color: active ? "#17171C" : "#6B6B74",
       textDecoration: "none",
       fontSize: 16,
-      borderBottom: "1px solid rgba(255,255,255,0.04)",
+      borderBottom: "1px solid rgba(23,23,28,0.06)",
       fontWeight: active ? 500 : 400,
     }}>
       {children}

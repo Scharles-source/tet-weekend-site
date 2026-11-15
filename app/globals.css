@@ -76,11 +76,11 @@ body {
 .mobile-nav {
   position: fixed;
   top: 65px; left: 0; right: 0;
-  background: rgba(63,63,76,0.97);
+  background: rgba(250,250,247,0.97);
   backdrop-filter: blur(20px);
   z-index: 99;
   flex-direction: column;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(23,23,28,0.08);
   padding: 8px 0 20px;
 }
 .mobile-nav a {
@@ -93,7 +93,7 @@ body {
   transition: color 0.15s;
 }
 .mobile-nav a:last-child { border-bottom: none; }
-.mobile-nav a.active { color: var(--white); font-weight: 500; }
+.mobile-nav a.active { color: #17171C; font-weight: 500; }
 .mobile-nav .mobile-cta {
   margin: 12px 24px 0;
   background: var(--blue);
@@ -126,37 +126,42 @@ body {
   .trending-home-title { font-size: 24px !important; gap: 8px !important; }
 }
 
-/* Thème « nuit » des pages publiques (l'accent se change ici, en un seul endroit). */
+/* Thème des pages publiques (classe historique « theme-nuit », valeurs CLAIRES
+   depuis le 15 nov. 2026 : fond clair, cartes blanches, texte foncé — demande
+   de Smith : « un thème clair, pas un thème gris »). L'accent se change ici,
+   en un seul endroit. Les jetons --creme/--encre restent la paire « surface
+   sélectionnée / son texte » : surface encre, texte blanc. */
 .theme-nuit {
-  --nuit-fond: #3F3F4C;
-  --nuit-carte: #4C4C5B;
-  --nuit-carte2: #595968;
-  --nuit-ligne: #6E6E82;
-  --nuit-texte: #F7F7F5;
-  --nuit-texte2: #E4E4EA;
-  --nuit-muet: #CBCBD4;
-  --creme: #F7F7F5;
-  --encre: #17171B;
-  --encre2: #55555E;
+  --nuit-fond: #FAFAF7;
+  --nuit-carte: #FFFFFF;
+  --nuit-carte2: #F1F1EC;
+  --nuit-ligne: #E3E3DC;
+  --nuit-texte: #17171C;
+  --nuit-texte2: #3F3F47;
+  --nuit-muet: #6B6B74;
+  --creme: #17171C;
+  --encre: #FFFFFF;
+  --encre2: #B9B9C2;
   --accent: #E9A13B;
-  --accent-texte: #E9A13B;
+  --accent-texte: #A96F14;
   --or: #E9A13B;
-  --text-sec: #CBCBD4;
-  --surface: #4C4C5B;
+  --text-sec: #6B6B74;
+  --surface: #FFFFFF;
   background: var(--nuit-fond);
   color: var(--nuit-texte);
   font-family: var(--font-body);
-  color-scheme: dark;
+  color-scheme: light;
 }
+body:has(.theme-nuit) { background: #FAFAF7; }
 
 /* Pont temporaire : les anciennes classes « crème » prennent les couleurs du thème nuit.
    À supprimer quand chaque composant utilisera directement les jetons --nuit-*. */
 .theme-nuit .bg-white { background-color: var(--nuit-carte); }
-.theme-nuit .bg-white\/75, .theme-nuit .bg-white\/85 { background-color: rgba(76, 76, 91, 0.94); }
+.theme-nuit .bg-white\/75, .theme-nuit .bg-white\/85 { background-color: rgba(255, 255, 255, 0.94); }
 .theme-nuit .bg-\[\#FBF7EF\] { background-color: var(--nuit-fond); }
 .theme-nuit .bg-\[\#FFFDF8\] { background-color: var(--nuit-carte); }
 .theme-nuit .bg-\[\#F3E6D8\] { background-color: var(--nuit-carte2); }
-.theme-nuit .bg-\[\#191410\] { background-color: var(--nuit-carte2); }
+.theme-nuit .bg-\[\#191410\] { background-color: #17171C; }
 .theme-nuit .bg-\[\#FDECEA\] { background-color: rgba(233, 161, 59, 0.14); }
 .theme-nuit .bg-\[\#D8C6A4\] { background-color: var(--nuit-ligne); }
 .theme-nuit .text-\[\#191410\] { color: var(--nuit-texte); }
@@ -165,9 +170,9 @@ body {
 .theme-nuit .text-\[\#B91C1C\], .theme-nuit .text-\[\#E02B20\] { color: var(--accent-texte); }
 .theme-nuit .border-\[\#EFE5D2\], .theme-nuit .border-\[\#EFE5D2\]\/70, .theme-nuit .border-\[\#D8C6A4\], .theme-nuit .border-\[\#E5D9BE\] { border-color: var(--nuit-ligne); }
 
-/* En-tête fixe du thème nuit : fond sombre translucide, simple flou — aucun effet de lueur. */
+/* En-tête fixe des pages publiques : fond clair translucide, simple flou — aucun effet de lueur. */
 .theme-nuit header[class*="sticky"] {
-  background-color: rgba(63, 63, 76, 0.88);
+  background-color: rgba(250, 250, 247, 0.88);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
 }

@@ -16,7 +16,7 @@ export function LoupeRecherche({ visible }: { visible: boolean }) {
       href="/recherche"
       aria-label="Search"
       aria-hidden={!visible}
-      className={`fixed right-4 bottom-[calc(16px_+_env(safe-area-inset-bottom,0px))] z-40 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[var(--accent)] text-[#1C1305] shadow-[0_10px_24px_rgba(0,0,0,0.45)] transition-[opacity,transform,visibility] duration-250 motion-reduce:transition-none md:right-6 md:bottom-6 ${
+      className={`fixed right-4 bottom-[calc(16px_+_env(safe-area-inset-bottom,0px))] z-40 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[var(--accent)] text-[#1C1305] shadow-[0_10px_24px_rgba(23,23,28,0.3)] transition-[opacity,transform,visibility] duration-250 motion-reduce:transition-none md:right-6 md:bottom-6 ${
         visible ? "visible scale-100 opacity-100" : "invisible scale-75 pointer-events-none opacity-0"
       }`}
     >
