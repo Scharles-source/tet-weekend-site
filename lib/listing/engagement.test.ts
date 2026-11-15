@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { estTresConsulte, estUuid, libelleInteret } from "./engagement.ts";
-import { preuveSociale, rangsParVille } from "./preuve.ts";
+import { libelleVues, preuveSociale, rangsParVille } from "./preuve.ts";
 import { signauxRarete } from "./rarete.ts";
 
 test("le nombre de « I'm in » est montré dès le premier", () => {
@@ -47,4 +47,14 @@ test("rareté : seulement ce que l'organisateur a écrit", () => {
   assert.deepEqual(signauxRarete({ titre: "Soirée", description: "Prévente jusqu'à vendredi", prix: null }), ["Early bird"]);
   assert.deepEqual(signauxRarete({ titre: "Soirée", description: "Dernières places disponibles", prix: null }), ["Limited tickets"]);
   assert.deepEqual(signauxRarete({ titre: "Concert", description: "Doors open at 9", prix: "$20" }), []);
+});
+
+test("vues : montrées dès la première, rien si zéro ou inconnu", () => {
+  assert.equal(libelleVues(1), "1 view");
+  assert.equal(libelleVues(2), "2 views");
+  assert.equal(libelleVues(100), "100 views");
+  assert.equal(libelleVues(1200), "1.2k views");
+  assert.equal(libelleVues(0), null);
+  assert.equal(libelleVues(null), null);
+  assert.equal(libelleVues(undefined), null);
 });
