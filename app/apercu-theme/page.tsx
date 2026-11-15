@@ -3,6 +3,7 @@ import { SectionEvenements } from "@/components/admin/SectionEvenements";
 import { AccueilPublic } from "@/components/listing/AccueilPublic";
 import { BanniereVide } from "@/components/listing/BanniereAccueil";
 import { Gabarit } from "@/components/listing/Gabarit";
+import { joursAvecEvenements } from "@/lib/listing/jours";
 import type { EvenementPublic } from "@/lib/listing/types";
 
 export const dynamic = "force-dynamic";
@@ -17,15 +18,7 @@ export default function ApercuTheme() {
   return (
     <>
       <Gabarit>
-        <AccueilPublic
-          evenements={[sponsor, tendance, suite]}
-          panneaux={[
-            { evenement: sponsor, sponsorise: true },
-            { evenement: tendance, sponsorise: false },
-          ]}
-          email={EMAIL}
-          auto={false}
-        />
+        <AccueilPublic evenements={[sponsor, tendance, suite]} jours={joursAvecEvenements([sponsor, tendance, suite])} />
         <div className="mt-8">
           <BanniereVide email={EMAIL} />
         </div>

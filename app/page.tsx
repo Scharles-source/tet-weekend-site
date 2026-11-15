@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { AccueilPublic } from "@/components/listing/AccueilPublic";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
-import { choisirBanniere } from "@/lib/listing/banniere";
-import { chargerAnnuaire, emailContact, evenementAllege } from "@/lib/listing/data";
+import { chargerAnnuaire, evenementAllege } from "@/lib/listing/data";
 import { dansLeWeekend, estTermine } from "@/lib/listing/dates";
+import { joursAvecEvenements } from "@/lib/listing/jours";
 import { dansLaPeriode } from "@/lib/listing/periode";
 import type { EvenementPublic } from "@/lib/listing/types";
 
@@ -70,7 +70,8 @@ export default async function Accueil() {
   // Premier jeu rendu côté serveur (correctif audit 13 nov. 2026) : ce soir,
   // ce weekend et les prochains à venir, plafonné à 40 — l'HTML initial ne
   // transporte plus les ~150 événements (508 Ko mesurés). La liste complète
-  // arrive par /api/annuaire seulement quand un filtre est activé.
+  // arrive par /api/annuaire seulement quand le jour choisi n'est pas
+  // entièrement couvert par ce premier jeu.
   const prioritaires = new Set(
     aVenir
       .filter((e) => dansLaPeriode(e.date_debut, "ce-soir") || dansLeWeekend(e.date_debut))
@@ -83,16 +84,12 @@ export default async function Accueil() {
   const compte = new Map<string, number>();
   for (const e of aVenir) if (e.ville) compte.set(e.ville, (compte.get(e.ville) ?? 0) + 1);
   const comptesVilles = [...compte.entries()].sort((a, b) => b[1] - a[1]);
-  const email = await emailContact();
+  // Bandeau de dates de l'accueil : jours et comptes exacts, calculés sur la
+  // liste complète — le client les affiche tels quels dès le premier rendu.
+  const jours = joursAvecEvenements(aVenir);
   return (
     <Gabarit large>
-      <AccueilPublic
-        evenements={initiaux.map(evenementAllege)}
-        comptesVilles={comptesVilles}
-        total={aVenir.length}
-        panneaux={choisirBanniere(aVenir).map((p) => ({ ...p, evenement: evenementAllege(p.evenement) }))}
-        email={email}
-      />
+      <AccueilPublic evenements={initiaux.map(evenementAllege)} comptesVilles={comptesVilles} jours={jours} />
     </Gabarit>
   );
 }

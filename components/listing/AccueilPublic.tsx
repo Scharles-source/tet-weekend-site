@@ -3,93 +3,39 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Affiche } from "@/components/listing/Affiche";
-import { BanniereAccueil, type Panneau } from "@/components/listing/BanniereAccueil";
 import { PastilleLieu, usePosition } from "@/components/listing/PositionFil";
-import { dansLeWeekend } from "@/lib/listing/dates";
-import { dansLaPeriode, type Periode } from "@/lib/listing/periode";
-import { pointDeReference, trierParDistance } from "@/lib/listing/proximite";
+import { cleJour, type JourEvenements } from "@/lib/listing/jours";
+import { pointDeReference, trierParDistance, zoneDePosition } from "@/lib/listing/proximite";
 import { tendances } from "@/lib/listing/tendance";
 import { libelleVues } from "@/lib/listing/preuve";
 import { flyerAllege } from "@/lib/listing/image-url";
-import { CATEGORIES } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 
-const PERIODES: { valeur: Periode; label: string }[] = [
-  { valeur: "tout", label: "All" },
-  { valeur: "ce-soir", label: "Tonight" },
-  { valeur: "demain", label: "Tomorrow" },
-  { valeur: "ce-weekend", label: "This weekend" },
-];
+type Mode = "proche" | "tout";
 
-const PUCE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-xl bg-[var(--nuit-texte)] px-4 text-sm font-extrabold text-[var(--encre)]";
-const PUCE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-xl border border-[#3F3F46] px-4 text-sm font-semibold text-[var(--nuit-texte)]";
-const ZONE_ON = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-[var(--accent)] px-[18px] text-sm font-bold text-[#1C1305]";
-const ZONE_OFF = "inline-flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-[18px] text-sm font-semibold text-[var(--nuit-texte)]";
-
-const CLE_FILTRE_VILLE = "tw_filtre_ville";
-const PLAFOND_A_VENIR = 40;
+const SEG_ON = "flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-[var(--nuit-carte2)] px-4 text-sm font-bold text-white";
+const SEG_OFF = "flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-full px-4 text-sm font-semibold text-[var(--nuit-muet)]";
 
 export function AccueilPublic({
   evenements: evenementsInitiaux,
   comptesVilles,
-  total,
-  panneaux,
-  email,
+  jours,
 }: {
   evenements: EvenementPublic[];
-  /** Comptes par ville sur la liste complète (les pastilles restent exactes même si seul un premier jeu est rendu). */
+  /** Comptes par ville sur la liste complète (la pastille de lieu reste exacte même si seul un premier jeu est rendu). */
   comptesVilles?: [string, number][];
-  /** Nombre total d'événements à venir (pour le lien « See all »). */
-  total?: number;
-  panneaux: Panneau[];
-  email: string;
-  auto?: boolean;
+  /** Jours qui ont au moins un événement à venir, comptes exacts sur la liste complète (calculés côté serveur). */
+  jours: JourEvenements[];
 }) {
   // L'accueil reçoit un premier jeu (ce soir, ce weekend, les prochains). La
-  // liste complète n'est chargée — par /api/annuaire — que lorsqu'un filtre
-  // ville/moment est activé (correctif poids, audit 13 nov. 2026).
+  // liste complète n'est chargée — par /api/annuaire — que si le jour choisi
+  // n'est pas entièrement couvert par ce premier jeu (correctif poids,
+  // audit 13 nov. 2026).
   const [tous, setTous] = useState<EvenementPublic[] | null>(null);
   const [chargement, setChargement] = useState(false);
   const listeBase = tous ?? evenementsInitiaux;
-  // Fil intelligent (tri radial, demande de Smith du 13 nov. 2026) : tous
-  // les événements sont ordonnés par distance croissante depuis le point
-  // du visiteur — point exact du réseau quand il existe, sinon sa ville
-  // détectée ou choisie, sinon le cœur du catalogue. À distance égale
-  // (même ville), l'ordre par date est conservé. Les filtres ci-dessous
-  // (ville stricte, moment) s'appliquent sur cette liste déjà triée :
-  // dans un filtre ville, l'ordre reste donc radial à l'intérieur du
-  // filtre.
   const { position, choisie, choisir } = usePosition(listeBase);
   const point = useMemo(() => pointDeReference(position), [position]);
-  const evenements = useMemo(() => trierParDistance(listeBase, point), [listeBase, point]);
-  const [periode, setPeriode] = useState<Periode>("tout");
-  const [ville, setVille] = useState<string | null>(null);
-
-  // La ville choisie via les pastilles est mémorisée et restaurée au retour du visiteur.
-  useEffect(() => {
-    let annule = false;
-    (async () => {
-      try {
-        const c = window.localStorage.getItem(CLE_FILTRE_VILLE);
-        if (c && !annule) setVille(c);
-      } catch {
-        /* stockage indisponible : pas de ville mémorisée */
-      }
-    })();
-    return () => {
-      annule = true;
-    };
-  }, []);
-
-  function choisirVille(nom: string | null) {
-    setVille(nom);
-    try {
-      if (nom) window.localStorage.setItem(CLE_FILTRE_VILLE, nom);
-      else window.localStorage.removeItem(CLE_FILTRE_VILLE);
-    } catch {
-      /* ignoré */
-    }
-  }
 
   const villes = useMemo(() => {
     if (comptesVilles) return comptesVilles;
@@ -98,10 +44,28 @@ export function AccueilPublic({
     return [...compte.entries()].sort((a, b) => b[1] - a[1]);
   }, [comptesVilles, listeBase]);
 
-  const filtres = periode !== "tout" || ville !== null;
+  // Jour affiché : aujourd'hui s'il a des événements, sinon le premier jour
+  // du bandeau (qui ne liste que des jours avec événements). Le choix du
+  // visiteur, quand il touche une autre case, prime ensuite.
+  const [jourChoisi, setJourChoisi] = useState<string | null>(null);
+  const jourDefaut = jours.find((j) => j.aujourdhui)?.cle ?? jours[0]?.cle ?? null;
+  const jourActif = jourChoisi ?? jourDefaut;
+  const jour = jours.find((j) => j.cle === jourActif) ?? null;
+
+  // « Near me » par défaut, comme la maquette validée ; « All » = tout le
+  // catalogue du jour, en ordre chronologique.
+  const [mode, setMode] = useState<Mode>("proche");
+
+  // Couverture du jour affiché : le compte exact vient du serveur (liste
+  // complète) ; si le premier jeu en contient moins, on charge tout.
+  const compteCharge = useMemo(
+    () => (jour ? listeBase.filter((e) => cleJour(e.date_debut, e.fuseau) === jour.cle).length : 0),
+    [listeBase, jour],
+  );
+  const manque = jour !== null && tous === null && compteCharge < jour.compte;
 
   useEffect(() => {
-    if (!filtres || tous !== null) return;
+    if (!manque) return;
     let annule = false;
     (async () => {
       setChargement(true);
@@ -111,7 +75,7 @@ export function AccueilPublic({
         const d = (await r.json()) as { evenements: EvenementPublic[] };
         if (!annule) setTous(d.evenements);
       } catch {
-        /* le premier jeu reste affiché et filtré au mieux */
+        /* le premier jeu reste affiché, filtré au mieux */
       } finally {
         if (!annule) setChargement(false);
       }
@@ -119,30 +83,28 @@ export function AccueilPublic({
     return () => {
       annule = true;
     };
-  }, [filtres, tous]);
-  const resultats = useMemo(
-    () => evenements.filter((e) => dansLaPeriode(e.date_debut, periode) && (ville === null || e.ville === ville)),
-    [evenements, periode, ville],
+  }, [manque]);
+
+  // Mode « Near me » : le tri radial existant (distance croissante depuis le
+  // point du visiteur). Mode « All » : ordre chronologique, sans distance.
+  const evenements = useMemo(() => {
+    if (mode === "proche") return trierParDistance(listeBase, point);
+    return [...listeBase].sort((a, b) => Date.parse(a.date_debut) - Date.parse(b.date_debut));
+  }, [listeBase, mode, point]);
+
+  const duJour = useMemo(
+    () => (jour ? evenements.filter((e) => cleJour(e.date_debut, e.fuseau) === jour.cle) : []),
+    [evenements, jour],
   );
-  // « Tonight or never » : seulement les soirées pas encore commencées. Dès que l'heure passe, elles quittent cette rangée.
-  const [maintenant, setMaintenant] = useState<number | null>(null);
-  useEffect(() => {
-    const t = setInterval(() => setMaintenant(Date.now()), 15_000);
-    return () => clearInterval(t);
-  }, []);
-  const ceSoir = useMemo(
-    () => evenements.filter((e) => dansLaPeriode(e.date_debut, "ce-soir") && (maintenant === null || Date.parse(e.date_debut) > maintenant)),
-    [evenements, maintenant],
-  );
-  const weekend = evenements.filter((e) => dansLeWeekend(e.date_debut));
+
   // « Trending now » : les plus vus, seulement avec de vraies vues (voir lib/listing/tendance.ts).
-  const enVogue = useMemo(() => tendances(evenements), [evenements]);
-  // « Coming up » de l'accueil : agenda de la suite — les événements déjà
-  // montrés dans « Tonight or never » et « This weekend » n'y sont pas
-  // rendus une deuxième fois (même correctif que les pages villes, et
-  // autant de HTML en moins pour les connexions lentes).
-  const idsMontres = new Set([...ceSoir.map((e) => e.id), ...weekend.map((e) => e.id)]);
-  const aVenirAutres = evenements.filter((e) => !idsMontres.has(e.id));
+  const enVogue = useMemo(() => tendances(listeBase), [listeBase]);
+
+  // Le deuxième segment dit « All of Haiti » tant que le visiteur est en
+  // Haïti (ou pas encore situé : le site y est ancré par défaut) ; ailleurs,
+  // il dit simplement « All events ».
+  const enHaiti = !position || position.pays === "HT" || zoneDePosition(position) === "haiti";
+  const libelleTout = enHaiti ? "All of Haiti" : "All events";
 
   return (
     <div>
@@ -155,121 +117,95 @@ export function AccueilPublic({
 
       <PastilleLieu position={position} evenements={listeBase} villes={villes.map(([nom]) => nom)} choisie={choisie} onChoisir={choisir} />
 
-      {/* Zone + moment */}
-      <div className="no-scrollbar -mx-[var(--page-px)] mt-5 flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Choose a city">
-        <button type="button" className={ville === null ? ZONE_ON : ZONE_OFF} aria-pressed={ville === null} onClick={() => choisirVille(null)}>
-          All cities
+      {/* Bandeau de dates : seuls les jours qui ont des événements. */}
+      {jours.length > 0 && (
+        <div className="no-scrollbar -mx-[var(--page-px)] mt-5 flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Choose a day">
+          {jours.map((j) => {
+            const actif = j.cle === jourActif;
+            return (
+              <button
+                key={j.cle}
+                type="button"
+                aria-pressed={actif}
+                onClick={() => setJourChoisi(j.cle)}
+                className={`flex min-w-[64px] shrink-0 flex-col items-center rounded-2xl px-3 py-2.5 ${
+                  actif
+                    ? "bg-[var(--nuit-texte)] text-[var(--encre)]"
+                    : "cursor-pointer border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] text-[var(--nuit-texte)]"
+                }`}
+              >
+                <span className={`text-[10px] font-bold tracking-[0.12em] uppercase ${actif ? "text-[var(--encre2)]" : "text-[var(--nuit-muet)]"}`}>
+                  {j.aujourdhui ? "Tonight" : j.nom}
+                </span>
+                <span className="mt-1 text-[19px] leading-none font-extrabold">{j.numero}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Près de moi, ou tout le catalogue. */}
+      <div className="mt-4 flex rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-1" role="group" aria-label="Near me or everywhere">
+        <button type="button" aria-pressed={mode === "proche"} onClick={() => setMode("proche")} className={mode === "proche" ? SEG_ON : SEG_OFF}>
+          {mode === "proche" && (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4 12.5l5 5L20 6.5" />
+            </svg>
+          )}
+          Near me
         </button>
-        {villes.map(([nom, n]) => (
-          <button key={nom} type="button" className={ville === nom ? ZONE_ON : ZONE_OFF} aria-pressed={ville === nom} onClick={() => choisirVille(nom)}>
-            {nom} <span className="ml-1.5 opacity-70">{n}</span>
-          </button>
-        ))}
-      </div>
-      <div className="no-scrollbar -mx-[var(--page-px)] mt-3 flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Choose a moment">
-        {PERIODES.map((p) => (
-          <button key={p.valeur} type="button" className={periode === p.valeur ? PUCE_ON : PUCE_OFF} aria-pressed={periode === p.valeur} onClick={() => setPeriode(p.valeur)}>
-            {p.label}
-          </button>
-        ))}
+        <button type="button" aria-pressed={mode === "tout"} onClick={() => setMode("tout")} className={mode === "tout" ? SEG_ON : SEG_OFF}>
+          {mode === "tout" && (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4 12.5l5 5L20 6.5" />
+            </svg>
+          )}
+          {libelleTout}
+        </button>
       </div>
 
-      {filtres ? (
-        <section className="mt-7" aria-live="polite">
-          <p className="mb-4 text-[13px] font-bold tracking-[0.12em] text-[var(--nuit-muet)] uppercase">
-            {resultats.length} event{resultats.length > 1 ? "s" : ""}
-            {chargement ? " · loading all events…" : ""}
-          </p>
-          {resultats.length === 0 ? (
-            <p className="rounded-[20px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-5 text-[15px] text-[var(--nuit-texte2)]">
-              Nothing published for this pick yet. Try another moment or another city.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-              {resultats.map((e) => (
-                <Affiche key={e.id} evenement={e} large />
-              ))}
+      {enVogue.length > 0 && (
+        <Rangee titre="Trending now" sousTitre="The most viewed events right now." href="/evenements">
+          {enVogue.map((e, i) => (
+            <PetiteAffiche key={e.id} evenement={e} rang={i + 1} />
+          ))}
+        </Rangee>
+      )}
+
+      {/* Le jour choisi, et lui seul. */}
+      <section className="mt-9 lg:mt-12" aria-live="polite">
+        {jour ? (
+          <>
+            <div className="mb-3.5 flex items-baseline justify-between gap-3 lg:mb-5">
+              <h2 className="font-[family-name:var(--font-display)] text-2xl font-black tracking-tight text-[var(--nuit-texte)] lg:text-[30px]">
+                {jour.nom} {jour.numero} · {mode === "proche" ? "Near you" : libelleTout}
+              </h2>
+              <span className="shrink-0 text-[13px] font-semibold text-[var(--nuit-muet)]">
+                {jour.compte} event{jour.compte > 1 ? "s" : ""}
+                {chargement ? " · loading…" : ""}
+              </span>
             </div>
-          )}
-        </section>
-      ) : (
-        <>
-          {enVogue.length > 0 && (
-            <Rangee titre="Trending now" sousTitre="The most viewed events right now." href="/evenements">
-              {enVogue.map((e, i) => (
-                <PetiteAffiche key={e.id} evenement={e} rang={i + 1} />
-              ))}
-            </Rangee>
-          )}
-
-          {ceSoir.length > 0 && (
-            <Rangee titre="Tonight or never" sousTitre="The countdown is real. Once it starts, it leaves this row." href="/evenements">
-              {ceSoir.map((e) => (
-                <Affiche key={e.id} evenement={e} className="w-[236px] shrink-0 snap-start lg:w-[260px]" />
-              ))}
-            </Rangee>
-          )}
-
-          <section className="mt-8 lg:mt-12">
-            <BanniereAccueil panneaux={panneaux} email={email} />
-          </section>
-
-          <section id="ce-weekend" className="mt-9 lg:mt-12">
-            <EnteteSection titre="This weekend" href="/evenements" />
-            {weekend.length === 0 ? (
-              <p className="text-sm text-[var(--nuit-muet)]">Nothing published for this weekend.</p>
+            {duJour.length === 0 ? (
+              <p className="rounded-[20px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-5 text-[15px] text-[var(--nuit-texte2)]">
+                Nothing published for this day yet.
+              </p>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-                {weekend.map((e) => (
+                {duJour.map((e) => (
                   <Affiche key={e.id} evenement={e} large />
                 ))}
               </div>
             )}
-          </section>
-
-          <div className="mt-9 lg:mt-12 lg:grid lg:grid-cols-[1fr_400px] lg:items-start lg:gap-8">
-            <section>
-              <EnteteSection titre="Coming up" href="/evenements" />
-              {evenements.length === 0 ? (
-                <p className="text-sm text-[var(--nuit-muet)]">No upcoming events for the moment.</p>
-              ) : aVenirAutres.length === 0 ? (
-                <p className="text-sm text-[var(--nuit-muet)]">No other upcoming events.</p>
-              ) : (
-                <>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3 lg:gap-4">
-                    {aVenirAutres.slice(0, PLAFOND_A_VENIR).map((e) => (
-                      <Affiche key={e.id} evenement={e} />
-                    ))}
-                  </div>
-                  {(total ?? evenements.length) > idsMontres.size + PLAFOND_A_VENIR && (
-                    <p className="mt-4">
-                      <Link href="/evenements" className="text-sm font-bold text-[var(--accent-texte)] no-underline">
-                        See all {total ?? evenements.length} events
-                      </Link>
-                    </p>
-                  )}
-                </>
-              )}
-            </section>
-            <BlocOrganisateurs />
-          </div>
-
-          <section className="mt-9 lg:mt-12">
-            <h2 className="mb-3.5 font-[family-name:var(--font-display)] text-2xl font-black tracking-tight text-[var(--nuit-texte)]">Your kind of night</h2>
-            <ul className="grid grid-cols-2 gap-2.5 lg:grid-cols-5">
-              {CATEGORIES.map((c) => (
-                <li key={c.slug}>
-                  <Link href={`/categories/${c.slug}`} className="flex min-h-16 items-center rounded-[18px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-4 text-[14.5px] font-bold text-[var(--nuit-texte)] no-underline">
-                    {c.nom}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </>
-      )}
-
-      {filtres && <BlocOrganisateurs className="mt-10" />}
+            <p className="mt-5">
+              <Link href="/evenements" className="text-sm font-bold text-[var(--accent-texte)] no-underline">
+                See all events
+              </Link>
+            </p>
+          </>
+        ) : (
+          <p className="text-sm text-[var(--nuit-muet)]">No upcoming events for the moment.</p>
+        )}
+      </section>
     </div>
   );
 }
@@ -290,25 +226,6 @@ function EnteteSection({ titre, href }: { titre: string; href: string }) {
       <h2 className="font-[family-name:var(--font-display)] text-2xl font-black tracking-tight text-[var(--nuit-texte)] lg:text-[30px]">{titre}</h2>
       <Link href={href} className="flex min-h-11 items-center text-sm font-bold text-[var(--accent-texte)] no-underline lg:text-[15px]">See all</Link>
     </div>
-  );
-}
-
-function BlocOrganisateurs({ className = "" }: { className?: string }) {
-  return (
-    <section className={`mt-9 lg:mt-0 ${className}`}>
-      <div className="rounded-[24px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-[22px] text-[var(--nuit-texte)]">
-        <h2 className="font-[family-name:var(--font-display)] text-[26px] leading-[1.05] font-black tracking-tight">Throwing a party?</h2>
-        <p className="mt-2.5 text-[14.5px] leading-relaxed text-[var(--nuit-muet)]">
-          Put your event in front of the whole community, in Haiti and across the diaspora.
-        </p>
-        <Link
-          href="/ajouter-evenement"
-          className="mt-4 flex min-h-12 items-center justify-center rounded-[14px] bg-[var(--accent)] px-6 text-[15px] font-extrabold text-[#1C1305] no-underline"
-        >
-          Submit my event
-        </Link>
-      </div>
-    </section>
   );
 }
 
