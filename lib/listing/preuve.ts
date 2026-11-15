@@ -20,6 +20,12 @@ function abrege(n: number): string {
   return String(n);
 }
 
+/** Nombre de vues montré tel quel dès la première (décision de Smith, 15 nov. 2026) : « 1 view », « 12 views », « 1.2k views ». */
+export function libelleVues(vues: number | null | undefined): string | null {
+  if (typeof vues !== "number" || !Number.isFinite(vues) || vues < 1) return null;
+  return vues === 1 ? "1 view" : `${abrege(Math.floor(vues))} views`;
+}
+
 /** Une seule preuve sociale par événement, vraie, par ordre d'impact : classement, vues du jour, vues cumulées. */
 export function preuveSociale(e: Source): Preuve | null {
   if (e.rang_ville === 1 && e.ville) {

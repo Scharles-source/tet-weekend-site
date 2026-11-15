@@ -7,7 +7,7 @@ import { estEnCours, estTermine, formaterQuand } from "@/lib/listing/dates";
 import { envoyer, interets, memoriserInteret, visiteur } from "@/lib/listing/engagement-client";
 import { nomLieuAffiche } from "@/lib/listing/faits";
 import { lienCourt } from "@/lib/listing/lien-court";
-import { preuveSociale } from "@/lib/listing/preuve";
+import { libelleVues, preuveSociale } from "@/lib/listing/preuve";
 import { signauxRarete } from "@/lib/listing/rarete";
 import { nomCategorie } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
@@ -85,7 +85,10 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   }
 
   const nombre = total !== null && total >= 1 ? total : null;
-  const preuve = preuveSociale(evenement);
+  // Les vues s'affichent toujours (dès 1) sous « I'm in » ; la preuve ne garde que classement / vues du jour pour ne pas répéter.
+  const vues = libelleVues(evenement.vues);
+  const preuveBrute = preuveSociale(evenement);
+  const preuve = preuveBrute && !preuveBrute.texte.endsWith(" views") ? preuveBrute : null;
   // Badges pré-calculés au chargement quand la description n'a pas voyagé (liste allégée de l'API).
   const raretes = (evenement.badges_rarete ?? signauxRarete(evenement)).slice(0, etroit ? 1 : 2);
 
@@ -179,6 +182,16 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
             {termine && "Share"}
           </button>
         </div>
+
+        {vues && (
+          <p className={`flex items-center gap-1.5 font-semibold ${etroit ? "mt-2 text-[12px]" : "mt-2.5 text-[12.5px]"}`} style={{ color: "rgba(255,255,255,0.88)" }}>
+            <svg className="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={OR} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span>{vues}</span>
+          </p>
+        )}
 
         {dedans && !termine && (
           <button type="button" onClick={() => setCarte(true)} className="mt-2.5 text-[12.5px] font-extrabold underline underline-offset-2" style={{ color: OR }}>
