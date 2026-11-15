@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { etiquettePosition, nombreProches, pointExact, POSITION_DEFAUT, positionDepuisVille, positionDetecteeFiable, type Position } from "@/lib/listing/proximite";
+import { etiquettePosition, pointExact, POSITION_DEFAUT, positionDepuisVille, positionDetecteeFiable, type Position } from "@/lib/listing/proximite";
 import type { EvenementPublic } from "@/lib/listing/types";
 
 const CLE_VILLE = "tw_ville_choisie";
@@ -88,16 +88,14 @@ export function usePosition(evenements: EvenementPublic[]) {
   return { position, choisie, choisir };
 }
 
-/** Pastille « Showing events near … · Change » : dit pourquoi le fil est dans cet ordre et laisse changer de ville. */
+/** Pastille de lieu : épingle, nom du lieu de référence et « Change » pour changer de ville. */
 export function PastilleLieu({
   position,
-  evenements,
   villes,
   choisie,
   onChoisir,
 }: {
   position: Position | null;
-  evenements: EvenementPublic[];
   villes: string[];
   choisie: string | null;
   onChoisir: (nom: string | null) => void;
@@ -105,8 +103,6 @@ export function PastilleLieu({
   const [ouvert, setOuvert] = useState(false);
   if (!position) return null;
   const nom = etiquettePosition(position);
-  const proches = nombreProches(evenements, position);
-  const texte = proches > 0 ? `Showing events near ${nom} first` : `Nothing listed near ${nom} yet. Showing everything.`;
 
   return (
     <div className="mt-5">
@@ -115,7 +111,7 @@ export function PastilleLieu({
           <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z" />
           <circle cx="12" cy="10" r="3" />
         </svg>
-        <span role="status">{texte}</span>
+        <span className="font-semibold text-[var(--nuit-texte)]">{nom}</span>
         <button type="button" onClick={() => setOuvert((o) => !o)} aria-expanded={ouvert} className="min-h-8 font-extrabold text-[var(--accent-texte)] underline underline-offset-2">
           Change
         </button>
