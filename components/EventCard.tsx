@@ -82,7 +82,7 @@ export default function EventCard({
             {isHot && (
               <span
                 style={{
-                  background: "rgba(10,10,12,0.85)",
+                  background: "rgba(38,38,44,0.85)",
                   backdropFilter: "blur(6px)",
                   fontSize: 10,
                   padding: "3px 9px",
@@ -101,7 +101,7 @@ export default function EventCard({
             {event.isRecurring && (
               <span
                 style={{
-                  background: "rgba(10,10,12,0.85)",
+                  background: "rgba(38,38,44,0.85)",
                   backdropFilter: "blur(6px)",
                   fontSize: 10,
                   padding: "3px 9px",

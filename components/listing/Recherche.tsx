@@ -22,7 +22,7 @@ const PERIODES: { valeur: Periode; label: string }[] = [
 ];
 
 const ON = "bg-[var(--nuit-texte)] text-[var(--encre)] font-extrabold";
-const OFF = "border border-[#3F3F46] text-[var(--nuit-texte)] font-semibold";
+const OFF = "border border-[#55555E] text-[var(--nuit-texte)] font-semibold";
 const PUCE = "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-xl px-4 text-sm";
 
 export function Recherche({ donnees, villes }: { donnees: Donnees; villes: string[] }) {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Affiche } from "@/components/listing/Affiche";
+import { LoupeRecherche } from "@/components/listing/LoupeRecherche";
 import { PastilleLieu, usePosition } from "@/components/listing/PositionFil";
 import { cleJour, type JourEvenements } from "@/lib/listing/jours";
 import { etiquettePosition, pointDeReference, trierParDistance, zoneDePosition } from "@/lib/listing/proximite";
@@ -121,9 +122,13 @@ export function AccueilPublic({
 
       <PastilleLieu position={position} villes={villes.map(([nom]) => nom)} choisie={choisie} onChoisir={choisir} />
 
+      {/* Dates + portée, collées sous l'en-tête dès que la page défile (l'en-tête
+          global, fixe, mesure 65 px bordure comprise) : le visiteur peut changer
+          de jour à tout moment, sans remonter en haut de la page. */}
+      <div className="sticky top-[65px] z-30 -mx-[var(--page-px)] mt-5 border-b border-[var(--nuit-ligne)] bg-[rgba(38,38,44,0.92)] px-[var(--page-px)] pt-3 pb-3 backdrop-blur-lg">
       {/* Bandeau de dates : seuls les jours qui ont des événements. */}
       {jours.length > 0 && (
-        <div className="no-scrollbar -mx-[var(--page-px)] mt-5 flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Choose a day">
+        <div className="no-scrollbar -mx-[var(--page-px)] flex gap-2 overflow-x-auto px-[var(--page-px)]" role="group" aria-label="Choose a day">
           {jours.map((j) => {
             const actif = j.cle === jourActif;
             return (
@@ -149,7 +154,7 @@ export function AccueilPublic({
       )}
 
       {/* Près de moi, ou tout le catalogue. */}
-      <div className="mt-4 flex rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-1" role="group" aria-label="Near me or everywhere">
+      <div className={`${jours.length > 0 ? "mt-3" : ""} flex rounded-full border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] p-1`} role="group" aria-label="Near me or everywhere">
         <button type="button" aria-pressed={mode === "proche"} onClick={() => setMode("proche")} className={mode === "proche" ? SEG_ON : SEG_OFF}>
           {mode === "proche" && (
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -166,6 +171,7 @@ export function AccueilPublic({
           )}
           {libelleTout}
         </button>
+      </div>
       </div>
 
       {enVogue.length > 0 && (
@@ -210,6 +216,8 @@ export function AccueilPublic({
           <p className="text-sm text-[var(--nuit-muet)]">No upcoming events for the moment.</p>
         )}
       </section>
+
+      <LoupeRecherche />
     </div>
   );
 }
@@ -240,7 +248,7 @@ function PetiteAffiche({ evenement, rang }: { evenement: EvenementPublic; rang: 
   return (
     <Link
       href={`/evenements/${evenement.slug}`}
-      className="relative block h-[230px] w-[160px] shrink-0 snap-start overflow-hidden rounded-[18px] bg-[#17171C] text-white no-underline shadow-[0_6px_16px_rgba(0,0,0,0.4)] lg:h-[270px] lg:w-[190px]"
+      className="relative block h-[230px] w-[160px] shrink-0 snap-start overflow-hidden rounded-[18px] bg-[#303037] text-white no-underline shadow-[0_6px_16px_rgba(0,0,0,0.4)] lg:h-[270px] lg:w-[190px]"
     >
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -248,7 +256,7 @@ function PetiteAffiche({ evenement, rang }: { evenement: EvenementPublic; rang: 
       ) : (
         <span className="absolute inset-0" style={{ background: "linear-gradient(160deg,#5C1A26 0%,#38121C 100%)" }} />
       )}
-      <span className="absolute inset-x-0 bottom-0 h-[130px]" style={{ background: "linear-gradient(180deg, rgba(14,14,17,0), rgba(14,14,17,0.9))" }} />
+      <span className="absolute inset-x-0 bottom-0 h-[130px]" style={{ background: "linear-gradient(180deg, rgba(18,18,22,0), rgba(18,18,22,0.9))" }} />
       <span className="absolute top-2 left-2.5 font-[family-name:var(--font-display)] text-[34px] leading-none font-black" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.55)" }}>
         {rang}
       </span>

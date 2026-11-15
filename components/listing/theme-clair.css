@@ -48,7 +48,7 @@ body:has(.theme-clair) { background: #FBF7EF; }
 .theme-clair nav a[aria-label="Rechercher"] { box-shadow: 0 8px 22px rgba(25, 20, 16, 0.28); }
 
 /* Pastille d'urgence discrète : reste sombre avec texte clair. */
-.theme-clair [class*="bg-[rgba(15,12,11,0.82)]"] { color: #FBF7EF; }
+.theme-clair [class*="bg-[rgba(18,18,22,0.82)]"] { color: #FBF7EF; }
 
 /* Bannière « À la une » : toujours sombre (flyer floué), texte clair. */
 .theme-clair section[aria-roledescription="carousel"] article { background-color: #2E2622; }

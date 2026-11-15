@@ -59,7 +59,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   const raretes = (evenement.badges_rarete ?? signauxRarete(evenement)).slice(0, etroit ? 1 : 2);
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden text-white" style={{ background: "#17171C" }}>
+    <div className="relative flex flex-1 flex-col overflow-hidden text-white" style={{ background: "#303037" }}>
       {couverture && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -72,7 +72,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           style={{ filter: "blur(28px) saturate(0.8) brightness(0.4)" }}
         />
       )}
-      <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,12,0.25), rgba(10,10,12,0.55))" }} />
+      <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(18,18,22,0.25), rgba(18,18,22,0.55))" }} />
       <div className={`relative flex flex-1 flex-col ${etroit ? "p-3" : compact ? "p-3.5" : "p-4"}`}>
         {(enCours || raretes.length > 0) && (
           <div className="mb-1.5 flex flex-wrap gap-1.5">

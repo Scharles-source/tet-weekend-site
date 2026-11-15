@@ -31,13 +31,13 @@ export function FlyerHeader({
   const cadre = flyer ? flyerFrameStyle({ publicUrl: flyer.publicUrl, cardUrl: flyer.cardUrl }) : null;
   const style =
     variant === "carte"
-      ? { backgroundColor: "#1C1C22", aspectRatio: cadre?.aspectRatio ?? "4 / 3", borderTopLeftRadius: 20, borderTopRightRadius: 20 }
+      ? { backgroundColor: "#3A3A42", aspectRatio: cadre?.aspectRatio ?? "4 / 3", borderTopLeftRadius: 20, borderTopRightRadius: 20 }
       : {
           width: "100%",
           minHeight: 240,
           maxHeight: 680,
           height: hauteurBanniere(flyer?.width, flyer?.height),
-          backgroundColor: "#1C1C22",
+          backgroundColor: "#3A3A42",
           borderRadius: 20,
         };
 

@@ -30,7 +30,7 @@ export function Affiche({ evenement, className = "", large = false }: { evenemen
   const url = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
   const categorie = nomCategorie(evenement.categorie);
   return (
-    <article className={`flex h-full flex-col overflow-hidden rounded-[22px] bg-[#17171C] ${className}`}>
+    <article className={`flex h-full flex-col overflow-hidden rounded-[22px] bg-[#303037] ${className}`}>
       <Link
         href={`/evenements/${evenement.slug}`}
         aria-label={evenement.titre}
@@ -46,7 +46,7 @@ export function Affiche({ evenement, className = "", large = false }: { evenemen
             <span className="font-[family-name:var(--font-display)] text-[28px] leading-none font-black text-balance text-white">{evenement.titre}</span>
           </div>
         )}
-        <span className="absolute top-2.5 left-2.5 rounded-full bg-[rgba(15,12,11,0.82)] px-2.5 py-1 text-xs font-bold text-[var(--nuit-texte)]">
+        <span className="absolute top-2.5 left-2.5 rounded-full bg-[rgba(18,18,22,0.82)] px-2.5 py-1 text-xs font-bold text-[var(--nuit-texte)]">
           {formaterBadge(evenement.date_debut, evenement.fuseau)}
         </span>
         <Urgence evenement={evenement} className="absolute top-2.5 right-2.5" />

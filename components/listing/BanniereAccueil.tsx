@@ -33,7 +33,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
   const e = courant.evenement;
   const lieu = [nomLieuAffiche(e), e.ville].filter(Boolean).join(" · ") || "Venue not listed";
   const badge = (
-    <span className="rounded-full bg-[#0E0E11] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
+    <span className="rounded-full bg-[#26262C] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
       {courant.sponsorise ? "SPONSORED" : "TRENDING"}
     </span>
   );
@@ -104,14 +104,14 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
             <h2 className="mt-2 line-clamp-2 h-[51px] font-[family-name:var(--font-display)] text-[22px] font-black leading-tight text-white lg:h-auto lg:text-[37px] lg:leading-[1.12]">
               {e.titre}
             </h2>
-            <p className="mt-2 flex min-w-0 items-center gap-1.5 text-[14px] text-[#D4D4D8] lg:text-[16.5px]">
+            <p className="mt-2 flex min-w-0 items-center gap-1.5 text-[14px] text-[#D8D8DC] lg:text-[16.5px]">
               <MapPin size={16} aria-hidden className="shrink-0" />
               <span className="truncate">{lieu}</span>
             </p>
             <div className="mt-auto flex items-center gap-5 pt-5 pr-[172px] lg:pt-0 lg:pr-0">
               {e.prix ? (
                 <div className="h-[64px] overflow-hidden lg:h-auto">
-                  <p className="text-[11px] font-bold tracking-[1.5px] text-[#A1A1AA]">ADMISSION</p>
+                  <p className="text-[11px] font-bold tracking-[1.5px] text-[#B4B4BC]">ADMISSION</p>
                   <p className="line-clamp-2 font-[family-name:var(--font-display)] text-[20px] font-black text-white lg:text-[26px]">{e.prix}</p>
                 </div>
               ) : null}
@@ -130,7 +130,7 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
 
       {/* Points du carrousel (mobile : sous la carte) */}
       {points("mt-3 flex items-center justify-center gap-1.5 lg:hidden", (actif) =>
-        `h-2 rounded-full ${actif ? "w-[26px] bg-[var(--accent)]" : "w-2 bg-[#3F3F46]"}`,
+        `h-2 rounded-full ${actif ? "w-[26px] bg-[var(--accent)]" : "w-2 bg-[#55555E]"}`,
       )}
     </section>
   );
