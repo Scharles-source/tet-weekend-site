@@ -30,7 +30,7 @@ export function Affiche({ evenement, className = "", large = false }: { evenemen
   const url = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
   const categorie = nomCategorie(evenement.categorie);
   return (
-    <article className={`flex h-full flex-col overflow-hidden rounded-[22px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] shadow-[0_2px_10px_rgba(23,23,28,0.06)] ${className}`}>
+    <article className={`flex h-full flex-col overflow-hidden rounded-[22px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] shadow-[0_12px_32px_rgba(23,23,28,0.14),0_3px_8px_rgba(23,23,28,0.08)] ${className}`}>
       <Link
         href={`/evenements/${evenement.slug}`}
         aria-label={evenement.titre}
