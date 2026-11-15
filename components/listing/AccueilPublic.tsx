@@ -9,6 +9,9 @@ import { PastilleLieu, usePosition } from "@/components/listing/PositionFil";
 import { dansLeWeekend } from "@/lib/listing/dates";
 import { dansLaPeriode, type Periode } from "@/lib/listing/periode";
 import { pointDeReference, trierParDistance } from "@/lib/listing/proximite";
+import { tendances } from "@/lib/listing/tendance";
+import { libelleVues } from "@/lib/listing/preuve";
+import { flyerAllege } from "@/lib/listing/image-url";
 import { CATEGORIES } from "@/lib/listing/schema";
 import type { EvenementPublic } from "@/lib/listing/types";
 
@@ -133,6 +136,8 @@ export function AccueilPublic({
     [evenements, maintenant],
   );
   const weekend = evenements.filter((e) => dansLeWeekend(e.date_debut));
+  // « Trending now » : les plus vus, seulement avec de vraies vues (voir lib/listing/tendance.ts).
+  const enVogue = useMemo(() => tendances(evenements), [evenements]);
   // « Coming up » de l'accueil : agenda de la suite — les événements déjà
   // montrés dans « Tonight or never » et « This weekend » n'y sont pas
   // rendus une deuxième fois (même correctif que les pages villes, et
@@ -143,13 +148,10 @@ export function AccueilPublic({
   return (
     <div>
       <header className="max-w-[640px]">
-        <p className="text-xs font-bold tracking-[0.16em] text-[var(--or)] uppercase">Where the party at?</p>
         <h1 className="mt-2 font-[family-name:var(--font-display)] text-[40px] leading-[1.02] font-black tracking-tight text-balance text-[var(--nuit-texte)] lg:text-[60px]">
           Partying <span className="text-[var(--accent-texte)]">in Haiti</span>
         </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-[var(--nuit-muet)] lg:text-[17px]">
-          Find your night out, in Haiti and across the diaspora, all in one place. No tickets sold here: we tell you where, when and with whom.
-        </p>
+        <p className="mt-2 text-[15px] leading-snug text-[var(--nuit-muet)] lg:text-[17px]">What&apos;s on, and what&apos;s close to you.</p>
       </header>
 
       <PastilleLieu position={position} evenements={listeBase} villes={villes.map(([nom]) => nom)} choisie={choisie} onChoisir={choisir} />
@@ -184,15 +186,23 @@ export function AccueilPublic({
               Nothing published for this pick yet. Try another moment or another city.
             </p>
           ) : (
-            <div className="grid grid-cols-2 gap-x-3 gap-y-6 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
               {resultats.map((e) => (
-                <Affiche key={e.id} evenement={e} />
+                <Affiche key={e.id} evenement={e} large />
               ))}
             </div>
           )}
         </section>
       ) : (
         <>
+          {enVogue.length > 0 && (
+            <Rangee titre="Trending now" sousTitre="The most viewed events right now." href="/evenements">
+              {enVogue.map((e, i) => (
+                <PetiteAffiche key={e.id} evenement={e} rang={i + 1} />
+              ))}
+            </Rangee>
+          )}
+
           {ceSoir.length > 0 && (
             <Rangee titre="Tonight or never" sousTitre="The countdown is real. Once it starts, it leaves this row." href="/evenements">
               {ceSoir.map((e) => (
@@ -205,27 +215,14 @@ export function AccueilPublic({
             <BanniereAccueil panneaux={panneaux} email={email} />
           </section>
 
-          <section className="mt-9 lg:mt-12">
-            <h2 className="mb-3.5 font-[family-name:var(--font-display)] text-2xl font-black tracking-tight text-[var(--nuit-texte)]">Your kind of night</h2>
-            <ul className="grid grid-cols-2 gap-2.5 lg:grid-cols-5">
-              {CATEGORIES.map((c) => (
-                <li key={c.slug}>
-                  <Link href={`/categories/${c.slug}`} className="flex min-h-16 items-center rounded-[18px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-4 text-[14.5px] font-bold text-[var(--nuit-texte)] no-underline">
-                    {c.nom}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-
           <section id="ce-weekend" className="mt-9 lg:mt-12">
             <EnteteSection titre="This weekend" href="/evenements" />
             {weekend.length === 0 ? (
               <p className="text-sm text-[var(--nuit-muet)]">Nothing published for this weekend.</p>
             ) : (
-              <div className="grid grid-cols-2 gap-x-3 gap-y-6 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
                 {weekend.map((e) => (
-                  <Affiche key={e.id} evenement={e} />
+                  <Affiche key={e.id} evenement={e} large />
                 ))}
               </div>
             )}
@@ -257,6 +254,19 @@ export function AccueilPublic({
             </section>
             <BlocOrganisateurs />
           </div>
+
+          <section className="mt-9 lg:mt-12">
+            <h2 className="mb-3.5 font-[family-name:var(--font-display)] text-2xl font-black tracking-tight text-[var(--nuit-texte)]">Your kind of night</h2>
+            <ul className="grid grid-cols-2 gap-2.5 lg:grid-cols-5">
+              {CATEGORIES.map((c) => (
+                <li key={c.slug}>
+                  <Link href={`/categories/${c.slug}`} className="flex min-h-16 items-center rounded-[18px] border border-[var(--nuit-ligne)] bg-[var(--nuit-carte)] px-4 text-[14.5px] font-bold text-[var(--nuit-texte)] no-underline">
+                    {c.nom}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
         </>
       )}
 
@@ -300,5 +310,33 @@ function BlocOrganisateurs({ className = "" }: { className?: string }) {
         </Link>
       </div>
     </section>
+  );
+}
+
+/** Petite affiche de la rangée « Trending now » : flyer rogné, rang, titre, vues. */
+function PetiteAffiche({ evenement, rang }: { evenement: EvenementPublic; rang: number }) {
+  const url = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
+  const vues = libelleVues(evenement.vues);
+  return (
+    <Link
+      href={`/evenements/${evenement.slug}`}
+      className="relative block h-[230px] w-[160px] shrink-0 snap-start overflow-hidden rounded-[18px] bg-[#2A1F1B] text-white no-underline shadow-[0_6px_16px_rgba(31,27,24,0.16)] lg:h-[270px] lg:w-[190px]"
+    >
+      {url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={flyerAllege(url, 384)} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover object-top" loading="lazy" decoding="async" />
+      ) : (
+        <span className="absolute inset-0" style={{ background: "linear-gradient(160deg,#C21810 0%,#5B1209 100%)" }} />
+      )}
+      <span className="absolute inset-x-0 bottom-0 h-[130px]" style={{ background: "linear-gradient(180deg, rgba(20,14,10,0), rgba(20,14,10,0.9))" }} />
+      <span className="absolute top-2 left-2.5 font-[family-name:var(--font-display)] text-[34px] leading-none font-black" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.55)" }}>
+        {rang}
+      </span>
+      <span className="absolute inset-x-2.5 bottom-2.5 block">
+        <span className="line-clamp-2 block font-[family-name:var(--font-display)] text-[15px] leading-tight font-black">{evenement.titre}</span>
+        {evenement.ville && <span className="mt-0.5 block truncate text-[12px] opacity-90">{evenement.ville}</span>}
+        {vues && <span className="mt-1 block text-[12px] font-semibold text-[#FFC247]">{vues}</span>}
+      </span>
+    </Link>
   );
 }

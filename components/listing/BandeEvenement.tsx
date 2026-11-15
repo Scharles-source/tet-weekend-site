@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CarteStory } from "@/components/listing/CarteStory";
 import { estEnCours, estTermine, formaterQuand } from "@/lib/listing/dates";
-import { envoyer, interets, memoriserInteret, visiteur } from "@/lib/listing/engagement-client";
 import { nomLieuAffiche } from "@/lib/listing/faits";
 import { lienCourt } from "@/lib/listing/lien-court";
 import { libelleVues, preuveSociale } from "@/lib/listing/preuve";
@@ -17,8 +16,9 @@ const OR = "#FFC247";
 
 /**
  * Bande sous le flyer : fond tiré du flyer lui-même (flou assombri), infos de l'événement,
- * badges de rareté écrits par l'organisateur, bouton « I'm in » (définitif, compteur visible
- * avant le clic), partage et une preuve sociale vraie (classement, vues du jour, vues).
+ * badges de rareté écrits par l'organisateur, nombre de vues (dès la première), bouton
+ * « Invite friends » et une preuve sociale vraie (classement, vues du jour). Plus de « I'm in »
+ * (décision de Smith, 15 nov. 2026).
  */
 export function BandeEvenement({ evenement, compact = false, etroit = false }: { evenement: EvenementPublic; compact?: boolean; etroit?: boolean }) {
   const termine = estTermine(evenement);
@@ -29,41 +29,8 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   const ou = [nomLieu, evenement.ville].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i).join(" · ");
   const couverture = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
 
-  const [dedans, setDedans] = useState(false);
-  const [total, setTotal] = useState<number | null>(evenement.interets ?? null);
-  const [occupe, setOccupe] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [carte, setCarte] = useState(false);
   const [cartePartage, setCartePartage] = useState(false);
-
-  useEffect(() => {
-    setDedans(interets().includes(evenement.id));
-  }, [evenement.id]);
-
-  /** « I'm in » ne se défait pas : un seul clic par personne et par événement, mémorisé sur l'appareil et confirmé côté serveur. */
-  async function confirmer() {
-    if (dedans || occupe) return;
-    setOccupe(true);
-    const avant = total;
-    setDedans(true);
-    setTotal((avant ?? 0) + 1);
-    memoriserInteret(evenement.id, true);
-    try {
-      const r = await envoyer({ type: "interet", evenementId: evenement.id, visiteur: visiteur() });
-      if (r?.ok && r.interesse) {
-        setTotal(r.total ?? (avant ?? 0) + 1);
-        setCarte(true);
-      } else {
-        throw new Error("non confirmé");
-      }
-    } catch {
-      setDedans(false);
-      setTotal(avant);
-      memoriserInteret(evenement.id, false);
-    } finally {
-      setOccupe(false);
-    }
-  }
 
   async function partager() {
     const url = lienCourt(evenement.id);
@@ -84,8 +51,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
     window.setTimeout(() => setMessage(null), 2500);
   }
 
-  const nombre = total !== null && total >= 1 ? total : null;
-  // Les vues s'affichent toujours (dès 1) sous « I'm in » ; la preuve ne garde que classement / vues du jour pour ne pas répéter.
+  // Les vues s'affichent toujours (dès 1), à côté de « Invite friends » ; la preuve ne garde que classement / vues du jour pour ne pas répéter.
   const vues = libelleVues(evenement.vues);
   const preuveBrute = preuveSociale(evenement);
   const preuve = preuveBrute && !preuveBrute.texte.endsWith(" views") ? preuveBrute : null;
@@ -144,61 +110,34 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           </p>
         )}
 
-        <div className={`flex items-center gap-2 ${etroit ? "mt-2.5" : "mt-3.5"}`}>
-          {!termine && (
-            <button
-              type="button"
-              aria-pressed={dedans}
-              aria-label={dedans ? "You're in" : undefined}
-              disabled={occupe || dedans}
-              onClick={confirmer}
-              className={`flex items-center justify-center rounded-full font-extrabold ${etroit ? "min-h-11 gap-1.5 px-4 text-[14px]" : "min-h-12 gap-2 px-6 text-[15px]"}`}
-              style={dedans ? { background: "transparent", color: OR, border: `2px solid ${OR}`, opacity: 1 } : { background: OR, color: "#191410" }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M20 6L9 17l-5-5" />
+        <div className={`flex items-center justify-between gap-2 ${etroit ? "mt-2.5" : "mt-3.5"}`}>
+          {vues ? (
+            <p className="flex min-w-0 items-center gap-1.5 text-[12.5px] font-semibold" style={{ color: "rgba(255,255,255,0.92)" }}>
+              <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={OR} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+                <circle cx="12" cy="12" r="3" />
               </svg>
-              {!dedans && "I'm in"}
-              {nombre !== null && (
-                <span className="rounded-[10px] px-2 py-0.5 text-[12.5px]" style={{ background: dedans ? "rgba(255,194,71,0.18)" : "rgba(25,20,16,0.14)" }}>
-                  {nombre}
-                </span>
-              )}
-            </button>
+              <span className="truncate">{vues}</span>
+            </p>
+          ) : (
+            <span />
           )}
           <button
             type="button"
-            aria-label={`Share ${evenement.titre}`}
+            aria-label={`Invite friends to ${evenement.titre}`}
             onClick={() => setCartePartage(true)}
-            className={`ml-auto flex shrink-0 items-center justify-center rounded-full ${etroit ? "h-11" : "h-12"} ${termine ? "flex-1 gap-2 px-5 text-[15px] font-extrabold" : etroit ? "w-11" : "w-12"}`}
-            style={{ border: "1.5px solid rgba(255,255,255,0.5)", color: "#FFFFFF" }}
+            className={`flex shrink-0 items-center justify-center gap-2 rounded-full font-extrabold ${etroit ? "min-h-11 px-3.5 text-[13px]" : "min-h-12 px-5 text-[14.5px]"}`}
+            style={{ background: OR, color: "#191410" }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="18" cy="5" r="3" />
-              <circle cx="6" cy="12" r="3" />
-              <circle cx="18" cy="19" r="3" />
-              <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" />
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="9" cy="8" r="3.5" />
+              <path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" />
+              <path d="M19 8v6M16 11h6" />
             </svg>
-            {termine && "Share"}
+            Invite friends
           </button>
         </div>
 
-        {vues && (
-          <p className={`flex items-center gap-1.5 font-semibold ${etroit ? "mt-2 text-[12px]" : "mt-2.5 text-[12.5px]"}`} style={{ color: "rgba(255,255,255,0.88)" }}>
-            <svg className="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={OR} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-            <span>{vues}</span>
-          </p>
-        )}
-
-        {dedans && !termine && (
-          <button type="button" onClick={() => setCarte(true)} className="mt-2.5 text-[12.5px] font-extrabold underline underline-offset-2" style={{ color: OR }}>
-            Post my card to my story
-          </button>
-        )}
-        <CarteStory evenementId={evenement.id} titre={evenement.titre} ouvert={carte} onFermer={() => setCarte(false)} />
         <CarteStory evenementId={evenement.id} titre={evenement.titre} ouvert={cartePartage} onFermer={() => setCartePartage(false)} mode="partage" secours={partager} />
 
         {(message || preuve) && (
