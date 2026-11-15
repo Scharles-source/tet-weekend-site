@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Affiche } from "@/components/listing/Affiche";
 import { BanniereAccueil, type Panneau } from "@/components/listing/BanniereAccueil";
-import { LigneEvenement } from "@/components/listing/CarteEvenement";
 import { PastilleLieu, usePosition } from "@/components/listing/PositionFil";
 import { dansLeWeekend } from "@/lib/listing/dates";
 import { dansLaPeriode, type Periode } from "@/lib/listing/periode";
@@ -149,7 +148,7 @@ export function AccueilPublic({
     <div>
       <header className="max-w-[640px]">
         <h1 className="mt-2 font-[family-name:var(--font-display)] text-[40px] leading-[1.02] font-black tracking-tight text-balance text-[var(--nuit-texte)] lg:text-[60px]">
-          Partying <span className="text-[var(--accent-texte)]">in Haiti</span>
+          Partying <span className="text-[#B8642F]">in Haiti</span>
         </h1>
         <p className="mt-2 text-[15px] leading-snug text-[var(--nuit-muet)] lg:text-[17px]">What&apos;s on, and what&apos;s close to you.</p>
       </header>
@@ -237,9 +236,9 @@ export function AccueilPublic({
                 <p className="text-sm text-[var(--nuit-muet)]">No other upcoming events.</p>
               ) : (
                 <>
-                  <div className="space-y-2.5">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3 lg:gap-4">
                     {aVenirAutres.slice(0, PLAFOND_A_VENIR).map((e) => (
-                      <LigneEvenement key={e.id} evenement={e} />
+                      <Affiche key={e.id} evenement={e} />
                     ))}
                   </div>
                   {(total ?? evenements.length) > idsMontres.size + PLAFOND_A_VENIR && (

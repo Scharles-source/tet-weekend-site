@@ -51,7 +51,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
     window.setTimeout(() => setMessage(null), 2500);
   }
 
-  // Les vues s'affichent toujours (dès 1), à côté de « Invite friends » ; la preuve ne garde que classement / vues du jour pour ne pas répéter.
+  // Les vues s'affichent toujours (dès 1) sous « I'm in » ; la preuve ne garde que classement / vues du jour pour ne pas répéter.
   const vues = libelleVues(evenement.vues);
   const preuveBrute = preuveSociale(evenement);
   const preuve = preuveBrute && !preuveBrute.texte.endsWith(" views") ? preuveBrute : null;
@@ -59,7 +59,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   const raretes = (evenement.badges_rarete ?? signauxRarete(evenement)).slice(0, etroit ? 1 : 2);
 
   return (
-    <div className="relative overflow-hidden text-white" style={{ background: "#2A1F1B" }}>
+    <div className="relative flex-1 overflow-hidden text-white" style={{ background: "#2A1F1B" }}>
       {couverture && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
