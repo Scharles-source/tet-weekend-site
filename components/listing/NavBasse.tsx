@@ -18,7 +18,7 @@ const PLUS = [
   { href: "/decembre", label: "December" },
 ];
 
-export function NavBasse({ email }: { email?: string }) {
+export function NavBasse({ email, masquee = false }: { email?: string; masquee?: boolean }) {
   const pathname = usePathname();
   const [plus, setPlus] = useState(false);
   const plusActif = PLUS.some((l) => pathname.startsWith(l.href));
@@ -36,7 +36,13 @@ export function NavBasse({ email }: { email?: string }) {
   };
 
   return (
-    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-3 md:hidden" aria-label="Navigation">
+    <nav
+      className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-3 transition-[opacity,transform,visibility] duration-250 motion-reduce:transition-none md:hidden ${
+        masquee ? "invisible translate-y-4 opacity-0" : "visible translate-y-0 opacity-100"
+      }`}
+      aria-label="Navigation"
+      aria-hidden={masquee}
+    >
       {plus && (
         <div className="pointer-events-auto mb-2 ml-auto w-56 rounded-[24px] border border-[var(--nuit-ligne)] bg-[rgba(38,38,44,0.92)] px-4 py-2 shadow-[0_12px_32px_rgba(0,0,0,.5)] backdrop-blur-xl">
           {PLUS.map((l) => (

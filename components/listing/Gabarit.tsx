@@ -1,8 +1,8 @@
 import Link from "next/link";
+import { BarreOutilsMorph } from "@/components/listing/BarreOutilsMorph";
 import { EnTete } from "@/components/listing/EnTete";
 import { InstallerApp } from "@/components/listing/InstallerApp";
 import { Logo } from "@/components/listing/Logo";
-import { LoupeRecherche } from "@/components/listing/LoupeRecherche";
 import { Mesure } from "@/components/listing/Mesure";
 import { ConfigurationSupabaseManquante, emailContact } from "@/lib/listing/data";
 
@@ -12,7 +12,7 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
   return (
     <div className="theme-nuit min-h-dvh">
       <EnTete large={large} email={email} />
-      <main className="pb-8">
+      <main className="pb-24 md:pb-10">
         <div className={`mx-auto w-full ${largeur} px-[var(--page-px)] py-6`}>{children}</div>
       </main>
       <footer className="hidden border-t border-[var(--nuit-ligne)] px-[var(--page-px)] py-8 md:block">
@@ -41,7 +41,7 @@ export async function Gabarit({ children, large = false }: { children: React.Rea
           </nav>
         </div>
       </footer>
-      <LoupeRecherche />
+      <BarreOutilsMorph email={email} />
       <Mesure />
       <InstallerApp />
     </div>
