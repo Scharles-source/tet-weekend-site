@@ -3,13 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Affiche } from "@/components/listing/Affiche";
-import { LoupeRecherche } from "@/components/listing/LoupeRecherche";
+import { BanniereAccueil, type Panneau } from "@/components/listing/BanniereAccueil";
 import { PastilleLieu, usePosition } from "@/components/listing/PositionFil";
 import { cleJour, type JourEvenements } from "@/lib/listing/jours";
 import { etiquettePosition, pointDeReference, trierParDistance, zoneDePosition } from "@/lib/listing/proximite";
-import { tendances } from "@/lib/listing/tendance";
-import { libelleVues } from "@/lib/listing/preuve";
-import { flyerAllege } from "@/lib/listing/image-url";
 import type { EvenementPublic } from "@/lib/listing/types";
 
 type Mode = "proche" | "tout";
@@ -21,12 +18,17 @@ export function AccueilPublic({
   evenements: evenementsInitiaux,
   comptesVilles,
   jours,
+  panneaux,
+  email,
 }: {
   evenements: EvenementPublic[];
   /** Comptes par ville sur la liste complète (la pastille de lieu reste exacte même si seul un premier jeu est rendu). */
   comptesVilles?: [string, number][];
   /** Jours qui ont au moins un événement à venir, comptes exacts sur la liste complète (calculés côté serveur). */
   jours: JourEvenements[];
+  /** Panneaux du carrousel vedette en haut de l'accueil (sponsorisés, puis trending). */
+  panneaux: Panneau[];
+  email: string;
 }) {
   // L'accueil reçoit un premier jeu (ce soir, ce weekend, les prochains). La
   // liste complète n'est chargée — par /api/annuaire — que si le jour choisi
@@ -97,9 +99,6 @@ export function AccueilPublic({
     () => (jour ? evenements.filter((e) => cleJour(e.date_debut, e.fuseau) === jour.cle) : []),
     [evenements, jour],
   );
-
-  // « Trending now » : les plus vus, seulement avec de vraies vues (voir lib/listing/tendance.ts).
-  const enVogue = useMemo(() => tendances(listeBase), [listeBase]);
 
   // Le deuxième segment dit « All of Haiti » tant que le visiteur est en
   // Haïti (ou pas encore situé : le site y est ancré par défaut) ; ailleurs,
@@ -174,13 +173,11 @@ export function AccueilPublic({
       </div>
       </div>
 
-      {enVogue.length > 0 && (
-        <Rangee titre="Trending now" sousTitre="The most viewed events right now." href="/evenements">
-          {enVogue.map((e, i) => (
-            <PetiteAffiche key={e.id} evenement={e} rang={i + 1} />
-          ))}
-        </Rangee>
-      )}
+      {/* Carrousel vedette : sponsorisés et trending, en grand format (la
+          bannière porte ses propres étiquettes FEATURED / TRENDING). */}
+      <section className="mt-8 lg:mt-12">
+        <BanniereAccueil panneaux={panneaux} email={email} />
+      </section>
 
       {/* Le jour choisi, et lui seul. */}
       <section className="mt-9 lg:mt-12" aria-live="polite">
@@ -216,55 +213,6 @@ export function AccueilPublic({
           <p className="text-sm text-[var(--nuit-muet)]">No upcoming events for the moment.</p>
         )}
       </section>
-
-      <LoupeRecherche />
     </div>
-  );
-}
-
-function Rangee({ titre, sousTitre, href, children }: { titre: string; sousTitre?: string; href: string; children: React.ReactNode }) {
-  return (
-    <section className="mt-8 lg:mt-12">
-      <EnteteSection titre={titre} href={href} />
-      {sousTitre && <p className="-mt-2 mb-3.5 text-[13.5px] text-[var(--nuit-muet)] lg:mb-5">{sousTitre}</p>}
-      <div className="no-scrollbar -mx-[var(--page-px)] flex snap-x gap-3 overflow-x-auto px-[var(--page-px)] lg:gap-5">{children}</div>
-    </section>
-  );
-}
-
-function EnteteSection({ titre, href }: { titre: string; href: string }) {
-  return (
-    <div className="mb-3.5 flex items-baseline justify-between gap-3 lg:mb-5">
-      <h2 className="font-[family-name:var(--font-display)] text-2xl font-black tracking-tight text-[var(--nuit-texte)] lg:text-[30px]">{titre}</h2>
-      <Link href={href} className="flex min-h-11 items-center text-sm font-bold text-[var(--accent-texte)] no-underline lg:text-[15px]">See all</Link>
-    </div>
-  );
-}
-
-/** Petite affiche de la rangée « Trending now » : flyer rogné, rang, titre, vues. */
-function PetiteAffiche({ evenement, rang }: { evenement: EvenementPublic; rang: number }) {
-  const url = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
-  const vues = libelleVues(evenement.vues);
-  return (
-    <Link
-      href={`/evenements/${evenement.slug}`}
-      className="relative block h-[230px] w-[160px] shrink-0 snap-start overflow-hidden rounded-[18px] bg-[#303037] text-white no-underline shadow-[0_6px_16px_rgba(0,0,0,0.4)] lg:h-[270px] lg:w-[190px]"
-    >
-      {url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={flyerAllege(url, 384)} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover object-top" loading="lazy" decoding="async" />
-      ) : (
-        <span className="absolute inset-0" style={{ background: "linear-gradient(160deg,#5C1A26 0%,#38121C 100%)" }} />
-      )}
-      <span className="absolute inset-x-0 bottom-0 h-[130px]" style={{ background: "linear-gradient(180deg, rgba(18,18,22,0), rgba(18,18,22,0.9))" }} />
-      <span className="absolute top-2 left-2.5 font-[family-name:var(--font-display)] text-[34px] leading-none font-black" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.55)" }}>
-        {rang}
-      </span>
-      <span className="absolute inset-x-2.5 bottom-2.5 block">
-        <span className="line-clamp-2 block font-[family-name:var(--font-display)] text-[15px] leading-tight font-black">{evenement.titre}</span>
-        {evenement.ville && <span className="mt-0.5 block truncate text-[12px] opacity-90">{evenement.ville}</span>}
-        {vues && <span className="mt-1 block text-[12px] font-semibold text-[#E9A13B]">{vues}</span>}
-      </span>
-    </Link>
   );
 }

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { AccueilPublic } from "@/components/listing/AccueilPublic";
 import { Gabarit, MessageErreurDonnees } from "@/components/listing/Gabarit";
-import { chargerAnnuaire, evenementAllege } from "@/lib/listing/data";
+import { choisirBanniere } from "@/lib/listing/banniere";
+import { chargerAnnuaire, emailContact, evenementAllege } from "@/lib/listing/data";
 import { dansLeWeekend, estTermine } from "@/lib/listing/dates";
 import { joursAvecEvenements } from "@/lib/listing/jours";
 import { dansLaPeriode } from "@/lib/listing/periode";
@@ -87,9 +88,16 @@ export default async function Accueil() {
   // Bandeau de dates de l'accueil : jours et comptes exacts, calculés sur la
   // liste complète — le client les affiche tels quels dès le premier rendu.
   const jours = joursAvecEvenements(aVenir);
+  const email = await emailContact();
   return (
     <Gabarit large>
-      <AccueilPublic evenements={initiaux.map(evenementAllege)} comptesVilles={comptesVilles} jours={jours} />
+      <AccueilPublic
+        evenements={initiaux.map(evenementAllege)}
+        comptesVilles={comptesVilles}
+        jours={jours}
+        panneaux={choisirBanniere(aVenir).map((p) => ({ ...p, evenement: evenementAllege(p.evenement) }))}
+        email={email}
+      />
     </Gabarit>
   );
 }

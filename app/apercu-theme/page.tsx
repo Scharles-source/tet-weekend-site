@@ -18,7 +18,15 @@ export default function ApercuTheme() {
   return (
     <>
       <Gabarit>
-        <AccueilPublic evenements={[sponsor, tendance, suite]} jours={joursAvecEvenements([sponsor, tendance, suite])} />
+        <AccueilPublic
+          evenements={[sponsor, tendance, suite]}
+          jours={joursAvecEvenements([sponsor, tendance, suite])}
+          panneaux={[
+            { evenement: sponsor, sponsorise: true },
+            { evenement: tendance, sponsorise: false },
+          ]}
+          email={EMAIL}
+        />
         <div className="mt-8">
           <BanniereVide email={EMAIL} />
         </div>
