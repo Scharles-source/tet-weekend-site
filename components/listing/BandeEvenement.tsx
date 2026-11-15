@@ -94,7 +94,7 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
           <p className="text-[10.5px] font-bold tracking-[0.12em] uppercase" style={{ color: OR }}>
             {quand}
             {categorie ? ` · ${categorie}` : ""}
-            {termine ? " · Event ended" : enCours ? " · Happening now" : ""}
+            {termine ? " · Event ended" : ""}
           </p>
         )}
         <h3 className={`font-[family-name:var(--font-display)] font-black leading-tight ${etroit ? "line-clamp-2 text-[15px]" : `mt-1 ${compact ? "text-[17px] lg:text-[18.5px]" : "text-[20px]"}`}`}>

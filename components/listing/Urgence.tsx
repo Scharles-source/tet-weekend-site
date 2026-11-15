@@ -15,7 +15,10 @@ export function Urgence({ evenement, className = "" }: { evenement: { date_debut
   if (!minute) return null;
   const maintenant = new Date(minute * 60_000);
   const u = urgenceDe(evenement, maintenant);
-  if (!u) {
+  // Règle Smith : un seul « Happening now » sur le site — le badge rouge de
+  // la bande des cartes. La pastille ne l'affiche donc pas : une fois
+  // l'événement commencé, elle se tait (le badge de la bande porte l'info).
+  if (!u || u.texte === "Happening now") {
     if (!estNouveau(evenement, maintenant)) return null;
     return <span className={`rounded-full bg-[var(--or)] px-2.5 py-1 text-xs font-extrabold text-[#1C1305] ${className}`}>New</span>;
   }

@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
-import { BlocDate } from "@/components/listing/BlocDate";
-import { estEnCours, formaterKicker } from "@/lib/listing/dates";
+import { formaterKicker } from "@/lib/listing/dates";
 import { nomLieuAffiche } from "@/lib/listing/faits";
 import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
@@ -32,7 +31,6 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
   if (!courant) return <BanniereVide email={email} />;
 
   const e = courant.evenement;
-  const enCours = estEnCours(e);
   const lieu = [nomLieuAffiche(e), e.ville].filter(Boolean).join(" · ") || "Venue not listed";
   const badge = (
     <span className="rounded-full bg-[#17171C] px-3 py-1.5 text-[11px] font-bold tracking-[1.5px] text-white">
@@ -79,38 +77,21 @@ export function BanniereAccueil({ panneaux, email, auto = true }: { panneaux: Pa
         )}
 
         <div className="relative flex h-[460px] flex-col lg:h-auto lg:min-h-[380px] lg:flex-row lg:items-center">
-          {/* Flyer entier, jamais recadré ; le bloc date aux couleurs du
-              flyer se pose en haut à gauche de l'image (le badge
-              « Happening now » vit dans la colonne d'infos, pas sur l'image). */}
+          {/* Flyer entier, jamais recadré */}
           <div className="flex items-center justify-center px-4 pt-4 lg:py-[30px] lg:pr-0 lg:pl-[34px]">
-            <div className="relative">
-              {e.flyer ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={flyerAllege(e.flyer.publicUrl, 640)} alt={e.titre} decoding="async" className="h-[220px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
-              ) : (
-                <div className="flex h-[220px] w-[240px] items-center justify-center rounded-[14px] bg-[rgba(0,0,0,.25)] px-4 text-center lg:h-[320px]">
-                  <p className="font-[family-name:var(--font-display)] text-[22px] font-black text-white">{e.titre}</p>
-                </div>
-              )}
-              <BlocDate
-                iso={e.date_debut}
-                fuseau={e.fuseau}
-                flyerUrl={e.flyer ? (flyerAllege(e.flyer.publicUrl, 128) ?? null) : null}
-                grand
-                className="absolute top-2 left-2"
-              />
-            </div>
+            {e.flyer ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={flyerAllege(e.flyer.publicUrl, 640)} alt={e.titre} decoding="async" className="h-[220px] w-auto max-w-full rounded-[14px] object-contain shadow-[0_18px_40px_rgba(0,0,0,.45)] lg:h-[320px]" />
+            ) : (
+              <div className="flex h-[220px] w-[240px] items-center justify-center rounded-[14px] bg-[rgba(0,0,0,.25)] px-4 text-center lg:h-[320px]">
+                <p className="font-[family-name:var(--font-display)] text-[22px] font-black text-white">{e.titre}</p>
+              </div>
+            )}
           </div>
 
           {/* Informations : bloc blanc sur mobile, texte blanc sur le fond flouté sur desktop */}
           <div className="flex flex-1 flex-col px-5 pt-1 pb-6 lg:py-[30px] lg:pr-[34px] lg:pl-7">
             <div className="mb-3 flex items-center gap-3">
-              {enCours && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E02B20] px-2 py-0.5 text-[10.5px] font-extrabold tracking-[0.06em] uppercase text-white">
-                  <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
-                  Happening now
-                </span>
-              )}
               <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-[2.5px] text-white">
                 <span className="h-[9px] w-[9px] rounded-full bg-[var(--accent)]" />
                 FEATURED

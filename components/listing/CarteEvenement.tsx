@@ -5,7 +5,7 @@ import { useState } from "react";
 import { BandeEvenement } from "@/components/listing/BandeEvenement";
 import { FlyerHeader } from "@/components/listing/FlyerHeader";
 import { FlyerViewer } from "@/components/listing/FlyerViewer";
-import { estEnCours, formaterBadge, formaterPastille } from "@/lib/listing/dates";
+import { formaterBadge, formaterPastille } from "@/lib/listing/dates";
 import { nomLieuAffiche } from "@/lib/listing/faits";
 import type { EvenementPublic } from "@/lib/listing/types";
 import { flyerAllege } from "@/lib/listing/image-url";
@@ -36,7 +36,6 @@ export function LigneEvenement({ evenement }: { evenement: EvenementPublic }) {
   const pastille = formaterPastille(evenement.date_debut, evenement.fuseau);
   const nomLieu = nomLieuAffiche(evenement);
   const ou = [nomLieu, evenement.ville].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i).join(" · ");
-  const enCours = estEnCours(evenement);
   return (
     <Link href={`/evenements/${evenement.slug}`} className="flex items-center gap-3 rounded-[16px] border-[1.5px] border-[#EFE5D2] bg-white p-3 text-inherit no-underline shadow-[0_3px_14px_rgba(23,23,28,0.1)]">
       <span className="flex h-[56px] w-[56px] shrink-0 flex-col items-center justify-center rounded-xl bg-[#FDECEA]">
@@ -46,7 +45,6 @@ export function LigneEvenement({ evenement }: { evenement: EvenementPublic }) {
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[14.5px] font-bold text-[#191410]">{evenement.titre}</span>
         <span className="block truncate text-[12.5px] text-[#8A7B66]">
-          {enCours && <span className="font-extrabold text-[#B91C1C]">Happening now · </span>}
           {ou}
         </span>
       </span>
