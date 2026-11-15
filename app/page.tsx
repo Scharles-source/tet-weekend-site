@@ -82,9 +82,6 @@ export default async function Accueil() {
   for (const e of aVenir) {
     if (prioritaires.has(e.id) || initiaux.length < 40) initiaux.push(e);
   }
-  const compte = new Map<string, number>();
-  for (const e of aVenir) if (e.ville) compte.set(e.ville, (compte.get(e.ville) ?? 0) + 1);
-  const comptesVilles = [...compte.entries()].sort((a, b) => b[1] - a[1]);
   // Bandeau de dates de l'accueil : jours et comptes exacts, calculés sur la
   // liste complète — le client les affiche tels quels dès le premier rendu.
   const jours = joursAvecEvenements(aVenir);
@@ -93,7 +90,6 @@ export default async function Accueil() {
     <Gabarit large>
       <AccueilPublic
         evenements={initiaux.map(evenementAllege)}
-        comptesVilles={comptesVilles}
         jours={jours}
         panneaux={choisirBanniere(aVenir).map((p) => ({ ...p, evenement: evenementAllege(p.evenement) }))}
         email={email}

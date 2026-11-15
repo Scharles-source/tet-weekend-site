@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Affiche } from "@/components/listing/Affiche";
 import { BanniereAccueil, type Panneau } from "@/components/listing/BanniereAccueil";
-import { PastilleLieu, usePosition } from "@/components/listing/PositionFil";
+import { usePosition } from "@/components/listing/PositionFil";
 import { cleJour, type JourEvenements } from "@/lib/listing/jours";
 import { etiquettePosition, pointDeReference, trierParDistance, zoneDePosition } from "@/lib/listing/proximite";
 import type { EvenementPublic } from "@/lib/listing/types";
@@ -16,14 +16,11 @@ const SEG_OFF = "flex min-h-11 flex-1 cursor-pointer items-center justify-center
 
 export function AccueilPublic({
   evenements: evenementsInitiaux,
-  comptesVilles,
   jours,
   panneaux,
   email,
 }: {
   evenements: EvenementPublic[];
-  /** Comptes par ville sur la liste complète (la pastille de lieu reste exacte même si seul un premier jeu est rendu). */
-  comptesVilles?: [string, number][];
   /** Jours qui ont au moins un événement à venir, comptes exacts sur la liste complète (calculés côté serveur). */
   jours: JourEvenements[];
   /** Panneaux du carrousel vedette en haut de l'accueil (sponsorisés, puis trending). */
@@ -37,15 +34,8 @@ export function AccueilPublic({
   const [tous, setTous] = useState<EvenementPublic[] | null>(null);
   const [chargement, setChargement] = useState(false);
   const listeBase = tous ?? evenementsInitiaux;
-  const { position, choisie, choisir } = usePosition(listeBase);
+  const { position } = usePosition(listeBase);
   const point = useMemo(() => pointDeReference(position), [position]);
-
-  const villes = useMemo(() => {
-    if (comptesVilles) return comptesVilles;
-    const compte = new Map<string, number>();
-    for (const e of listeBase) if (e.ville) compte.set(e.ville, (compte.get(e.ville) ?? 0) + 1);
-    return [...compte.entries()].sort((a, b) => b[1] - a[1]);
-  }, [comptesVilles, listeBase]);
 
   // Jour affiché : aujourd'hui s'il a des événements, sinon le premier jour
   // du bandeau (qui ne liste que des jours avec événements). Le choix du
@@ -105,8 +95,7 @@ export function AccueilPublic({
   // il dit simplement « All events ».
   const enHaiti = !position || position.pays === "HT" || zoneDePosition(position) === "haiti";
   const libelleTout = enHaiti ? "All of Haiti" : "All events";
-  // Le segment « près de moi » nomme le lieu de référence — la même étiquette
-  // que la pastille de lieu (etiquettePosition), pour ne jamais diverger.
+  // Le segment « près de moi » nomme le lieu de référence (etiquettePosition).
   const nomLieu = position ? etiquettePosition(position) : null;
   const libelleProche = nomLieu ? `Near me · ${nomLieu}` : "Near me";
 
@@ -118,8 +107,6 @@ export function AccueilPublic({
         </h1>
         <p className="mt-2 text-[15px] leading-snug text-[var(--nuit-muet)] lg:text-[17px]">What&apos;s on, and what&apos;s close to you.</p>
       </header>
-
-      <PastilleLieu position={position} villes={villes.map(([nom]) => nom)} choisie={choisie} onChoisir={choisir} />
 
       {/* Dates + portée, collées sous l'en-tête dès que la page défile (l'en-tête
           global, fixe, mesure 65 px bordure comprise) : le visiteur peut changer
