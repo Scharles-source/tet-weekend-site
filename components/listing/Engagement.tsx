@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { CarteStory } from "@/components/listing/CarteStory";
-import { envoyer, ecrire, interets, lire, memoriserInteret, visiteur } from "@/lib/listing/engagement-client";
-import { libelleInteret } from "@/lib/listing/engagement";
+import { envoyer, ecrire, lire, visiteur } from "@/lib/listing/engagement-client";
+import { lienCourt } from "@/lib/listing/lien-court";
+import { libelleVues } from "@/lib/listing/preuve";
 
-/** Compte une vue par jour et par visiteur, et propose « J'y vais » (anonyme, sans compte). */
-export function Engagement({ evenementId, titre = "", interetsInitiaux, termine }: { evenementId: string; titre?: string; interetsInitiaux: number | null; termine: boolean }) {
-  const [actif, setActif] = useState(false);
-  const [total, setTotal] = useState<number | null>(interetsInitiaux);
-  const [occupe, setOccupe] = useState(false);
+/**
+ * Compte une vue par jour et par visiteur (anonyme, sans compte), montre le nombre de vues dès la première
+ * et propose « Invite your friends ». Plus de « I'm in » (décision de Smith, 15 nov. 2026).
+ */
+export function Engagement({ evenementId, titre = "", termine, vues = null }: { evenementId: string; titre?: string; termine: boolean; vues?: number | null }) {
   const [carte, setCarte] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const id = visiteur();
@@ -20,57 +22,57 @@ export function Engagement({ evenementId, titre = "", interetsInitiaux, termine 
       ecrire(cle, jour);
       void envoyer({ type: "vue", evenementId, visiteur: id }).catch(() => undefined);
     }
-    setActif(interets().includes(evenementId));
   }, [evenementId, termine]);
 
   if (termine) return null;
 
-  /** « I'm in » est définitif : un seul clic par personne et par événement. */
-  async function confirmer() {
-    if (actif || occupe) return;
-    setOccupe(true);
-    const avant = total;
-    setActif(true);
-    setTotal((avant ?? 0) + 1);
-    memoriserInteret(evenementId, true);
+  /** Repli quand la carte story ne peut pas s'ouvrir : partage natif, sinon lien copié. */
+  async function partager() {
+    const url = lienCourt(evenementId);
     try {
-      const r = await envoyer({ type: "interet", evenementId, visiteur: visiteur() });
-      if (r?.ok && r.interesse) {
-        setTotal(r.total ?? (avant ?? 0) + 1);
-        setCarte(true);
-      } else throw new Error("non confirmé");
-    } catch {
-      setActif(false);
-      setTotal(avant);
-      memoriserInteret(evenementId, false);
-    } finally {
-      setOccupe(false);
+      if (typeof navigator.share === "function") {
+        await navigator.share({ title: titre, url });
+        return;
+      }
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
     }
+    try {
+      await navigator.clipboard.writeText(url);
+      setMessage("Link copied");
+    } catch {
+      setMessage(url);
+    }
+    window.setTimeout(() => setMessage(null), 2500);
   }
 
-  const nombre = libelleInteret(total) ? total : null;
+  const nombre = libelleVues(vues);
   return (
-    <div className="mt-6 flex flex-wrap items-center gap-3">
+    <div className="mt-6 flex flex-col gap-2.5">
       <button
         type="button"
-        aria-pressed={actif}
-        aria-label={actif ? "You're in" : undefined}
-        disabled={occupe || actif}
-        onClick={confirmer}
-        className={`inline-flex min-h-12 items-center gap-2 rounded-[14px] px-5 text-[15px] font-extrabold ${actif ? "bg-[var(--creme)] text-[var(--encre)]" : "border-2 border-[var(--accent)] text-[var(--nuit-texte)]"}`}
+        onClick={() => setCarte(true)}
+        className="inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-2xl border-0 bg-[var(--accent)] px-5 text-[16px] font-extrabold text-white"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M20 6L9 17l-5-5" />
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="9" cy="8" r="3.5" />
+          <path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" />
+          <path d="M19 8v6M16 11h6" />
         </svg>
-        {!actif && "I'm in"}
-        {nombre !== null && <span className="text-[13px] opacity-80">{nombre}</span>}
+        Invite your friends
       </button>
-      {actif && (
-        <button type="button" onClick={() => setCarte(true)} className="text-[13px] font-extrabold text-[var(--accent-texte)] underline underline-offset-2">
-          Post my card to my story
-        </button>
+      {(nombre || message) && (
+        <p className="flex items-center gap-1.5 text-[13.5px] font-semibold text-[var(--nuit-muet)]" role="status">
+          {!message && (
+            <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          )}
+          {message ?? nombre}
+        </p>
       )}
-      <CarteStory evenementId={evenementId} titre={titre} ouvert={carte} onFermer={() => setCarte(false)} />
+      <CarteStory evenementId={evenementId} titre={titre} ouvert={carte} onFermer={() => setCarte(false)} mode="partage" secours={partager} />
     </div>
   );
 }
