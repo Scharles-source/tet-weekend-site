@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CarteStory } from "@/components/listing/CarteStory";
 import { estEnCours, estTermine, formaterQuand } from "@/lib/listing/dates";
 import { enregistrerPartage } from "@/lib/listing/engagement-client";
 import { nomLieuAffiche } from "@/lib/listing/faits";
-import { lienCourt } from "@/lib/listing/lien-court";
+import { partagerCarteEvenement } from "@/lib/listing/partage-carte";
 import { libelleVues, preuveSociale } from "@/lib/listing/preuve";
 import { signauxRarete } from "@/lib/listing/rarete";
 import { nomCategorie } from "@/lib/listing/schema";
@@ -31,25 +30,20 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
   const couverture = evenement.flyer ? evenement.flyer.cardUrl || evenement.flyer.publicUrl : null;
 
   const [message, setMessage] = useState<string | null>(null);
-  const [cartePartage, setCartePartage] = useState(false);
+  const [partageEnCours, setPartageEnCours] = useState(false);
 
+  /** Un seul geste : la carte part directement dans la feuille de partage native (ou se télécharge, lien copié). */
   async function partager() {
-    const url = lienCourt(evenement.id);
+    if (partageEnCours) return;
+    setPartageEnCours(true);
     try {
-      if (typeof navigator.share === "function") {
-        await navigator.share({ title: evenement.titre, text: `${evenement.titre} — ${quand}`, url });
-        return;
-      }
-    } catch (e) {
-      if (e instanceof DOMException && e.name === "AbortError") return;
+      await partagerCarteEvenement(evenement.id, evenement.titre, (texte) => {
+        setMessage(texte);
+        window.setTimeout(() => setMessage(null), 3500);
+      });
+    } finally {
+      setPartageEnCours(false);
     }
-    try {
-      await navigator.clipboard.writeText(url);
-      setMessage("Link copied");
-    } catch {
-      setMessage(url);
-    }
-    window.setTimeout(() => setMessage(null), 2500);
   }
 
   // Les vues s'affichent toujours (dès 1) sous « I'm in » ; la preuve ne garde que classement / vues du jour pour ne pas répéter.
@@ -139,9 +133,10 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
             aria-label={`Invite friends to ${evenement.titre}`}
             onClick={() => {
               enregistrerPartage(evenement.id);
-              setCartePartage(true);
+              void partager();
             }}
-            className={`flex shrink-0 items-center justify-center gap-2 rounded-full font-extrabold ${etroit ? "min-h-11 px-3.5 text-[13px]" : "min-h-12 px-5 text-[14.5px]"}`}
+            disabled={partageEnCours}
+            className={`flex shrink-0 items-center justify-center gap-2 rounded-full font-extrabold disabled:opacity-70 ${etroit ? "min-h-11 px-3.5 text-[13px]" : "min-h-12 px-5 text-[14.5px]"}`}
             style={{ background: OR, color: "#1C1305" }}
           >
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -152,8 +147,6 @@ export function BandeEvenement({ evenement, compact = false, etroit = false }: {
             Invite friends
           </button>
         </div>
-
-        <CarteStory evenementId={evenement.id} titre={evenement.titre} ouvert={cartePartage} onFermer={() => setCartePartage(false)} mode="partage" secours={partager} />
       </div>
     </div>
   );

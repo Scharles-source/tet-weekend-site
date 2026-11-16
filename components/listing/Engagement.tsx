@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CarteStory } from "@/components/listing/CarteStory";
 import { enregistrerPartage, envoyer, ecrire, lire, visiteur } from "@/lib/listing/engagement-client";
-import { lienCourt } from "@/lib/listing/lien-court";
+import { partagerCarteEvenement } from "@/lib/listing/partage-carte";
 import { libelleVues } from "@/lib/listing/preuve";
 
 /**
@@ -11,8 +10,8 @@ import { libelleVues } from "@/lib/listing/preuve";
  * et propose « Invite your friends ». Plus de « I'm in » (décision de Smith, 15 nov. 2026).
  */
 export function Engagement({ evenementId, titre = "", termine, vues = null }: { evenementId: string; titre?: string; termine: boolean; vues?: number | null }) {
-  const [carte, setCarte] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [partageEnCours, setPartageEnCours] = useState(false);
 
   useEffect(() => {
     const id = visiteur();
@@ -26,24 +25,18 @@ export function Engagement({ evenementId, titre = "", termine, vues = null }: { 
 
   if (termine) return null;
 
-  /** Repli quand la carte story ne peut pas s'ouvrir : partage natif, sinon lien copié. */
+  /** Un seul geste : la carte part directement dans la feuille de partage native (ou se télécharge, lien copié). */
   async function partager() {
-    const url = lienCourt(evenementId);
+    if (partageEnCours) return;
+    setPartageEnCours(true);
     try {
-      if (typeof navigator.share === "function") {
-        await navigator.share({ title: titre, url });
-        return;
-      }
-    } catch (e) {
-      if (e instanceof DOMException && e.name === "AbortError") return;
+      await partagerCarteEvenement(evenementId, titre, (texte) => {
+        setMessage(texte);
+        window.setTimeout(() => setMessage(null), 3500);
+      });
+    } finally {
+      setPartageEnCours(false);
     }
-    try {
-      await navigator.clipboard.writeText(url);
-      setMessage("Link copied");
-    } catch {
-      setMessage(url);
-    }
-    window.setTimeout(() => setMessage(null), 2500);
   }
 
   const nombre = libelleVues(vues);
@@ -53,9 +46,10 @@ export function Engagement({ evenementId, titre = "", termine, vues = null }: { 
         type="button"
         onClick={() => {
           enregistrerPartage(evenementId);
-          setCarte(true);
+          void partager();
         }}
-        className="inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-2xl border-0 bg-[var(--accent)] px-5 text-[16px] font-extrabold text-[#1C1305]"
+        disabled={partageEnCours}
+        className="inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-2xl border-0 bg-[var(--accent)] px-5 text-[16px] font-extrabold text-[#1C1305] disabled:opacity-70"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="9" cy="8" r="3.5" />
@@ -75,7 +69,6 @@ export function Engagement({ evenementId, titre = "", termine, vues = null }: { 
           {message ?? nombre}
         </p>
       )}
-      <CarteStory evenementId={evenementId} titre={titre} ouvert={carte} onFermer={() => setCarte(false)} mode="partage" secours={partager} />
     </div>
   );
 }
